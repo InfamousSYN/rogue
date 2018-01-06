@@ -1,0 +1,9 @@
+hostapd-wpe
+freeradius-wpe
+isc-dhcp-server
+httrack
+sslsplit
+responder
+apache2
+tcpdump
+beef-xss

@@ -1,0 +1,9 @@
+### Python ###
+**.pyc
+
+### log files ###
+**.log
+
+## Certificate files ###
+core/certs/
+**.cnf
