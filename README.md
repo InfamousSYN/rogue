@@ -5,7 +5,7 @@ Introduction
 ------------
 The Rogue Toolkit is an extensible toolkit aimed at providing penetration testers an easy-to-use platform to deploy software-defined Access Points (AP) for the purpose of conducting penetration testing and red team engagements. By using Rogue, penetration testers can easily perform targeted evil twin attacks against a variety of wireless network types. 
 
-Rogue was originally forked from s0lst1c3's [eaphammer](https://github.com/s0lst1c3/eaphammer) project. The fundamental idea of the Rogue toolkit was to leverage the core concept of the eaphammer project in a significantly different way to allow for flexibility, integration and adaption to future changes to the 802.11 standards and supporting tools. Rogue is suited for the the following cases: 
+Rogue was originally forked from s0lst1c3's [eaphammer](https://github.com/s0lst1c3/eaphammer) project. The fundamental idea of the Rogue toolkit was to leverage the core concept of the eaphammer project in an alternative manner to allow for flexibility, integration and adaption to future changes to the 802.11 standards and supporting tools. Rogue is suited for the the following cases: 
 * Compromising corporate accounts to be later used in impersonation attacks to gain access to corporate wireless networks.
 * To subvert network protections, such as captive portals or client to client isolation, to be able to target and compromise connected wireless devices and using compromised devices and credentials to pivot deeper into internal networks.
 
