@@ -1,6 +1,14 @@
 The Rogue Toolkit
 =================
 
+## Getting Started
+* [Introduction](https://github.com/InfamousSYN/rogue#introduction)
+* [Usage](https://github.com/InfamousSYN/rogue#usage)
+* [Features](https://github.com/InfamousSYN/rogue/wiki/Features) list of current features and the toolkit's roadmap
+* [Installation](https://github.com/InfamousSYN/rogue/wiki/Installation) toolkit's installation guide
+* [Selecting a 802.11 protocol and authentication mode](https://github.com/InfamousSYN/rogue/wiki/Selecting-a-802.11-protocol-and-authentication-mode) toolkit's usage guide
+* [Performing Attacks](https://github.com/InfamousSYN/rogue/wiki/Performing-Attacks) a collection of Rogue attacks examples
+
 Introduction
 ------------
 The Rogue Toolkit is an extensible toolkit aimed at providing penetration testers an easy-to-use platform to deploy software-defined Access Points (AP) for the purpose of conducting penetration testing and red team engagements. By using Rogue, penetration testers can easily perform targeted evil twin attacks against a variety of wireless network types. 
@@ -8,15 +16,6 @@ The Rogue Toolkit is an extensible toolkit aimed at providing penetration tester
 Rogue was originally forked from s0lst1c3's [eaphammer](https://github.com/s0lst1c3/eaphammer) project. The fundamental idea of the Rogue toolkit was to leverage the core concept of the eaphammer project in an alternative manner to allow for flexibility, integration and adaption to future changes to the 802.11 standards and supporting tools. Rogue is suited for the the following cases: 
 * Compromising corporate accounts to be later used in impersonation attacks to gain access to corporate wireless networks.
 * To subvert network protections, such as captive portals or client to client isolation, to be able to target and compromise connected wireless devices and using compromised devices and credentials to pivot deeper into internal networks.
-
-Installation
-------------
-
-```
-git clone https://github.com/InfamousSYN/rogue.git
-cd ./rogue
-pytho install.py
-```
 
 Usage
 -----
@@ -229,9 +228,3 @@ HTTPD configuration:
                         --httpd-ssl-port overwrites --httpd-port. (Default:
                         443)
 ```
-
-## Getting Started
-* [Features](https://github.com/InfamousSYN/rogue/wiki/Features) list of current features and the toolkit's roadmap
-* [Installation](https://github.com/InfamousSYN/rogue/wiki/Installation) toolkit's installation guide
-* [Selecting a 802.11 protocol and authentication mode](https://github.com/InfamousSYN/rogue/wiki/Selecting-a-802.11-protocol-and-authentication-mode) toolkit's usage guide
-* [Performing Attacks](https://github.com/InfamousSYN/rogue/wiki/Performing-Attacks) a collection of Rogue attacks examples
