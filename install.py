@@ -24,28 +24,28 @@ if __name__ == "__main__":
     print("[*] Checking if rogue's temporary directory exists")
     try:
       os.stat(config.working_dir)
-    except
+    except:
       print("[+] Creating rogue's temporary directory")
       os.mkdir(config.working_dir)
 
     print("[*] Checking if rogue's log directory exists")
     try:
       os.stat(config.logdir)
-    except
+    except:
       print("[+] Creating rogue's log directory")
       os.mkdir(config.logdir)
 
     print("[*] Checking if sslsplit's temporary directory exists")
     try:
       os.stat(config.sslsplit_tmp)
-    except
+    except:
       print("[+] Creating rogue's temporary sslsplit directory")
       os.mkdir(config.sslsplit_tmp)
 
     print("[*] Checking if sslsplit's jail directory exists")
     try:
       os.stat(config.sslsplit_jail)
-    except
+    except:
       print("[+] Creating rogue's sslsplit jail directory")
       os.mkdir(config.sslsplit_jail)
 
