@@ -287,13 +287,14 @@ vht_oper_chwidth=%d
 # So index 42 gives center freq 5.210 GHz
 # which is channel 42 in 5G band
 #
-vht_oper_centr_freq_seg0_idx=%d
+#vht_oper_centr_freq_seg0_idx=42
 #
 # center freq = 5 GHz + (5 * index)
 # So index 159 gives center freq 5.795 GHz
 # which is channel 159 in 5G band
 #
-vht_oper_centr_freq_seg1_idx=%d
+#vht_oper_centr_freq_seg1_idx=159
+%s
 
 # Workaround to use station's nsts capability in (Re)Association Response frame
 # This may be needed with some deployed devices as an interoperability
@@ -610,13 +611,14 @@ vht_oper_chwidth=%d
 # So index 42 gives center freq 5.210 GHz
 # which is channel 42 in 5G band
 #
-vht_oper_centr_freq_seg0_idx=%d
+#vht_oper_centr_freq_seg0_idx=42
 #
 # center freq = 5 GHz + (5 * index)
 # So index 159 gives center freq 5.795 GHz
 # which is channel 159 in 5G band
 #
-vht_oper_centr_freq_seg1_idx=%d
+#vht_oper_centr_freq_seg1_idx=159
+%s
 
 # Workaround to use station's nsts capability in (Re)Association Response frame
 # This may be needed with some deployed devices as an interoperability
@@ -914,13 +916,14 @@ vht_oper_chwidth=%d
 # So index 42 gives center freq 5.210 GHz
 # which is channel 42 in 5G band
 #
-vht_oper_centr_freq_seg0_idx=%d
+#vht_oper_centr_freq_seg0_idx=42
 #
 # center freq = 5 GHz + (5 * index)
 # So index 159 gives center freq 5.795 GHz
 # which is channel 159 in 5G band
 #
-vht_oper_centr_freq_seg1_idx=%d
+#vht_oper_centr_freq_seg1_idx=159
+%s
 
 # Workaround to use station's nsts capability in (Re)Association Response frame
 # This may be needed with some deployed devices as an interoperability
@@ -1273,13 +1276,14 @@ vht_oper_chwidth=%d
 # So index 42 gives center freq 5.210 GHz
 # which is channel 42 in 5G band
 #
-vht_oper_centr_freq_seg0_idx=%d
+#vht_oper_centr_freq_seg0_idx=42
 #
 # center freq = 5 GHz + (5 * index)
 # So index 159 gives center freq 5.795 GHz
 # which is channel 159 in 5G band
 #
-vht_oper_centr_freq_seg1_idx=%d
+#vht_oper_centr_freq_seg1_idx=159
+%s
 
 # Workaround to use station's nsts capability in (Re)Association Response frame
 # This may be needed with some deployed devices as an interoperability

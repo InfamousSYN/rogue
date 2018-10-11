@@ -217,17 +217,18 @@ def set_options():
                     default=1,
                     help='VHT channel width (Default: 1).')
 
-    ieee80211ac_config.add_argument('--vht-seg0_index',
-                    dest='vht_oper_centr_freq_seg0_idx',
+    ieee80211ac_config.add_argument('--vht-operation',
+                    dest='vht_oper',
+                    type=int,
+                    choices=[0,1],
+                    default=0,
+                    help='Enable toggling between vht_oper_centr_freq_seg0_idx and vht_oper_centr_freq_seg1_idx (Default: 1 for vht_oper_centr_freq_seg0_idx).')
+
+    ieee80211ac_config.add_argument('--vht-index',
+                    dest='vht_index',
                     type=int,
                     default=42,
-                    help='index 42 gives center freq 5.210 GHz (Default: 42).')
-
-    ieee80211ac_config.add_argument('--vht-seg1_index',
-                    dest='vht_oper_centr_freq_seg1_idx',
-                    type=int,
-                    default=159,
-                    help='index 159 gives center freq 5.795 GHz (Default: 159).')
+                    help='Enables control of vht_oper_centr_freq_seg[0/1]_idx index value (Default: 42).')
 
     ieee80211ac_config.add_argument('--require-vht',
                     dest='require_vht',
@@ -631,6 +632,12 @@ def set_options():
         options['require_vht'] = 1
     else:
         options['require_vht'] = 0
+
+    if(options['vht_oper'] == 1):
+        options['vht_oper'] = "vht_oper_centr_freq_seg1_idx"
+    else:
+        options['vht_oper'] = "vht_oper_centr_freq_seg0_idx"
+    options['vht_operations'] = ("%s=%s" % (options['vht_oper'], options['vht_index']))
 
     # comments out the Wireless Multimedia Extensions (WMM) in hostapd-wpe config file if not specified
     if(options['wmm_enabled']):
