@@ -117,10 +117,13 @@ IEEE 802.11n related configuration:
 IEEE 802.11ac related configuration:
   --vht-width {0,1,2,3}
                         VHT channel width (Default: 1).
-  --vht-seg0_index VHT_OPER_CENTR_FREQ_SEG0_IDX
-                        index 42 gives center freq 5.210 GHz (Default: 42).
-  --vht-seg1_index VHT_OPER_CENTR_FREQ_SEG1_IDX
-                        index 159 gives center freq 5.795 GHz (Default: 159).
+  --vht-operation {0,1}
+                        Enable toggling between vht_oper_centr_freq_seg0_idx
+                        and vht_oper_centr_freq_seg1_idx (Default: 1 for
+                        vht_oper_centr_freq_seg0_idx).
+  --vht-index VHT_INDEX
+                        Enables control of vht_oper_centr_freq_seg[0/1]_idx
+                        index value (Default: 42).
   --require-vht         Require stations to support VHT PHY (reject
                         association if they do not) (Default: disabled).
 
