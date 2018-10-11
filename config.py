@@ -3,7 +3,7 @@ import os
 import argparse
 
 # application version
-__version__ = "1.1"
+__version__ = "1.1.1"
 
 # directory mapping
 root_dir, conf_file = os.path.split(os.path.abspath(__file__))
@@ -38,6 +38,8 @@ hostapd_conf_file = "/hostapd-wpe.conf"
 hostapd_conf_full = working_dir + hostapd_conf_file
 hostapd_command = "%s "
 hostapd_command_with_karma = "%s -k"
+hostapd_command_with_debug = "%s -d"
+hostapd_command_with_ddebug = "%s -dd"
 hostapd_log = logdir + "/hostapd-wpe.log"
 hostapd_dir = "/usr/sbin"
 hostapd_bin = hostapd_dir + "/hostapd-wpe"

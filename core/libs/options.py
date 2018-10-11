@@ -106,6 +106,18 @@ def set_options():
                     choices=['hostap','nl80211','atheros','wired','none','bsd'],
                     help='Choose the hostapd-wpe driver')
 
+    hostapd_config.add_argument('-d',
+                    dest='debug',
+                    action='store_true',
+                    default=False,
+                    help='show more hostapd-wpe debug messages')
+
+    hostapd_config.add_argument('-dd',
+                    dest='ddebug',
+                    action='store_true',
+                    default=False,
+                    help='show even more hostapd-wpe debug messages')
+
     ieee80211_config.add_argument('-B', '--bssid',
                     dest='bssid',
                     default='00:11:22:33:44:00',
@@ -539,6 +551,9 @@ def set_options():
         options['driver'] = ("driver=" + options['driver'])
     else:
         options['driver'] = ("#driver=hostap")
+
+    if(options['ddebug'] is True and options['debug'] is True):
+        parser.error('[!] Specify only -d or -dd')
 
     # comments out the country_code line in hostapd-wpe config file if not specified
     if(options['country_code'] is not None):

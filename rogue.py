@@ -322,11 +322,14 @@ if __name__ == '__main__':
     utils.IscDhcpServer.start()
 
     print("[*] Launching hostapd-wpe")
-    if options['karma']:
+    if(options['karma']):
         utils.Hostapd.hardstart(config.hostapd_command_with_karma % config.hostapd_conf_full, verbose=False)
+    if(options['debug']):
+        utils.Hostapd.hardstart(config.hostapd_command_with_debug % config.hostapd_conf_full, verbose=False)
+    if(options['ddebug']):
+        utils.Hostapd.hardstart(config.hostapd_command_with_ddebug % config.hostapd_conf_full, verbose=False)
     else:
         utils.Hostapd.hardstart(config.hostapd_command % (config.hostapd_conf_full), verbose=False)
-
 
     ##### Middle Operations #####
 
