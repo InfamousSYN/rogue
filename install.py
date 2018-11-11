@@ -10,10 +10,10 @@ if __name__ == "__main__":
   try:
     if raw_input("Do you want update your package list ('apt-get update')? [y/N]").lower() == "y":
       print("[*] Downloading package lists from repositories")
-      os.system("apt-get update")
+      os.system("apt-get update -y")
   
     print("[*] Installing Rogue's software dependencies...")
-    os.system("apt-get install %s" % read_deps_file(config.software_dep))
+    os.system("apt-get install -y %s" % read_deps_file(config.software_dep))
     print("[*] complete!")
   
     print("[*] Installing Rogue's Python dependencies...")
