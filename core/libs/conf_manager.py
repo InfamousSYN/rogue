@@ -242,6 +242,8 @@ class hostapd_open_cnf(object):
             channel=None,
             country_code=None,
             macaddr_acl=None,
+            macaddr_accept_file=None,
+            macaddr_deny_file=None,
             auth_algs=None,
             essid_mask=None,
             wmm_enabled=None,
@@ -265,6 +267,8 @@ class hostapd_open_cnf(object):
         assert channel is not None
         assert country_code is not None
         assert macaddr_acl is not None
+        assert macaddr_accept_file is not None
+        assert macaddr_deny_file is not None
         assert auth_algs is not None
         assert essid_mask is not None
         assert wmm_enabled is not None
@@ -282,7 +286,7 @@ class hostapd_open_cnf(object):
             print("[+] Creating hostapd-wpe.confg file: %s" % cls.path)
             with open(cls.path, 'w') as fd:
                 fd.write(cls.template %\
-                    (driver, interface, bssid, ssid, hw_mode, channel, country_code, ieee80211d, ieee80211h, auth_algs, essid_mask, macaddr_acl, wmm_enabled, ap_isolate, ieee80211n, ht_capab, require_ht, ieee80211ac, require_vht, vht_oper_chwidth, vht_operations))
+                    (driver, interface, bssid, ssid, hw_mode, channel, country_code, ieee80211d, ieee80211h, auth_algs, essid_mask, macaddr_acl, macaddr_accept_file, macaddr_deny_file, wmm_enabled, ap_isolate, ieee80211n, ht_capab, require_ht, ieee80211ac, require_vht, vht_oper_chwidth, vht_operations))
         except Exception as e:
             print("[!] Error: %s" % e)
             return 1
@@ -303,6 +307,8 @@ class hostapd_wep_cnf(object):
             channel=None,
             country_code=None,
             macaddr_acl=None,
+            macaddr_accept_file=None,
+            macaddr_deny_file=None,
             auth_algs=None,
             essid_mask=None,
             wmm_enabled=None,
@@ -328,6 +334,8 @@ class hostapd_wep_cnf(object):
         assert channel is not None
         assert country_code is not None
         assert macaddr_acl is not None
+        assert macaddr_accept_file is not None
+        assert macaddr_deny_file is not None
         assert auth_algs is not None
         assert essid_mask is not None
         assert wmm_enabled is not None
@@ -347,7 +355,7 @@ class hostapd_wep_cnf(object):
             print("[+] Creating hostapd-wpe.confg file: %s" % cls.path)
             with open(cls.path, 'w') as fd:
                 fd.write(cls.template %\
-                    (driver, interface, bssid, ssid, hw_mode, channel, country_code, ieee80211d, ieee80211h, auth_algs, essid_mask, macaddr_acl, wmm_enabled, ap_isolate, wep_default_key, wep_key, ieee80211n, ht_capab, require_ht, ieee80211ac, require_vht, vht_oper_chwidth, vht_operations))
+                    (driver, interface, bssid, ssid, hw_mode, channel, country_code, ieee80211d, ieee80211h, auth_algs, essid_mask, macaddr_acl, macaddr_accept_file, macaddr_deny_file, wmm_enabled, ap_isolate, wep_default_key, wep_key, ieee80211n, ht_capab, require_ht, ieee80211ac, require_vht, vht_oper_chwidth, vht_operations))
         except Exception as e:
             print("[!] Error: %s" % e)
             return 1
@@ -368,6 +376,8 @@ class hostapd_wpa_psk_cnf(object):
             channel=None,
             country_code=None,
             macaddr_acl=None,
+            macaddr_accept_file=None,
+            macaddr_deny_file=None,
             auth_algs=None,
             essid_mask=None,
             wmm_enabled=None,
@@ -395,6 +405,8 @@ class hostapd_wpa_psk_cnf(object):
         assert channel is not None
         assert country_code is not None
         assert macaddr_acl is not None
+        assert macaddr_accept_file is not None
+        assert macaddr_deny_file is not None
         assert auth_algs is not None
         assert essid_mask is not None
         assert wmm_enabled is not None
@@ -416,7 +428,7 @@ class hostapd_wpa_psk_cnf(object):
             print("[+] Creating hostapd-wpe.confg file: %s" % cls.path)
             with open(cls.path, 'w') as fd:
                 fd.write(cls.template %\
-                    (driver, interface, bssid, ssid, hw_mode, channel, country_code, ieee80211d, ieee80211h, auth_algs, essid_mask, macaddr_acl, wmm_enabled, ap_isolate, ieee80211n, ht_capab, require_ht, ieee80211ac, require_vht, vht_oper_chwidth, vht_operations, wpa, wpa_passphrase, wpa_pairwise, rsn_pairwise))
+                    (driver, interface, bssid, ssid, hw_mode, channel, country_code, ieee80211d, ieee80211h, auth_algs, essid_mask, macaddr_acl, macaddr_accept_file, macaddr_deny_file, wmm_enabled, ap_isolate, ieee80211n, ht_capab, require_ht, ieee80211ac, require_vht, vht_oper_chwidth, vht_operations, wpa, wpa_passphrase, wpa_pairwise, rsn_pairwise))
         except Exception as e:
             print("[!] Error: %s" % e)
             return 1
@@ -437,6 +449,8 @@ class hostapd_wpa_eap_cnf(object):
             channel=None,
             country_code=None,
             macaddr_acl=None,
+            macaddr_accept_file=None,
+            macaddr_deny_file=None,
             auth_algs=None,
             essid_mask=None,
             wmm_enabled=None,
@@ -478,6 +492,8 @@ class hostapd_wpa_eap_cnf(object):
         assert channel is not None
         assert country_code is not None
         assert macaddr_acl is not None
+        assert macaddr_accept_file is not None
+        assert macaddr_deny_file is not None
         assert auth_algs is not None
         assert essid_mask is not None
         assert wmm_enabled is not None
@@ -513,7 +529,7 @@ class hostapd_wpa_eap_cnf(object):
             print("[+] Creating hostapd-wpe.confg file: %s" % cls.path)
             with open(cls.path, 'w') as fd:
                 fd.write(cls.template %\
-                    (driver, interface, bssid, eap_user_file, ca_pem, server_pem, private_key, dh_file, ssid, hw_mode, channel, country_code, ieee80211d, ieee80211h, auth_algs, essid_mask, macaddr_acl, wmm_enabled, ap_isolate, ieee80211n, ht_capab, require_ht, ieee80211ac, require_vht, vht_oper_chwidth, vht_operations, wpa, wpa_pairwise, rsn_pairwise, ieee8021x, eapol_version, eapol_workaround, own_ip_addr, auth_server_addr, auth_server_port, auth_server_shared_secret, acct_server_addr, acct_server_port, acct_server_shared_secret))
+                    (driver, interface, bssid, eap_user_file, ca_pem, server_pem, private_key, dh_file, ssid, hw_mode, channel, country_code, ieee80211d, ieee80211h, auth_algs, essid_mask, macaddr_acl, macaddr_accept_file, macaddr_deny_file, wmm_enabled, ap_isolate, ieee80211n, ht_capab, require_ht, ieee80211ac, require_vht, vht_oper_chwidth, vht_operations, wpa, wpa_pairwise, rsn_pairwise, ieee8021x, eapol_version, eapol_workaround, own_ip_addr, auth_server_addr, auth_server_port, auth_server_shared_secret, acct_server_addr, acct_server_port, acct_server_shared_secret))
         except Exception as e:
             print("[!] Error: %s" % e)
             return 1

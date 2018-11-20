@@ -184,7 +184,19 @@ def set_options():
                     type=int,
                     choices=[0,1,2],
                     default=0,
-                    help='Station MAC address -based authentication')
+                    help='Station MAC address -based authentication\r\n0 = accept unless in deny list\r\n  1 = deny unless in accept list\r\n  2 = use external RADIUS (accept/deny will be searched first)\r\n(Default: 0)')
+
+    ieee80211_config.add_argument('--mac-accept-file',
+                    dest='macaddr_accept_file',
+                    type=str,
+                    default=config.hostapd_accept_file_full,
+                    help='Location of hostapd-wpe macaddr_acl accept file (Default: %s)' % config.hostapd_accept_file_full)
+
+    ieee80211_config.add_argument('--mac-deny-file',
+                    dest='macaddr_deny_file',
+                    type=str,
+                    default=config.hostapd_deny_file_full,
+                    help='Location of hostapd-wpe macaddr_acl deny file (Default: %s)' % config.hostapd_accept_file_full)
 
     ieee80211_config.add_argument('--auth-algs',
                     dest='auth_algs',

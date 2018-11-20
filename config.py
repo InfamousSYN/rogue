@@ -44,6 +44,10 @@ hostapd_log = logdir + "/hostapd-wpe.log"
 hostapd_dir = "/usr/sbin"
 hostapd_bin = hostapd_dir + "/hostapd-wpe"
 eap_user_file = "/etc/hostapd-wpe/hostapd-wpe.eap_user"
+hostapd_accept_file = "/hostapd.accept"
+hostapd_accept_file_full = working_dir + hostapd_accept_file
+hostapd_deny_file = "/hostapd.deny"
+hostapd_deny_file_full = working_dir + hostapd_deny_file
 
 # freeradius-wpe settings
 freeradius_dir = "/usr/sbin"
