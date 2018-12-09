@@ -500,6 +500,10 @@ if __name__ == '__main__':
 
     iptablesStop()
 
+    if(options['country_code'] != "#country_code=AU"):
+        print("[*] Resetting Regulatory Domain")
+        utils.set_reg()
+
     # cleanly allow network manager to regain control of interface
     utils.nmcli.set_managed(options['interface'])
 

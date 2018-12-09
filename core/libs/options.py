@@ -176,7 +176,7 @@ def set_options():
     ieee80211_config.add_argument('--country',
                     dest='country_code',
                     type=str,
-                    choices=['AU', 'US'],
+                    choices=config.hostapd_country_options,
                     help='Configures of country of operation')
 
     ieee80211_config.add_argument('--macaddr-acl',
