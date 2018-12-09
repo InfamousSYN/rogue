@@ -106,6 +106,18 @@ def set_options():
                     choices=['hostap','nl80211','atheros','wired','none','bsd'],
                     help='Choose the hostapd-wpe driver')
 
+    hostapd_config.add_argument('-d',
+                    dest='debug',
+                    action='store_true',
+                    default=False,
+                    help='show more hostapd-wpe debug messages')
+
+    hostapd_config.add_argument('-dd',
+                    dest='ddebug',
+                    action='store_true',
+                    default=False,
+                    help='show even more hostapd-wpe debug messages')
+
     ieee80211_config.add_argument('-B', '--bssid',
                     dest='bssid',
                     default='00:11:22:33:44:00',
@@ -164,7 +176,7 @@ def set_options():
     ieee80211_config.add_argument('--country',
                     dest='country_code',
                     type=str,
-                    choices=['AU', 'US'],
+                    choices=config.hostapd_country_options,
                     help='Configures of country of operation')
 
     ieee80211_config.add_argument('--macaddr-acl',
@@ -172,7 +184,19 @@ def set_options():
                     type=int,
                     choices=[0,1,2],
                     default=0,
-                    help='Station MAC address -based authentication')
+                    help='Station MAC address -based authentication\r\n0 = accept unless in deny list\r\n  1 = deny unless in accept list\r\n  2 = use external RADIUS (accept/deny will be searched first)\r\n(Default: 0)')
+
+    ieee80211_config.add_argument('--mac-accept-file',
+                    dest='macaddr_accept_file',
+                    type=str,
+                    default=config.hostapd_accept_file_full,
+                    help='Location of hostapd-wpe macaddr_acl accept file (Default: %s)' % config.hostapd_accept_file_full)
+
+    ieee80211_config.add_argument('--mac-deny-file',
+                    dest='macaddr_deny_file',
+                    type=str,
+                    default=config.hostapd_deny_file_full,
+                    help='Location of hostapd-wpe macaddr_acl deny file (Default: %s)' % config.hostapd_accept_file_full)
 
     ieee80211_config.add_argument('--auth-algs',
                     dest='auth_algs',
@@ -539,6 +563,9 @@ def set_options():
         options['driver'] = ("driver=" + options['driver'])
     else:
         options['driver'] = ("#driver=hostap")
+
+    if(options['ddebug'] is True and options['debug'] is True):
+        parser.error('[!] Specify only -d or -dd')
 
     # comments out the country_code line in hostapd-wpe config file if not specified
     if(options['country_code'] is not None):

@@ -3,7 +3,7 @@ import os
 import argparse
 
 # application version
-__version__ = "1.1"
+__version__ = "1.1.3"
 
 # directory mapping
 root_dir, conf_file = os.path.split(os.path.abspath(__file__))
@@ -38,10 +38,17 @@ hostapd_conf_file = "/hostapd-wpe.conf"
 hostapd_conf_full = working_dir + hostapd_conf_file
 hostapd_command = "%s "
 hostapd_command_with_karma = "%s -k"
+hostapd_command_with_debug = "%s -d"
+hostapd_command_with_ddebug = "%s -dd"
 hostapd_log = logdir + "/hostapd-wpe.log"
 hostapd_dir = "/usr/sbin"
 hostapd_bin = hostapd_dir + "/hostapd-wpe"
 eap_user_file = "/etc/hostapd-wpe/hostapd-wpe.eap_user"
+hostapd_accept_file = "/hostapd.accept"
+hostapd_accept_file_full = working_dir + hostapd_accept_file
+hostapd_deny_file = "/hostapd.deny"
+hostapd_deny_file_full = working_dir + hostapd_deny_file
+hostapd_country_options = ["AD", "AE", "AF", "AG", "AI", "AL", "AM", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BQ", "BR", "BS", "BT", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CR", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DJ", "DK", "DM", "DO", "DZ", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "FI", "FJ", "FK", "FM", "FO", "FR", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SV", "SX", "SY", "SZ", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "YE", "YT", "ZA", "ZM", "ZW"]
 
 # freeradius-wpe settings
 freeradius_dir = "/usr/sbin"

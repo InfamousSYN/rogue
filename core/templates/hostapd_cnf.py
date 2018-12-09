@@ -92,6 +92,12 @@ ignore_broadcast_ssid=%d
 # 2 = use external RADIUS server (accept/deny lists are searched first)
 macaddr_acl=%d
 
+# Accept/deny lists are read from separate files (containing list of
+# MAC addresses, one per line). Use absolute path name to make sure that the
+# files can be read on SIGHUP configuration reloads.
+accept_mac_file=%s
+deny_mac_file=%s
+
 # Default WMM parameters (IEEE 802.11 draft; 11-03-0504-03-000e):
 # for 802.11a or 802.11g networks
 # These parameters are sent to WMM clients when they associate.
@@ -396,6 +402,12 @@ ignore_broadcast_ssid=%d
 # 1 = deny unless in accept list
 # 2 = use external RADIUS server (accept/deny lists are searched first)
 macaddr_acl=%d
+
+# Accept/deny lists are read from separate files (containing list of
+# MAC addresses, one per line). Use absolute path name to make sure that the
+# files can be read on SIGHUP configuration reloads.
+accept_mac_file=%s
+deny_mac_file=%s
 
 # Default WMM parameters (IEEE 802.11 draft; 11-03-0504-03-000e):
 # for 802.11a or 802.11g networks
@@ -720,6 +732,12 @@ ignore_broadcast_ssid=%d
 # 1 = deny unless in accept list
 # 2 = use external RADIUS server (accept/deny lists are searched first)
 macaddr_acl=%d
+
+# Accept/deny lists are read from separate files (containing list of
+# MAC addresses, one per line). Use absolute path name to make sure that the
+# files can be read on SIGHUP configuration reloads.
+accept_mac_file=%s
+deny_mac_file=%s
 
 # Default WMM parameters (IEEE 802.11 draft; 11-03-0504-03-000e):
 # for 802.11a or 802.11g networks
@@ -1080,6 +1098,12 @@ ignore_broadcast_ssid=%d
 # 1 = deny unless in accept list
 # 2 = use external RADIUS server (accept/deny lists are searched first)
 macaddr_acl=%d
+
+# Accept/deny lists are read from separate files (containing list of
+# MAC addresses, one per line). Use absolute path name to make sure that the
+# files can be read on SIGHUP configuration reloads.
+accept_mac_file=%s
+deny_mac_file=%s
 
 # Default WMM parameters (IEEE 802.11 draft; 11-03-0504-03-000e):
 # for 802.11a or 802.11g networks

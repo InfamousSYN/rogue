@@ -242,3 +242,6 @@ class Iptables(object):
     @staticmethod
     def sslsplit_rules(sslsplit_encrypted_port):
         os.system('iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports %d' % sslsplit_encrypted_port)
+
+def set_reg():
+    os.system('iw reg set 00')

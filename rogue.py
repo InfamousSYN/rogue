@@ -147,6 +147,8 @@ if __name__ == '__main__':
             channel=options['channel'],
             country_code=options['country_code'],
             macaddr_acl=options['macaddr_acl'],
+            macaddr_accept_file=options['macaddr_accept_file'],
+            macaddr_deny_file=options['macaddr_deny_file'],
             auth_algs=options['auth_algs'],
             essid_mask=options['essid_mask'],
             wmm_enabled=options['wmm_enabled'],
@@ -171,6 +173,8 @@ if __name__ == '__main__':
             channel=options['channel'],
             country_code=options['country_code'],
             macaddr_acl=options['macaddr_acl'],
+            macaddr_accept_file=options['macaddr_accept_file'],
+            macaddr_deny_file=options['macaddr_deny_file'],
             auth_algs=options['auth_algs'],
             essid_mask=options['essid_mask'],
             wmm_enabled=options['wmm_enabled'],
@@ -197,6 +201,8 @@ if __name__ == '__main__':
             channel=options['channel'],
             country_code=options['country_code'],
             macaddr_acl=options['macaddr_acl'],
+            macaddr_accept_file=options['macaddr_accept_file'],
+            macaddr_deny_file=options['macaddr_deny_file'],
             auth_algs=options['auth_algs'],
             essid_mask=options['essid_mask'],
             wmm_enabled=options['wmm_enabled'],
@@ -225,6 +231,8 @@ if __name__ == '__main__':
             channel=options['channel'],
             country_code=options['country_code'],
             macaddr_acl=options['macaddr_acl'],
+            macaddr_accept_file=options['macaddr_accept_file'],
+            macaddr_deny_file=options['macaddr_deny_file'],
             auth_algs=options['auth_algs'],
             essid_mask=options['essid_mask'],
             wmm_enabled=options['wmm_enabled'],
@@ -322,11 +330,14 @@ if __name__ == '__main__':
     utils.IscDhcpServer.start()
 
     print("[*] Launching hostapd-wpe")
-    if options['karma']:
+    if(options['karma']):
         utils.Hostapd.hardstart(config.hostapd_command_with_karma % config.hostapd_conf_full, verbose=False)
+    if(options['debug']):
+        utils.Hostapd.hardstart(config.hostapd_command_with_debug % config.hostapd_conf_full, verbose=False)
+    if(options['ddebug']):
+        utils.Hostapd.hardstart(config.hostapd_command_with_ddebug % config.hostapd_conf_full, verbose=False)
     else:
         utils.Hostapd.hardstart(config.hostapd_command % (config.hostapd_conf_full), verbose=False)
-
 
     ##### Middle Operations #####
 
@@ -488,6 +499,10 @@ if __name__ == '__main__':
         pass
 
     iptablesStop()
+
+    if(options['country_code'] != "#country_code=AU"):
+        print("[*] Resetting Regulatory Domain")
+        utils.set_reg()
 
     # cleanly allow network manager to regain control of interface
     utils.nmcli.set_managed(options['interface'])

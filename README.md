@@ -45,6 +45,8 @@ optional arguments:
 hostapd configuration:
   --driver {hostap,nl80211,atheros,wired,none,bsd}
                         Choose the hostapd-wpe driver
+  -d                    show more hostapd-wpe debug messages
+  -dd                   show even more hostapd-wpe debug messages
 
 Attack Arguments:
   --karma               Enable Karma.
@@ -88,7 +90,16 @@ IEEE 802.11 related configuration:
                         to find an unused channel)
   --country {AU,US}     Configures of country of operation
   --macaddr-acl {0,1,2}
-                        Station MAC address -based authentication
+                        Station MAC address -based authentication 0 = accept
+                        unless in deny list 1 = deny unless in accept list 2 =
+                        use external RADIUS (accept/deny will be searched
+                        first) (Default: 0)
+  --mac-accept-file MACADDR_ACCEPT_FILE
+                        Location of hostapd-wpe macaddr_acl accept file
+                        (Default: rogue/tmp/hostapd.accept)
+  --mac-deny-file MACADDR_DENY_FILE
+                        Location of hostapd-wpe macaddr_acl deny file
+                        (Default: rogue/tmp/hostapd.accept)
   --auth-algs {1,2,3}   IEEE 802.11 specifies two authentication algorithms. 1
                         allows only WPA2 authentication algorithms. 2 is WEP.
                         3 allows both.
