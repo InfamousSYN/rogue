@@ -35,6 +35,7 @@ dh_file = certs_dir + "/dh"
 
 # rogue options default values
 rogue_bssid = "00:11:22:33:44:00"
+rogue_essid = "rogue"
 rogue_auth = "open"
 rogue_hw_mode = "g"
 rogue_channel = 0

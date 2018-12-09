@@ -5,8 +5,11 @@ import config
 
 def set_options():
     parser = ArgumentParser(prog="%(prog)s",
-                            description="The Rogue Toolkit is an extensible toolkit aimed at providing penetration testers an easy-to-use platform to deploy software-defined Access Points (AP) for the purpose of conducting penetration testing and red team engagements. By using Rogue, penetration testers can easily perform targeted evil twin attacks against a variety of wireless network types.",
-                            usage="python rogue.py -I wlan0 -H g -C 6 --auth open --internet"
+                            description="The Rogue Toolkit is an extensible toolkit aimed at providing penetration testers an easy-to-use platform to deploy\
+                            software-defined Access Points (AP) for the purpose of conducting penetration testing and red team engagements. By using Rogue, \
+                            penetration testers can easily perform targeted evil twin attacks against a variety of wireless network types.",
+                            usage="python rogue.py -i wlan0 -h g -c 6 -e rogue --auth open --internet",
+                            add_help=False
                             )
 
     hostapd_config = parser.add_argument_group(
@@ -95,7 +98,7 @@ def set_options():
                     Note: httrack will create a directory in this location with the name of the site cloned. \r\n\
                     (Default: %s)' % config.httrack_dest)
 
-    parser.add_argument('-I', '--interface',
+    parser.add_argument('-i', '--interface',
                     dest='interface',
                     type=str,
                     help='The phy interface on which to create the AP')
@@ -118,19 +121,19 @@ def set_options():
                     default=False,
                     help='show even more hostapd-wpe debug messages')
 
-    ieee80211_config.add_argument('-B', '--bssid',
+    ieee80211_config.add_argument('-b', '--bssid',
                     dest='bssid',
                     default=config.rogue_bssid,
                     type=str,
                     help='Specify access point BSSID (Default: %s)' % (config.rogue_bssid))
 
-    ieee80211_config.add_argument('-E', '--essid',
+    ieee80211_config.add_argument('-e', '--essid',
                     dest='essid',
                     type=str,
-                    default='rogue',
-                    help='Specify access point ESSID')
+                    default=config.rogue_essid,
+                    help='Specify access point ESSID (Default: %s)' % config.rogue_essid)
 
-    ieee80211_config.add_argument('-H', '--hw-mode',
+    ieee80211_config.add_argument('-h', '--hw-mode',
                     dest='hw_mode',
                     type=str,
                     choices=['a','b','g','n','ac'],
@@ -167,7 +170,7 @@ def set_options():
                     default=True,
                     help='Disables Short GI for 40 MHz for HT capabilities.')
 
-    ieee80211_config.add_argument('-C', '--channel',
+    ieee80211_config.add_argument('-c', '--channel',
                     dest='channel',
                     type=int,
                     default=config.rogue_channel,
@@ -252,7 +255,7 @@ def set_options():
                     dest='vht_index',
                     type=int,
                     default=config.rogue_vht_index_options,
-                    help='Enables control of vht_oper_centr_freq_seg[0/1]_idx index value (Default: %s).' % (config.rogue_vht_index_option))
+                    help='Enables control of vht_oper_centr_freq_seg[0/1]_idx index value (Default: %s).' % (config.rogue_vht_index_options))
 
     ieee80211ac_config.add_argument('--require-vht',
                     dest='require_vht',
@@ -413,7 +416,7 @@ def set_options():
                     1 = send empty (length=0) SSID in beacon and ignore probe request for broadcast SSID \
                     2 = clear SSID (ASCII 0), but keep the original length (this may be required with some clients \
                     that do not support empty SSID) and ignore probe requests for broadcast SSID \
-                    (Default: 0)' % config.rogue_essid_mask)
+                    (Default: %s)' % config.rogue_essid_mask)
 
     attacks.add_argument('--hostile-portal',
                     dest='hostile_portal',
@@ -506,7 +509,7 @@ def set_options():
                     dest='secondary_interface',
                     type=str,
                     default=config.secondary_interface,
-                    help='Used to specify the second phy interface used to bridge the hostapd-wpe interface (-I) with another network (Default: %s)' % (config.secondary_interface))
+                    help='Used to specify the second phy interface used to bridge the hostapd-wpe interface (-i) with another network (Default: %s)' % (config.secondary_interface))
 
     dhcp.add_argument('--pool-start',
                     dest='dhcp_pool_start',

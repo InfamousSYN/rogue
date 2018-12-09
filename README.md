@@ -21,7 +21,7 @@ Usage
 -----
 
 ```
-usage: python rogue.py -I wlan0 -H g -C 6 --auth open --internet
+usage: python rogue.py -i wlan0 -h g -c 6 -e rogue --auth open --internet
 
 The Rogue Toolkit is an extensible toolkit aimed at providing penetration
 testers an easy-to-use platform to deploy software-defined Access Points (AP)
@@ -30,7 +30,6 @@ using Rogue, penetration testers can easily perform targeted evil twin attacks
 against a variety of wireless network types.
 
 optional arguments:
-  -h, --help            show this help message and exit
   -w PCAP_FILENAME, --write PCAP_FILENAME
                         Write all collected wireless frames to a pcap file.
   --internet            Provide network access
@@ -39,7 +38,7 @@ optional arguments:
   --cert-wizard         Use this flag to create a new RADIUS cert for your AP
   --clone-wizard        Used to clone a target website
   --show-options        Display configured options.
-  -I INTERFACE, --interface INTERFACE
+  -i INTERFACE, --interface INTERFACE
                         The phy interface on which to create the AP
 
 hostapd configuration:
@@ -78,17 +77,19 @@ Attack Arguments:
                         file
 
 IEEE 802.11 related configuration:
-  -B BSSID, --bssid BSSID
-                        Specify access point BSSID
-  -E ESSID, --essid ESSID
-                        Specify access point ESSID
-  -H {a,b,g,n,ac}, --hw-mode {a,b,g,n,ac}
+  -b BSSID, --bssid BSSID
+                        Specify access point BSSID (Default:
+                        00:11:22:33:44:00)
+  -e ESSID, --essid ESSID
+                        Specify access point ESSID (Default: rogue)
+  -h {a,b,g,n,ac}, --hw-mode {a,b,g,n,ac}
                         Specify access point hardware mode (Default: g).
   --freq {2,5}          Specify the radio band to use (Default: 2GHz).
-  -C CHANNEL, --channel CHANNEL
+  -c CHANNEL, --channel CHANNEL
                         Specify access point channel. (Default: 0 - with ACS
                         to find an unused channel)
-  --country {AU,US}     Configures of country of operation
+  --country {AD,AE,AF,AG,AI,AL,AM,AO,AQ,AR,AS,AT,AU,AW,AX,AZ,BA,BB,BD,BE,BF,BG,BH,BI,BJ,BL,BM,BN,BO,BQ,BQ,BR,BS,BT,BV,BW,BY,BZ,CA,CC,CD,CF,CG,CH,CI,CK,CL,CM,CN,CO,CR,CU,CV,CW,CX,CY,CZ,DE,DJ,DK,DM,DO,DZ,EC,EE,EG,EH,ER,ES,ET,FI,FJ,FK,FM,FO,FR,GA,GB,GD,GE,GF,GG,GH,GI,GL,GM,GN,GP,GQ,GR,GS,GT,GU,GW,GY,HK,HM,HN,HR,HT,HU,ID,IE,IL,IM,IN,IO,IQ,IR,IS,IT,JE,JM,JO,JP,KE,KG,KH,KI,KM,KN,KP,KR,KW,KY,KZ,LA,LB,LC,LI,LK,LR,LS,LT,LU,LV,LY,MA,MC,MD,ME,MF,MG,MH,MK,ML,MM,MN,MO,MP,MQ,MR,MS,MT,MU,MV,MW,MX,MY,MZ,NA,NC,NE,NF,NG,NI,NL,NO,NP,NR,NU,NZ,OM,PA,PE,PF,PG,PH,PK,PL,PM,PN,PR,PS,PT,PW,PY,QA,RE,RO,RS,RU,RW,SA,SB,SC,SD,SE,SG,SH,SI,SJ,SK,SL,SM,SN,SO,SR,SS,ST,SV,SX,SY,SZ,TC,TD,TF,TG,TH,TJ,TK,TL,TM,TN,TO,TR,TT,TV,TW,TZ,UA,UG,UM,US,UY,UZ,VA,VC,VE,VG,VI,VN,VU,WF,WS,YE,YT,ZA,ZM,ZW}
+                        Configures of country of operation
   --macaddr-acl {0,1,2}
                         Station MAC address -based authentication 0 = accept
                         unless in deny list 1 = deny unless in accept list 2 =
@@ -102,7 +103,7 @@ IEEE 802.11 related configuration:
                         (Default: rogue/tmp/hostapd.accept)
   --auth-algs {1,2,3}   IEEE 802.11 specifies two authentication algorithms. 1
                         allows only WPA2 authentication algorithms. 2 is WEP.
-                        3 allows both.
+                        3 allows both. (Default: 3)
   --wmm-enabled         Enable Wireless Multimedia Extensions
   --ieee80211d          Enabling IEEE 802.11d advertises the country_code and
                         the set of allowed channels and transmit power levels
@@ -129,9 +130,9 @@ IEEE 802.11ac related configuration:
   --vht-width {0,1,2,3}
                         VHT channel width (Default: 1).
   --vht-operation {0,1}
-                        Enable toggling between vht_oper_centr_freq_seg0_idx
-                        and vht_oper_centr_freq_seg1_idx (Default: 1 for
-                        vht_oper_centr_freq_seg0_idx).
+                        Enable toggling between 0 for
+                        vht_oper_centr_freq_seg0_idx and 1 for
+                        vht_oper_centr_freq_seg1_idx (Default: 0).
   --vht-index VHT_INDEX
                         Enables control of vht_oper_centr_freq_seg[0/1]_idx
                         index value (Default: 42).
@@ -155,7 +156,7 @@ WEP authentication configuration:
 IEEE 802.1X-2004 configuration:
   --ieee8021x           Enable 802.1x
   --eapol-version {1,2}
-                        IEEE 802.1X/EAPOL version
+                        IEEE 802.1X/EAPOL version (Default: 2)
   --eapol-workaround    EAPOL-Key index workaround (set bit7) for WinXP
                         Supplicant
 
@@ -206,7 +207,7 @@ External DHCP configuration:
                         (Default: 10.254.239.1)
   --secondary-interface SECONDARY_INTERFACE
                         Used to specify the second phy interface used to
-                        bridge the hostapd-wpe interface (-I) with another
+                        bridge the hostapd-wpe interface (-i) with another
                         network (Default: eth0)
   --pool-start DHCP_POOL_START
                         (Default: 10.254.239.10)
