@@ -63,8 +63,8 @@ def set_options():
                     dest='auth',
                     type=str,
                     choices=['open','wep','wpa-personal','wpa-enterprise'],
-                    default='open',
-                    help='Specify auth type. (Default: open)')
+                    default=config.rogue_auth,
+                    help='Specify auth type. (Default: %s)' % config.rogue_auth)
 
     parser.add_argument('--cert-wizard',
                     dest='cert_wizard',
@@ -120,9 +120,9 @@ def set_options():
 
     ieee80211_config.add_argument('-B', '--bssid',
                     dest='bssid',
-                    default='00:11:22:33:44:00',
+                    default=config.rogue_bssid,
                     type=str,
-                    help='Specify access point BSSID')
+                    help='Specify access point BSSID (Default: %s)' % (config.rogue_bssid))
 
     ieee80211_config.add_argument('-E', '--essid',
                     dest='essid',
@@ -134,26 +134,26 @@ def set_options():
                     dest='hw_mode',
                     type=str,
                     choices=['a','b','g','n','ac'],
-                    default='g',
-                    help='Specify access point hardware mode (Default: g).')
+                    default=config.rogue_hw_mode,
+                    help='Specify access point hardware mode (Default: %s).' % config.rogue_hw_mode)
 
     ieee80211_config.add_argument('--freq',
                     dest='freq',
                     type=int,
                     choices=[2,5],
-                    default=2,
-                    help='Specify the radio band to use (Default: 2GHz).')
+                    default=config.rogue_default_frequency,
+                    help='Specify the radio band to use (Default: %sGHz).' % config.rogue_default_frequency)
 
     ieee80211n_config.add_argument('--ht-mode',
                     dest='ht_mode',
                     type=int,
                     choices=[0,1,2],
-                    default=0,
+                    default=config.rogue_ht_mode,
                     help='Configure supported channel width set\
                     0 = Feature disabled\
                     1 = [HT40-] (2.4 GHz = 5-13, 5 GHz = 40,48,56,64)\
                     2 = [HT40+] (2.4 GHz = 1-7 (1-9 in Europe/Japan), 5 GHz = 36,44,52,60)\
-                    (Default = 0). ')
+                    (Default = %s). ' % config.rogue_ht_mode)
 
     ieee80211n_config.add_argument('--disable-short20',
                     dest='short20',
@@ -170,21 +170,21 @@ def set_options():
     ieee80211_config.add_argument('-C', '--channel',
                     dest='channel',
                     type=int,
-                    default=0,
-                    help='Specify access point channel. (Default: 0 - with ACS to find an unused channel)')
+                    default=config.rogue_channel,
+                    help='Specify access point channel. (Default: %s - with ACS to find an unused channel)' % config.rogue_channel)
 
     ieee80211_config.add_argument('--country',
                     dest='country_code',
                     type=str,
-                    choices=config.hostapd_country_options,
+                    choices=config.rogue_country_options,
                     help='Configures of country of operation')
 
     ieee80211_config.add_argument('--macaddr-acl',
                     dest='macaddr_acl',
                     type=int,
                     choices=[0,1,2],
-                    default=0,
-                    help='Station MAC address -based authentication\r\n0 = accept unless in deny list\r\n  1 = deny unless in accept list\r\n  2 = use external RADIUS (accept/deny will be searched first)\r\n(Default: 0)')
+                    default=config.rogue_macaddr_acl,
+                    help='Station MAC address -based authentication\r\n0 = accept unless in deny list\r\n  1 = deny unless in accept list\r\n  2 = use external RADIUS (accept/deny will be searched first)\r\n(Default: %s)' % config.rogue_macaddr_acl)
 
     ieee80211_config.add_argument('--mac-accept-file',
                     dest='macaddr_accept_file',
@@ -202,8 +202,8 @@ def set_options():
                     dest='auth_algs',
                     type=int,
                     choices=[1,2,3],
-                    default=3,
-                    help='IEEE 802.11 specifies two authentication algorithms. 1 allows only WPA2 authentication algorithms. 2 is WEP. 3 allows both.')
+                    default=config.rogue_auth_algs,
+                    help='IEEE 802.11 specifies two authentication algorithms. 1 allows only WPA2 authentication algorithms. 2 is WEP. 3 allows both. (Default: %s)' % config.rogue_auth_algs)
 
     ieee80211_config.add_argument('--wmm-enabled',
                     dest='wmm_enabled',
@@ -238,21 +238,21 @@ def set_options():
                     dest='vht_oper_chwidth',
                     type=int,
                     choices=[0,1,2,3],
-                    default=1,
-                    help='VHT channel width (Default: 1).')
+                    default=config.rogue_vht_index,
+                    help='VHT channel width (Default: %s).' % config.rogue_vht_index)
 
     ieee80211ac_config.add_argument('--vht-operation',
                     dest='vht_oper',
                     type=int,
                     choices=[0,1],
-                    default=0,
-                    help='Enable toggling between vht_oper_centr_freq_seg0_idx and vht_oper_centr_freq_seg1_idx (Default: 1 for vht_oper_centr_freq_seg0_idx).')
+                    default=config.rogue_vht_operations,
+                    help='Enable toggling between 0 for vht_oper_centr_freq_seg0_idx and 1 for vht_oper_centr_freq_seg1_idx (Default: %s).' % config.rogue_vht_operations)
 
     ieee80211ac_config.add_argument('--vht-index',
                     dest='vht_index',
                     type=int,
-                    default=42,
-                    help='Enables control of vht_oper_centr_freq_seg[0/1]_idx index value (Default: 42).')
+                    default=config.rogue_vht_index_options,
+                    help='Enables control of vht_oper_centr_freq_seg[0/1]_idx index value (Default: %s).' % (config.rogue_vht_index_option))
 
     ieee80211ac_config.add_argument('--require-vht',
                     dest='require_vht',
@@ -280,8 +280,8 @@ def set_options():
                     dest='wpa',
                     type=int,
                     choices=[1,2,3],
-                    default=2,
-                    help='Specify WPA type (Default: 2).')
+                    default=config.rogue_wpa_version,
+                    help='Specify WPA type (Default: %s).' % config.rogue_wpa_version)
 
     wpa_psk_config.add_argument('--wpa-pairwise',
                     dest='wpa_pairwise',
@@ -307,8 +307,8 @@ def set_options():
                     dest='eapol_version',
                     type=int,
                     choices=[1,2],
-                    default=2,
-                    help='IEEE 802.1X/EAPOL version')
+                    default=config.rogue_eapol_version,
+                    help='IEEE 802.1X/EAPOL version (Default: %s)' % config.rogue_eapol_version)
 
     ieee8021x_config.add_argument('--eapol-workaround',
                     dest='eapol_workaround',
@@ -380,9 +380,9 @@ def set_options():
     radius_config.add_argument('--eap-type',
                     dest='default_eap_type',
                     type=str,
-                    default='md5',
+                    default=config.rogue_default_eap_type,
                     choices=['fast','peap','ttls','tls','leap','pwd','md5','gtc'],
-                    help='(Default: md5)')
+                    help='(Default: %s)' % (config.rogue_default_eap_type))
 
     radius_config.add_argument('--print-creds',
                     dest='print_creds',
@@ -408,12 +408,12 @@ def set_options():
                     dest='essid_mask',
                     type=int,
                     choices=[0,1,2],
-                    default=0,
+                    default=config.rogue_essid_mask,
                     help='Send empty SSID in beacons and ignore probe request frames that do not specify full SSID. \
                     1 = send empty (length=0) SSID in beacon and ignore probe request for broadcast SSID \
                     2 = clear SSID (ASCII 0), but keep the original length (this may be required with some clients \
                     that do not support empty SSID) and ignore probe requests for broadcast SSID \
-                    (Default: 0)')
+                    (Default: 0)' % config.rogue_essid_mask)
 
     attacks.add_argument('--hostile-portal',
                     dest='hostile_portal',
