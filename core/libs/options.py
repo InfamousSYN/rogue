@@ -319,17 +319,17 @@ def set_options():
                     default=False,
                     help='EAPOL-Key index workaround (set bit7) for WinXP Supplicant')
 
-    radius_config.add_argument('--log-badpass',
+    radius_config.add_argument('--no-log-badpass',
                     dest='log_badpass',
                     action='store_true',
-                    default=True,
-                    help='logs password if it\'s rejected')
+                    default=False,
+                    help='When set, incorrect passwords will not be logged')
 
-    radius_config.add_argument('--log-goodpass',
+    radius_config.add_argument('--no-log-goodpass',
                     dest='log_goodpass',
                     action='store_true',
-                    default=True,
-                    help='logs password if it\'s correct')
+                    default=False,
+                    help='When set, valid passwords will not be logged')
 
     radius_config.add_argument('--own-address',
                     dest='own_ip_addr',
@@ -710,14 +710,14 @@ def set_options():
 
     # Radius Configuration
     if(options['log_goodpass']):
-        options['log_goodpass'] = 'yes'
-    else:
         options['log_goodpass'] = 'no'
+    else:
+        options['log_goodpass'] = 'yes'
 
     if(options['log_badpass']):
-        options['log_badpass'] = 'yes'
-    else:
         options['log_badpass'] = 'no'
+    else:
+        options['log_badpass'] = 'yes'
 
     if(options['clone_wizard']):
         if options['clone_target'] is None:
