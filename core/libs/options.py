@@ -3,8 +3,330 @@ from argparse import *
 import sys
 import config
 
+class optionsClass():
+
+    def __init__(self, options, parser):
+        self.options = options
+        self.parser = parser
+        for key, value in options.iteritems():
+            setattr(self, key, value)
+        del self.options
+
+    def __reassemble__(self):
+        del self.parser
+        return self.__dict__
+
+    def check_debug(self):
+        '''
+        checks to make sure that only one of the hostapd-wpe debugging options is set
+        '''
+        if(self.ddebug is True and self.debug is True):
+            parser.error('[!] Specify only -d or -dd')
+
+    def check_driver(self):
+        if(self.driver is not None):
+            self.set_driver(1)
+        else:
+            self.set_driver(0)
+
+    def set_driver(self, value):
+        if(value > 0):
+            self.driver = ("driver=%s" % (self.driver))
+        else:
+            self.driver = "#driver=hostap"
+
+    def check_country(self):
+        if(self.country_code is not None):
+            self.set_country(1)
+        else:
+            self.set_country(0)
+
+    def set_country(self, value):
+        if(value > 0):
+            self.country_code = ("country_code=%s" % (self.country_code))
+        else:
+            self.country_code = "#country_code=00"
+
+    def check_80211d(self):
+        if((self.ieee80211d) and (self.country_code is None)):
+            self.parser.error('[!] --ieee80211d has been provided without --country-code.')
+        elif((self.ieee80211d) and (self.country_code is not None)):
+            self.set_80211d(1)
+        else:
+            self.set_80211d(0)
+
+    def set_80211d(self, value):
+        if(value > 0):
+            self.ieee80211d = 1
+        else:
+            self.ieee80211d = 0
+
+    def check_80211h(self):
+        if((self.ieee80211d is False) and (self.ieee80211h is True)):
+            self.parser.error('[!] --ieee80211h has been provided without --ieee80211d.')
+        elif((self.ieee80211d is True) and (self.ieee80211h is True)):
+            self.set_80211h(1)
+        else:
+            self.set_80211h(0)
+
+    def set_80211h(self, value):
+        if(value > 0):
+            self.ieee80211h = 1
+        else:
+            self.ieee80211h = 0
+
+    def check_hw_mode(self):
+        if(self.hw_mode == 'n'):
+            self.minimum_N_hwmode()
+        elif(self.hw_mode == 'ac'):
+            self.minimum_AC_hwmode()
+        elif(self.hw_mode == 'a'):
+            self.minimum_A_hwmode()
+        else:
+            self.default_hwmode()
+
+    def check_channel(self):
+        if((self.freq == 2) and (self.channel != 0)):
+            if(self.channel > 13):
+                self.parser.error("[!] The provided channel %d can not be used with Radio Band 2.4GHz." % (self.channel))
+        if((self.hw_mode == 'a' or self.freq == 5) and (self.channel != 0)):
+            if(self.channel < 13):
+                self.parser.error("[!] The provided channel %d can not be used with Radio Band 5.0GHz." % (self.channel))
+
+    def check_require_ht(self):
+        if(self.require_ht):
+            self.set_require_ht(1)
+            # toggles ht_mode to an active state when the config file default value is unaltered
+            if(self.ht_mode == 0):
+                self.set_ht_mode(2)
+        else:
+            self.set_require_ht(0)
+
+        if(self.ht_mode > 0):
+            self.set_ht_capab(1)
+        else:
+            self.set_ht_capab(0)
+    def set_ht_mode(self, value):
+        self.ht_mode = value
+
+    def set_require_ht(self, value):
+        self.require_ht = value
+
+    def set_ht_capab(self, value):
+        if(value > 0):
+            self.ht_capab = 'ht_capab='
+            if(self.ht_mode == 1):
+                self.ht_capab += '[HT40+]'
+            elif(self.ht_mode == 2):
+                self.ht_capab += '[HT40+]'
+            else:
+                pass
+            if(self.short20):
+                self.ht_capab += '[SHORT-GI-20]'
+            if(self.short40):
+                self.ht_capab += '[SHORT-GI-40]'
+        else:
+            self.ht_capab = '#ht_capab='
+
+    def check_require_vht(self):
+        if(self.require_vht):
+            self.set_require_vht(1)
+        else:
+            self.set_require_vht(0)
+
+    def set_require_vht(self, value):
+        self.require_vht = value
+
+    def check_vht_operations(self):
+        if(self.vht_oper == 1):
+            self.set_vht_operations(1)
+        else:
+            self.set_vht_operations(0)
+
+    def set_vht_operations(self, value):
+        self.vht_oper = ("vht_oper_centr_freq_seg%s_idx" % (value))
+        setattr(self, "vht_operations", ("%s=%s" % (self.vht_oper, self.vht_index)))
+
+    def check_wmm_enabled(self):
+        if(self.wmm_enabled):
+            self.set_wmm_enabled(1)
+        else:
+            self.set_wmm_enabled(0)
+
+    def set_wmm_enabled(self, value):
+        if(value > 0):
+            self.wmm_enabled = 'wmm_enabled=1'
+        else:
+            self.wmm_enabled = '#wmm_enabled=1'
+
+    def check_ap_isolate(self):
+        if(self.ap_isolate):
+            self.set_ap_isolate(1)
+        else:
+            self.set_ap_isolate(0)
+
+    def set_ap_isolate(self, value):
+        if(value > 0):
+            self.ap_isolate = 1
+        else:
+            self.ap_isolate = 0
+
+    def check_auth(self):
+        if(self.auth == 'wep'):
+            self.check_wep()
+        elif(self.auth == 'wpa'):
+            self.check_wpa_passphrase()
+        else:
+            pass
+
+    def check_wep(self):
+        if((self.wep_default_key is None) or (self.wep_key is None)):
+            self.parser.error("[!] Please configure wep related configuration options: ['%s','%s']" % ("wep-key-version", "wep-key"))
+        elif((self.wep_default_key == 1) or (self.wep_default_key == 3)):
+            self.set_wep_key(self.wep_default_key, 0, self.wep_key)
+        elif((self.wep_default_key == 0) or (self.wep_default_key == 2)):
+            self.set_wep_key(self.wep_default_key, 1, self.wep_key)
+        else:
+            pass
+
+    def set_wep_key(self, value, method, key):
+        if(method > 0):
+            self.wep_key = ('wep_key%s=%s' % (value, key))
+        else:
+            self.wep_key = ('wep_key%s="%s"' % (value, key))
+
+    def check_wpa_passphrase(self):
+        if((self.auth == 'wpa') and (self.wpa_passphrase is None)):
+            self.parser.error("[!] Please configure provide the following wpa-personal configuration options: ['%s']" % ("--wpa-passphrase"))
+
+    #
+    ## IEEE 802.1x Configuration
+    #
+
+    def check_8021x(self):
+        if(self.ieee8021x):
+            self.set_8021x(1)
+        else:
+            self.set_8021x(0)
+
+    def set_8021x(self, value):
+        self.ieee8021x = value
+
+    def check_eapol_workaround(self):
+        if(self.eapol_workaround):
+            self.set_eapol_workaround(1)
+        else:
+            self.set_eapol_workaround(0)
+
+    def set_eapol_workaround(self, value):
+        self.eapol_workaround = value
+
+    #
+    ## RADIUS Configuration
+    #
+
+    def check_log_goodpass(self):
+        if(self.log_goodpass):
+            self.set_log_goodpass('no')
+        else:
+            self.set_log_goodpass('yes')
+
+    def set_log_goodpass(self, value):
+        self.log_goodpass = value
+
+    def check_log_badpass(self):
+        if(self.log_badpass):
+            self.set_log_badpass('no')
+        else:
+            self.set_log_badpass('yes')
+
+    def set_log_badpass(self, value):
+        self.log_badpass = value
+
+    #
+    ## Attack Configuration
+    #
+
+    def check_clone_wizard(self):
+        if((self.clone_wizard is True) and (self.clone_target is None)):
+            parser.error("[!] Please set a target site to clone")
+
+    def check_hostile_mode(self):
+        if(self.hostile_mode == 'beef'):
+            self.set_hostile_hook(config.beef_hook)
+        elif(self.hostile_mode == 'responder'):
+            self.set_hostile_hook(config.responder_hook)
+            self.responder = True
+        elif(self.hostile_mode == 'http'):
+            self.set_enable_httpd(True)
+        else:
+            self.set_enable_httpd(False)
+
+    def set_hostile_hook(self, value):
+        self.hostile_hook = value
+
+    def check_hostile_portal(self):
+        if((self.hostile_portal is True) and (self.hostile_mode is None)):
+            self.parser.error("[!] Please select a hostile portal operation mode using --hostile-mode")
+        elif((self.hostile_portal is not True) and (self.hostile_mode is not None)):
+            parser.error("[!] A --hostile-mode has been specified without enabling --hostile-portal.")
+        elif((self.hostile_portal is True) and (self.hostile_mode == 'http')):
+            self.set_enable_httpd(True)
+        else:
+            pass
+
+    def set_enable_httpd(self, value):
+        setattr(self, 'enable_httpd', value)
+        if(self.enable_httpd):
+            self.check_httpd_ssl()
+
+    def check_httpd_ssl(self):
+        if(self.httpd_ssl):
+            self.set_httpd_port(self.http_ssl_port)
+
+    def set_httpd_port(self, value):
+        self.httpd_port = value
+
+    def check_hostile_location(self):
+        if(self.hostile_location is not None):
+            self.set_httpd_root(self.hostile_location)
+
+    def set_httpd_root(self, value):
+        self.httpd_root = value
+
+
+    # minimum settings
+    def minimum_N_hwmode(self):
+        if(self.freq == 5):
+            self.hw_mode = 'a'
+        else:
+            self.hw_mode = 'g'
+        self.ieee80211n = 1
+        self.ieee80211ac = 0
+        self.wmm_enabled = 1
+
+    def minimum_AC_hwmode(self):
+        self.hw_mode = 'a'
+        self.freq = 5
+        self.ieee80211n = 1
+        self.ieee80211ac = 1
+        self.wmm_enabled = 1
+
+    def minimum_A_hwmode(self):
+        self.hw_mode = 'a'
+        self.freq = 5
+        self.ieee80211n = 0
+        self.ieee80211ac = 0
+        self.wmm_enabled = 0
+
+    def default_hwmode(self):
+        self.ieee80211n = 0
+        self.ieee80211ac = 0
+        self.wmm_enabled = 0
+
+
 def set_options():
-    parser = ArgumentParser(prog="%(prog)s",
+    parser = ArgumentParser(prog=sys.argv[0],
                             description="The Rogue Toolkit is an extensible toolkit aimed at providing penetration testers an easy-to-use platform to deploy\
                             software-defined Access Points (AP) for the purpose of conducting penetration testing and red team engagements. By using Rogue, \
                             penetration testers can easily perform targeted evil twin attacks against a variety of wireless network types.",
@@ -561,200 +883,37 @@ def set_options():
     args, leftovers = parser.parse_known_args()
     options = args.__dict__
 
-    # Set driver value
-    if(options['driver'] is not None):
-        options['driver'] = ("driver=" + options['driver'])
-    else:
-        options['driver'] = ("#driver=hostap")
+    o = optionsClass(options, parser)
 
-    if(options['ddebug'] is True and options['debug'] is True):
-        parser.error('[!] Specify only -d or -dd')
 
-    # comments out the country_code line in hostapd-wpe config file if not specified
-    if(options['country_code'] is not None):
-        options['country_code'] = ("country_code=" + options['country_code'])
-    else:
-        options['country_code'] = "#country_code=AU"
-
-    if(options['ieee80211d']):
-        if(options['country_code'] is None):
-            parser.error('[!] --ieee80211d has been provided without --country-code.')
-        else:
-            options['ieee80211d'] = 1
-    else:
-        pass
-
-    if(options['ieee80211h']):
-        options['ieee80211h'] = 1
-    else:
-        pass
-
-    if(options['ieee80211h']):
-        if(options['ieee80211d']):
-            pass
-        else:
-            parser.error('[!] --ieee80211h has been provided without --ieee80211d.')
-    else:
-        pass
-
-    # 802.11 Operation Modes
-    if(options['hw_mode'] == 'n'):
-        if(options['freq'] == 2):
-            options['hw_mode'] = 'g'
-            if(options['channel'] > 13):
-                parser.error("[!] The provided channel %d can not be used with Radio Band 2.4GHz." % (options['channel']))
-            else:
-                pass
-        else:
-            options['hw_mode'] = 'a'
-            if(options['channel'] == 0):
-                pass
-            elif(options['channel'] < 13):
-                parser.error("[!] The provided channel %d can not be used with Radio Band 5.0GHz." % (options['channel']))
-            else:
-                pass
-        options['ieee80211n'] = 1
-        options['ieee80211ac'] = 0
-        options['wmm_enabled'] = 1
-    elif(options['hw_mode'] == 'a'):
-        options['hw_mode'] = 'a'
-        options['ieee80211n'] = 0
-        options['ieee80211ac'] = 0
-    elif options['hw_mode'] == 'ac':
-        options['hw_mode'] = 'a'
-        if(options['channel'] == 0):
-            pass
-        elif(options['channel'] < 13):
-            parser.error("[!] The provided channel %d can not be used with Radio Band 5.0GHz." % (options['channel']))
-        else:
-            pass
-        options['ieee80211n'] = 1
-        options['ieee80211ac'] = 1
-    else:
-        options['ieee80211n'] = 0
-        options['ieee80211ac'] = 0
-
-    # Configures HT Capabilities
-    if(options['require_ht']):
-        options['require_ht'] = 1
-    else:
-        options['require_ht'] = 0
-
-    if(options['ht_mode'] == 0):
-        options['ht_capab'] = '#ht_capab='
-    else:
-        options['ht_capab'] = 'ht_capab='
-        if(options['ht_mode'] == 1):
-            options['ht_capab'] += '[HT40-]'
-        else:
-            options['ht_capab'] += '[HT40+]'
-    if(options['short20']):
-        options['ht_capab'] += '[SHORT-GI-20]'
-    else:
-        pass
-    if(options['short40']):
-        options['ht_capab'] += '[SHORT-GI-40]'
-    else:
-        pass
-
-    # Configures VHT Capabilities
-    if(options['require_vht']):
-        options['require_vht'] = 1
-    else:
-        options['require_vht'] = 0
-
-    if(options['vht_oper'] == 1):
-        options['vht_oper'] = "vht_oper_centr_freq_seg1_idx"
-    else:
-        options['vht_oper'] = "vht_oper_centr_freq_seg0_idx"
-    options['vht_operations'] = ("%s=%s" % (options['vht_oper'], options['vht_index']))
-
-    # comments out the Wireless Multimedia Extensions (WMM) in hostapd-wpe config file if not specified
-    if(options['wmm_enabled']):
-        options['wmm_enabled'] = "wmm_enabled=1"
-    else:
-        options['wmm_enabled'] = "#wmm_enabled=1"
-
-    if(options['auth'] == 'wep'):
-        if (options['wep_default_key'] is None) or (options['wep_key'] is None):
-            paser.error("[!] Please configure wep related configuration options: ['%s','%s']" % ("wep-key-version", "wep-key"))
-        else:
-            # Set wep-key object
-            if (options['wep_default_key'] == 1) or (options['wep_default_key'] == 3):
-                options['wep_key'] = ("wep_key" + str(options['wep_default_key']) + "=" + "\"" + options['wep_key'] + "\"")
-            else:
-                options['wep_key'] = ("wep_key" + str(options['wep_default_key']) + "=" + options['wep_key'])
-    else:
-        pass
-
-    if(options['auth'] == 'wpa'):
-        if (options['wpa_passphrase'] is None):
-            parser.error("[!] Please configure provide the following wpa-personal configuration options: ['%s']" % ("wpa-passphrase"))
-
-    # 802.11 Configuration
-    if(options['ap_isolate']):
-        options['ap_isolate'] = 1
-    else:
-        options['ap_isolate'] = 0
+    o.check_debug()
+    o.check_driver()
+    o.check_country()
+    o.check_80211d()
+    o.check_80211h()
+    o.check_hw_mode()
+    o.check_channel()
+    o.check_require_ht()
+    o.check_require_vht()
+    o.check_vht_operations()
+    o.check_wmm_enabled()
+    o.check_ap_isolate()
+    o.check_auth()
 
     # 802.1x Configuration
-    if(options['ieee8021x']):
-        options['ieee8021x'] = 1
-    else:
-        options['ieee8021x'] = 0
+    o.check_8021x()
+    o.check_eapol_workaround()
 
-    if(options['eapol_workaround']):
-        options['eapol_workaround'] = 1
-    else:
-        options['eapol_workaround'] = 0
+    # RADIUS Configuration
+    o.check_log_goodpass()
+    o.check_log_badpass()
 
-    # Radius Configuration
-    if(options['log_goodpass']):
-        options['log_goodpass'] = 'no'
-    else:
-        options['log_goodpass'] = 'yes'
+    # Attack Configurations
+    o.check_clone_wizard()
+    o.check_hostile_portal()
+    o.check_hostile_mode()
+    o.check_hostile_location()
 
-    if(options['log_badpass']):
-        options['log_badpass'] = 'no'
-    else:
-        options['log_badpass'] = 'yes'
-
-    if(options['clone_wizard']):
-        if options['clone_target'] is None:
-            parser.error("[!] Please set a target site to clone")
-
-    if(options['hostile_portal']):
-        if(options['hostile_mode'] is None):
-            parser.error("[!] Please select a hostile portal operation mode using --hostile-mode")
-        else:
-            pass
-
-    if(options['hostile_mode'] is not None):
-        if(options['hostile_portal'] is not True):
-            parser.error("[!] A --hostile-mode has been specified without enabling --hostile-portal.")
-
-    if(options['hostile_hook'] is None):
-        if(options['hostile_mode'] == 'beef'):
-            options['hostile_hook'] = config.beef_hook
-        elif(options['hostile_mode'] == 'responder'):
-            options['hostile_hook'] = config.responder_hook
-            options['responder'] = True
-        else:
-            pass
-    else:
-        pass
-
-    if(options['hostile_location'] is not None):
-        options['httpd_root'] = options['hostile_location']
-    else:
-        pass
-
-    if(options['httpd_ssl']):
-        options['httpd_port'] = options['http_ssl_port']
-
-    if(options['hostile_portal']):
-        options['enable_httpd'] = True
-    else:
-        options['enable_httpd'] = False
+    options = o.__reassemble__()
 
     return options
