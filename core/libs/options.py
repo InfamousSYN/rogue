@@ -400,6 +400,12 @@ def set_options():
                     default=None,
                     help='Write all collected wireless frames to a pcap file.')
 
+    parser.add_argument('-m', '--manual',
+                    dest='hostapd_manual_conf',
+                    type=str,
+                    default=None,
+                    help='Loads a custom hostapd config file instead of dynamically generating a file')
+
     parser.add_argument('--internet',
                     dest='internet',
                     action='store_true',

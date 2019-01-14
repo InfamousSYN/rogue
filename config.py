@@ -3,7 +3,7 @@ import os
 import argparse
 
 # application version
-__version__ = "1.2.2"
+__version__ = "1.2.3"
 
 # directory mapping
 root_dir, conf_file = os.path.split(os.path.abspath(__file__))

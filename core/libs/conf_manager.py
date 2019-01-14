@@ -534,6 +534,24 @@ class hostapd_wpa_eap_cnf(object):
             print("[!] Error: %s" % e)
             return 1
 
+class hostapd_custom_cnf(object):
+    path = config.hostapd_conf_full
+
+    @classmethod
+    def configure(cls,
+        hostapd_location=None
+        ):
+
+        assert hostapd_location is not None
+
+        try:
+            print("[+] Copying custom hostapd-wpe.conf file to default rogue hostapd-wpe.conf file:\r\n %s -> %s" % (hostapd_location, cls.path))
+            os.system('cp %s %s' % (hostapd_location, cls.path))
+        except Exception as e:
+            print("[!] Error: %s" % e)
+            return 1
+
+
 class http_cnf(object):
 
     path = config.http_conf_full
