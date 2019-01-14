@@ -2,6 +2,7 @@
 from argparse import *
 import sys
 import config
+import re
 
 class optionsClass():
 
@@ -183,11 +184,31 @@ class optionsClass():
         if((self.wep_default_key is None) or (self.wep_key is None)):
             self.parser.error("[!] Please configure wep related configuration options: ['%s','%s']" % ("wep-key-version", "wep-key"))
         elif((self.wep_default_key == 1) or (self.wep_default_key == 3)):
-            self.set_wep_key(self.wep_default_key, 0, self.wep_key)
+            if(self.check_wep_key_size(self.wep_default_key, self.wep_key)):
+                self.set_wep_key(self.wep_default_key, 0, self.wep_key)
+            else:
+                self.parser.error("[!] The wep key size is %s, please choose a 40-bit, 104-bit or 128-bit key instead")
         elif((self.wep_default_key == 0) or (self.wep_default_key == 2)):
-            self.set_wep_key(self.wep_default_key, 1, self.wep_key)
+            if(self.check_wep_key_size(self.wep_default_key, self.wep_key)):
+                self.set_wep_key(self.wep_default_key, 1, self.wep_key)
+            else:
+                self.parser.error("[!] The wep key size is %s, please choose a 40-bit, 104-bit or 128-bit key instead")
         else:
             pass
+
+    def check_wep_key_size(self, method, key):
+        try:
+            for k in [40, 104, 128]:
+                if((method == 0) or (method == 2)):
+                    if(len(re.findall('..', key))*8 == k):
+                        return True
+                    raise
+                elif((method == 1) or (method == 3)):
+                    if(len(key)*8 == k):
+                        return True
+            raise
+        except Exception as e:
+            return False
 
     def set_wep_key(self, value, method, key):
         if(method > 0):
