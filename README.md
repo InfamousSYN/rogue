@@ -32,6 +32,9 @@ against a variety of wireless network types.
 optional arguments:
   -w PCAP_FILENAME, --write PCAP_FILENAME
                         Write all collected wireless frames to a pcap file.
+  -m HOSTAPD_MANUAL_CONF, --manual HOSTAPD_MANUAL_CONF
+                        Loads a custom hostapd config file instead of
+                        dynamically generating a file
   --internet            Provide network access
   --auth {open,wep,wpa-personal,wpa-enterprise}
                         Specify auth type. (Default: open)
@@ -97,10 +100,10 @@ IEEE 802.11 related configuration:
                         first) (Default: 0)
   --mac-accept-file MACADDR_ACCEPT_FILE
                         Location of hostapd-wpe macaddr_acl accept file
-                        (Default: rogue/tmp/hostapd.accept)
+                        (Default: /home/rogue/tmp/hostapd.accept)
   --mac-deny-file MACADDR_DENY_FILE
                         Location of hostapd-wpe macaddr_acl deny file
-                        (Default: rogue/tmp/hostapd.accept)
+                        (Default: /home/rogue/tmp/hostapd.accept)
   --auth-algs {1,2,3}   IEEE 802.11 specifies two authentication algorithms. 1
                         allows only WPA2 authentication algorithms. 2 is WEP.
                         3 allows both. (Default: 3)
@@ -161,8 +164,8 @@ IEEE 802.1X-2004 configuration:
                         Supplicant
 
 RADIUS client configuration:
-  --log-badpass         logs password if it's rejected
-  --log-goodpass        logs password if it's correct
+  --no-log-badpass      When set, incorrect passwords will not be logged
+  --no-log-goodpass     When set, valid passwords will not be logged
   --own-address OWN_IP_ADDR
                         The own IP address of the access point (Default:
                         127.0.0.1)
@@ -185,8 +188,12 @@ RADIUS client configuration:
                         1813)
   --radius-proto {udp,tcp,*}
                         (Default: *)
-  --eap-type {fast,peap,ttls,tls,leap,pwd,md5,gtc}
-                        (Default: md5)
+  --default-eap {fast,peap,ttls,tls,leap,pwd,md5,gtc}
+                        Specify the default EAP method used in RADIUS
+                        authentication. (Default: md5)
+  -E {all,fast,peap,ttls,tls,leap,pwd,md5,gtc}, --supported-eap {all,fast,peap,ttls,tls,leap,pwd,md5,gtc}
+                        Specify the default EAP method used in RADIUS
+                        authentication. (Default: md5)
   --print-creds         Print intercepted credentials
 
 External DHCP configuration:
