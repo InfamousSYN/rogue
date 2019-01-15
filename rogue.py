@@ -345,16 +345,8 @@ if __name__ == '__main__':
                 log_badpass=options['log_badpass']
             )
 
-            if(options['auth'] == 'fast'):
-                conf_manager.freeradius_eap_fast_conf.configure(
-                    default_eap_type=options['default_eap_type'],
-                    private_key_file=config.private_key,
-                    certificate_file=config.server_pem,
-                    ca_file=config.ca_pem,
-                    dh_file=config.dh_file,
-                    ca_path=config.certs_dir
-                )
-            else:
+            if(options['supported_eap_type'] == 'all'):
+                print("hit")
                 conf_manager.freeradius_eap_conf.configure(
                     default_eap_type=options['default_eap_type'],
                     private_key_file=config.private_key,
@@ -363,6 +355,56 @@ if __name__ == '__main__':
                     dh_file=config.dh_file,
                     ca_path=config.certs_dir
                 )
+            elif(options['supported_eap_type'] == 'fast'):
+                conf_manager.freeradius_eap_fast_conf.configure(
+                    default_eap_type=options['default_eap_type']
+                )
+            elif(options['supported_eap_type'] == 'md5'):
+                conf_manager.freeradius_eap_md5_conf.configure(
+                    default_eap_type=options['default_eap_type']
+                )
+            elif(options['supported_eap_type'] == 'peap'):
+                conf_manager.freeradius_eap_peap_conf.configure(
+                    default_eap_type=options['default_eap_type'],
+                    private_key_file=config.private_key,
+                    certificate_file=config.server_pem,
+                    ca_file=config.ca_pem,
+                    dh_file=config.dh_file,
+                    ca_path=config.certs_dir
+                )
+            elif(options['supported_eap_type'] == 'ttls'):
+                conf_manager.freeradius_eap_ttls_conf.configure(
+                    default_eap_type=options['default_eap_type'],
+                    private_key_file=config.private_key,
+                    certificate_file=config.server_pem,
+                    ca_file=config.ca_pem,
+                    dh_file=config.dh_file,
+                    ca_path=config.certs_dir
+                )
+            elif(options['supported_eap_type'] == 'tls'):
+                conf_manager.freeradius_eap_tls_conf.configure(
+                    default_eap_type=options['default_eap_type'],
+                    private_key_file=config.private_key,
+                    certificate_file=config.server_pem,
+                    ca_file=config.ca_pem,
+                    dh_file=config.dh_file,
+                    ca_path=config.certs_dir
+                )
+            elif(options['supported_eap_type'] == 'leap'):
+                conf_manager.freeradius_eap_leap_conf.configure(
+                    default_eap_type=options['default_eap_type']
+                )
+            elif(options['supported_eap_type'] == 'pwd'):
+                conf_manager.freeradius_eap_pwd_conf.configure(
+                    default_eap_type=options['default_eap_type']
+                )
+            elif(options['supported_eap_type'] == 'gtc'):
+                conf_manager.freeradius_eap_gtc_conf.configure(
+                    default_eap_type=options['default_eap_type']
+                )
+            else:
+                print("[!] No freeradius EAP configuration is created, exiting...")
+                exit(1)
 
             conf_manager.freeradius_clients_conf.configure(
                 own_ip_addr=options['own_ip_addr'],

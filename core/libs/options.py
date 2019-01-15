@@ -264,6 +264,22 @@ class optionsClass():
     def set_log_badpass(self, value):
         self.log_badpass = value
 
+    def check_default_supported_eap_types(self, supported_eap_types):
+        if((self.default_eap_type == 'fast') and (self.supported_eap_type != 'fast')):
+            self.parser.error("[!] The default EAP type of fast is only allowed when the supported eap type is also fast")
+
+        if((self.supported_eap_type == 'all')):
+            if(self.default_eap_type in supported_eap_types):
+                pass
+            else:
+                self.parser.error("[!] The specified default EAP type was not found in list of supported EAP types")
+        else:
+            if(self.default_eap_type == self.supported_eap_type):
+                pass
+            else:
+                self.parser.error("[!] When in single supported EAP type mode, the default EAP type must match the supported EAP type")
+
+
     #
     ## Attack Configuration
     #
@@ -729,12 +745,19 @@ def set_options():
                     choices=['udp','tcp','*'],
                     help='(Default: *)')
 
-    radius_config.add_argument('--eap-type',
+    radius_config.add_argument('--default-eap',
                     dest='default_eap_type',
                     type=str,
                     default=config.rogue_default_eap_type,
-                    choices=['fast','peap','ttls','tls','leap','pwd','md5','gtc'],
-                    help='(Default: %s)' % (config.rogue_default_eap_type))
+                    choices=config.rogue_default_eap_types,
+                    help='Specify the default EAP method used in RADIUS authentication. (Default: %s)' % (config.rogue_default_eap_type))
+
+    radius_config.add_argument('-E','--supported-eap',
+                    dest='supported_eap_type',
+                    type=str,
+                    default=config.rogue_supported_eap_type,
+                    choices=config.rogue_supported_eap_types,
+                    help='Specify the default EAP method used in RADIUS authentication. (Default: %s)' % (config.rogue_supported_eap_type))    
 
     radius_config.add_argument('--print-creds',
                     dest='print_creds',
@@ -934,6 +957,7 @@ def set_options():
     # RADIUS Configuration
     o.check_log_goodpass()
     o.check_log_badpass()
+    o.check_default_supported_eap_types(config.rogue_supported_eap_types)
 
     # Attack Configurations
     o.check_clone_wizard()
