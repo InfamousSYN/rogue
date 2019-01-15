@@ -201,6 +201,111 @@ class freeradius_eap_fast_conf(object):
 
     @classmethod
     def configure(cls,
+            default_eap_type=None
+            ):
+
+        assert default_eap_type is not None
+
+        try:
+            print("[+] Creating eap.conf file: %s" % cls.path)
+            with open(cls.path, 'w') as fd:
+                fd.write(cls.template %\
+                    (default_eap_type))
+        except Exception as e:
+            print("[!] Error: %s" % e)
+            return 1
+
+class freeradius_eap_md5_conf(object):
+
+    path = config.freeradius_mods_dir_eap_full
+    template = freeradius_cnf.freeradius_eap_md5_conf
+
+    @classmethod
+    def configure(cls,
+            default_eap_type=None
+            ):
+
+        assert default_eap_type is not None
+
+        try:
+            print("[+] Creating eap.conf file: %s" % cls.path)
+            with open(cls.path, 'w') as fd:
+                fd.write(cls.template %\
+                    (default_eap_type))
+        except Exception as e:
+            print("[!] Error: %s" % e)
+            return 1
+
+class freeradius_eap_pwd_conf(object):
+
+    path = config.freeradius_mods_dir_eap_full
+    template = freeradius_cnf.freeradius_eap_pwd_conf
+
+    @classmethod
+    def configure(cls,
+            default_eap_type=None
+            ):
+
+        assert default_eap_type is not None
+
+        try:
+            print("[+] Creating eap.conf file: %s" % cls.path)
+            with open(cls.path, 'w') as fd:
+                fd.write(cls.template %\
+                    (default_eap_type))
+        except Exception as e:
+            print("[!] Error: %s" % e)
+            return 1
+
+class freeradius_eap_leap_conf(object):
+
+    path = config.freeradius_mods_dir_eap_full
+    template = freeradius_cnf.freeradius_eap_leap_conf
+
+    @classmethod
+    def configure(cls,
+            default_eap_type=None
+            ):
+
+        assert default_eap_type is not None
+
+        try:
+            print("[+] Creating eap.conf file: %s" % cls.path)
+            with open(cls.path, 'w') as fd:
+                fd.write(cls.template %\
+                    (default_eap_type))
+        except Exception as e:
+            print("[!] Error: %s" % e)
+            return 1
+
+class freeradius_eap_gtc_conf(object):
+
+    path = config.freeradius_mods_dir_eap_full
+    template = freeradius_cnf.freeradius_eap_gtc_conf
+
+    @classmethod
+    def configure(cls,
+            default_eap_type=None
+            ):
+
+        assert default_eap_type is not None
+
+        try:
+            print("[+] Creating eap.conf file: %s" % cls.path)
+            with open(cls.path, 'w') as fd:
+                fd.write(cls.template %\
+                    (default_eap_type))
+        except Exception as e:
+            print("[!] Error: %s" % e)
+            return 1
+
+class freeradius_eap_peap_conf(object):
+
+    path = config.freeradius_mods_dir_eap_full
+    template = freeradius_cnf.freeradius_eap_peap_conf
+
+    @classmethod
+    def configure(cls,
             default_eap_type=None,
             private_key_file=None,
             certificate_file=None,
@@ -225,6 +330,67 @@ class freeradius_eap_fast_conf(object):
             print("[!] Error: %s" % e)
             return 1
 
+class freeradius_eap_ttls_conf(object):
+
+    path = config.freeradius_mods_dir_eap_full
+    template = freeradius_cnf.freeradius_eap_ttls_conf
+
+    @classmethod
+    def configure(cls,
+            default_eap_type=None,
+            private_key_file=None,
+            certificate_file=None,
+            ca_file=None,
+            dh_file=None,
+            ca_path=None
+            ):
+
+        assert default_eap_type is not None
+        assert private_key_file is not None
+        assert certificate_file is not None
+        assert ca_file is not None
+        assert dh_file is not None
+        assert ca_path is not None
+
+        try:
+            print("[+] Creating eap.conf file: %s" % cls.path)
+            with open(cls.path, 'w') as fd:
+                fd.write(cls.template %\
+                    (default_eap_type, private_key_file, certificate_file, ca_file, dh_file, ca_path))
+        except Exception as e:
+            print("[!] Error: %s" % e)
+            return 1
+
+class freeradius_eap_tls_conf(object):
+
+    path = config.freeradius_mods_dir_eap_full
+    template = freeradius_cnf.freeradius_eap_tls_conf
+
+    @classmethod
+    def configure(cls,
+            default_eap_type=None,
+            private_key_file=None,
+            certificate_file=None,
+            ca_file=None,
+            dh_file=None,
+            ca_path=None
+            ):
+
+        assert default_eap_type is not None
+        assert private_key_file is not None
+        assert certificate_file is not None
+        assert ca_file is not None
+        assert dh_file is not None
+        assert ca_path is not None
+
+        try:
+            print("[+] Creating eap.conf file: %s" % cls.path)
+            with open(cls.path, 'w') as fd:
+                fd.write(cls.template %\
+                    (default_eap_type, private_key_file, certificate_file, ca_file, dh_file, ca_path))
+        except Exception as e:
+            print("[!] Error: %s" % e)
+            return 1
 
 class hostapd_open_cnf(object):
 
@@ -533,6 +699,24 @@ class hostapd_wpa_eap_cnf(object):
         except Exception as e:
             print("[!] Error: %s" % e)
             return 1
+
+class hostapd_custom_cnf(object):
+    path = config.hostapd_conf_full
+
+    @classmethod
+    def configure(cls,
+        hostapd_location=None
+        ):
+
+        assert hostapd_location is not None
+
+        try:
+            print("[+] Copying custom hostapd-wpe.conf file to default rogue hostapd-wpe.conf file:\r\n %s -> %s" % (hostapd_location, cls.path))
+            os.system('cp %s %s' % (hostapd_location, cls.path))
+        except Exception as e:
+            print("[!] Error: %s" % e)
+            return 1
+
 
 class http_cnf(object):
 

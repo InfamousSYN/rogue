@@ -2,11 +2,373 @@
 from argparse import *
 import sys
 import config
+import re
+
+class optionsClass():
+
+    def __init__(self, options, parser):
+        self.options = options
+        self.parser = parser
+        for key, value in options.iteritems():
+            setattr(self, key, value)
+        del self.options
+
+    def __reassemble__(self):
+        del self.parser
+        return self.__dict__
+
+    def check_debug(self):
+        '''
+        checks to make sure that only one of the hostapd-wpe debugging options is set
+        '''
+        if(self.ddebug is True and self.debug is True):
+            parser.error('[!] Specify only -d or -dd')
+
+    def check_driver(self):
+        if(self.driver is not None):
+            self.set_driver(1)
+        else:
+            self.set_driver(0)
+
+    def set_driver(self, value):
+        if(value > 0):
+            self.driver = ("driver=%s" % (self.driver))
+        else:
+            self.driver = "#driver=hostap"
+
+    def check_country(self):
+        if(self.country_code is not None):
+            self.set_country(1)
+        else:
+            self.set_country(0)
+
+    def set_country(self, value):
+        if(value > 0):
+            self.country_code = ("country_code=%s" % (self.country_code))
+        else:
+            self.country_code = "#country_code=00"
+
+    def check_80211d(self):
+        if((self.ieee80211d) and (self.country_code is None)):
+            self.parser.error('[!] --ieee80211d has been provided without --country-code.')
+        elif((self.ieee80211d) and (self.country_code is not None)):
+            self.set_80211d(1)
+        else:
+            self.set_80211d(0)
+
+    def set_80211d(self, value):
+        if(value > 0):
+            self.ieee80211d = 1
+        else:
+            self.ieee80211d = 0
+
+    def check_80211h(self):
+        if((self.ieee80211d is False) and (self.ieee80211h is True)):
+            self.parser.error('[!] --ieee80211h has been provided without --ieee80211d.')
+        elif((self.ieee80211d is True) and (self.ieee80211h is True)):
+            self.set_80211h(1)
+        else:
+            self.set_80211h(0)
+
+    def set_80211h(self, value):
+        if(value > 0):
+            self.ieee80211h = 1
+        else:
+            self.ieee80211h = 0
+
+    def check_hw_mode(self):
+        if(self.hw_mode == 'n'):
+            self.minimum_N_hwmode()
+        elif(self.hw_mode == 'ac'):
+            self.minimum_AC_hwmode()
+        elif(self.hw_mode == 'a'):
+            self.minimum_A_hwmode()
+        else:
+            self.default_hwmode()
+
+    def check_channel(self):
+        if((self.freq == 2) and (self.channel != 0)):
+            if(self.channel > 13):
+                self.parser.error("[!] The provided channel %d can not be used with Radio Band 2.4GHz." % (self.channel))
+        if((self.hw_mode == 'a' or self.freq == 5) and (self.channel != 0)):
+            if(self.channel < 13):
+                self.parser.error("[!] The provided channel %d can not be used with Radio Band 5.0GHz." % (self.channel))
+
+    def check_require_ht(self):
+        if(self.require_ht):
+            self.set_require_ht(1)
+            # toggles ht_mode to an active state when the config file default value is unaltered
+            if(self.ht_mode == 0):
+                self.set_ht_mode(2)
+        else:
+            self.set_require_ht(0)
+
+        if(self.ht_mode > 0):
+            self.set_ht_capab(1)
+        else:
+            self.set_ht_capab(0)
+    def set_ht_mode(self, value):
+        self.ht_mode = value
+
+    def set_require_ht(self, value):
+        self.require_ht = value
+
+    def set_ht_capab(self, value):
+        if(value > 0):
+            self.ht_capab = 'ht_capab='
+            if(self.ht_mode == 1):
+                self.ht_capab += '[HT40+]'
+            elif(self.ht_mode == 2):
+                self.ht_capab += '[HT40+]'
+            else:
+                pass
+            if(self.short20):
+                self.ht_capab += '[SHORT-GI-20]'
+            if(self.short40):
+                self.ht_capab += '[SHORT-GI-40]'
+        else:
+            self.ht_capab = '#ht_capab='
+
+    def check_require_vht(self):
+        if(self.require_vht):
+            self.set_require_vht(1)
+        else:
+            self.set_require_vht(0)
+
+    def set_require_vht(self, value):
+        self.require_vht = value
+
+    def check_vht_operations(self):
+        if(self.vht_oper == 1):
+            self.set_vht_operations(1)
+        else:
+            self.set_vht_operations(0)
+
+    def set_vht_operations(self, value):
+        self.vht_oper = ("vht_oper_centr_freq_seg%s_idx" % (value))
+        setattr(self, "vht_operations", ("%s=%s" % (self.vht_oper, self.vht_index)))
+
+    def check_wmm_enabled(self):
+        if(self.wmm_enabled):
+            self.set_wmm_enabled(1)
+        else:
+            self.set_wmm_enabled(0)
+
+    def set_wmm_enabled(self, value):
+        if(value > 0):
+            self.wmm_enabled = 'wmm_enabled=1'
+        else:
+            self.wmm_enabled = '#wmm_enabled=1'
+
+    def check_ap_isolate(self):
+        if(self.ap_isolate):
+            self.set_ap_isolate(1)
+        else:
+            self.set_ap_isolate(0)
+
+    def set_ap_isolate(self, value):
+        if(value > 0):
+            self.ap_isolate = 1
+        else:
+            self.ap_isolate = 0
+
+    def check_auth(self):
+        if(self.auth == 'wep'):
+            self.check_wep()
+        elif(self.auth == 'wpa'):
+            self.check_wpa_passphrase()
+        else:
+            pass
+
+    def check_wep(self):
+        if((self.wep_default_key is None) or (self.wep_key is None)):
+            self.parser.error("[!] Please configure wep related configuration options: ['%s','%s']" % ("wep-key-version", "wep-key"))
+        elif((self.wep_default_key == 1) or (self.wep_default_key == 3)):
+            if(self.check_wep_key_size(self.wep_default_key, self.wep_key)):
+                self.set_wep_key(self.wep_default_key, 0, self.wep_key)
+            else:
+                self.parser.error("[!] The wep key size is %s, please choose a 40-bit, 104-bit or 128-bit key instead")
+        elif((self.wep_default_key == 0) or (self.wep_default_key == 2)):
+            if(self.check_wep_key_size(self.wep_default_key, self.wep_key)):
+                self.set_wep_key(self.wep_default_key, 1, self.wep_key)
+            else:
+                self.parser.error("[!] The wep key size is %s, please choose a 40-bit, 104-bit or 128-bit key instead")
+        else:
+            pass
+
+    def check_wep_key_size(self, method, key):
+        try:
+            for k in [40, 104, 128]:
+                if((method == 0) or (method == 2)):
+                    if(len(re.findall('..', key))*8 == k):
+                        return True
+                    raise
+                elif((method == 1) or (method == 3)):
+                    if(len(key)*8 == k):
+                        return True
+            raise
+        except Exception as e:
+            return False
+
+    def set_wep_key(self, value, method, key):
+        if(method > 0):
+            self.wep_key = ('wep_key%s=%s' % (value, key))
+        else:
+            self.wep_key = ('wep_key%s="%s"' % (value, key))
+
+    def check_wpa_passphrase(self):
+        if((self.auth == 'wpa') and (self.wpa_passphrase is None)):
+            self.parser.error("[!] Please configure provide the following wpa-personal configuration options: ['%s']" % ("--wpa-passphrase"))
+
+    #
+    ## IEEE 802.1x Configuration
+    #
+
+    def check_8021x(self):
+        if(self.ieee8021x):
+            self.set_8021x(1)
+        else:
+            self.set_8021x(0)
+
+    def set_8021x(self, value):
+        self.ieee8021x = value
+
+    def check_eapol_workaround(self):
+        if(self.eapol_workaround):
+            self.set_eapol_workaround(1)
+        else:
+            self.set_eapol_workaround(0)
+
+    def set_eapol_workaround(self, value):
+        self.eapol_workaround = value
+
+    #
+    ## RADIUS Configuration
+    #
+
+    def check_log_goodpass(self):
+        if(self.log_goodpass):
+            self.set_log_goodpass('no')
+        else:
+            self.set_log_goodpass('yes')
+
+    def set_log_goodpass(self, value):
+        self.log_goodpass = value
+
+    def check_log_badpass(self):
+        if(self.log_badpass):
+            self.set_log_badpass('no')
+        else:
+            self.set_log_badpass('yes')
+
+    def set_log_badpass(self, value):
+        self.log_badpass = value
+
+    def check_default_supported_eap_types(self, supported_eap_types):
+        if((self.default_eap_type == 'fast') and (self.supported_eap_type != 'fast')):
+            self.parser.error("[!] The default EAP type of fast is only allowed when the supported eap type is also fast")
+
+        if((self.supported_eap_type == 'all')):
+            if(self.default_eap_type in supported_eap_types):
+                pass
+            else:
+                self.parser.error("[!] The specified default EAP type was not found in list of supported EAP types")
+        else:
+            if(self.default_eap_type == self.supported_eap_type):
+                pass
+            else:
+                self.parser.error("[!] When in single supported EAP type mode, the default EAP type must match the supported EAP type")
+
+
+    #
+    ## Attack Configuration
+    #
+
+    def check_clone_wizard(self):
+        if((self.clone_wizard is True) and (self.clone_target is None)):
+            parser.error("[!] Please set a target site to clone")
+
+    def check_hostile_mode(self):
+        if(self.hostile_mode == 'beef'):
+            self.set_hostile_hook(config.beef_hook)
+        elif(self.hostile_mode == 'responder'):
+            self.set_hostile_hook(config.responder_hook)
+            self.responder = True
+        elif(self.hostile_mode == 'http'):
+            self.set_enable_httpd(True)
+        else:
+            self.set_enable_httpd(False)
+
+    def set_hostile_hook(self, value):
+        self.hostile_hook = value
+
+    def check_hostile_portal(self):
+        if((self.hostile_portal is True) and (self.hostile_mode is None)):
+            self.parser.error("[!] Please select a hostile portal operation mode using --hostile-mode")
+        elif((self.hostile_portal is not True) and (self.hostile_mode is not None)):
+            parser.error("[!] A --hostile-mode has been specified without enabling --hostile-portal.")
+        elif((self.hostile_portal is True) and (self.hostile_mode == 'http')):
+            self.set_enable_httpd(True)
+        else:
+            pass
+
+    def set_enable_httpd(self, value):
+        setattr(self, 'enable_httpd', value)
+        if(self.enable_httpd):
+            self.check_httpd_ssl()
+
+    def check_httpd_ssl(self):
+        if(self.httpd_ssl):
+            self.set_httpd_port(self.http_ssl_port)
+
+    def set_httpd_port(self, value):
+        self.httpd_port = value
+
+    def check_hostile_location(self):
+        if(self.hostile_location is not None):
+            self.set_httpd_root(self.hostile_location)
+
+    def set_httpd_root(self, value):
+        self.httpd_root = value
+
+
+    # minimum settings
+    def minimum_N_hwmode(self):
+        if(self.freq == 5):
+            self.hw_mode = 'a'
+        else:
+            self.hw_mode = 'g'
+        self.ieee80211n = 1
+        self.ieee80211ac = 0
+        self.wmm_enabled = 1
+
+    def minimum_AC_hwmode(self):
+        self.hw_mode = 'a'
+        self.freq = 5
+        self.ieee80211n = 1
+        self.ieee80211ac = 1
+        self.wmm_enabled = 1
+
+    def minimum_A_hwmode(self):
+        self.hw_mode = 'a'
+        self.freq = 5
+        self.ieee80211n = 0
+        self.ieee80211ac = 0
+        self.wmm_enabled = 0
+
+    def default_hwmode(self):
+        self.ieee80211n = 0
+        self.ieee80211ac = 0
+        self.wmm_enabled = 0
+
 
 def set_options():
-    parser = ArgumentParser(prog="%(prog)s",
-                            description="The Rogue Toolkit is an extensible toolkit aimed at providing penetration testers an easy-to-use platform to deploy software-defined Access Points (AP) for the purpose of conducting penetration testing and red team engagements. By using Rogue, penetration testers can easily perform targeted evil twin attacks against a variety of wireless network types.",
-                            usage="python rogue.py -I wlan0 -H g -C 6 --auth open --internet"
+    parser = ArgumentParser(prog=sys.argv[0],
+                            description="The Rogue Toolkit is an extensible toolkit aimed at providing penetration testers an easy-to-use platform to deploy\
+                            software-defined Access Points (AP) for the purpose of conducting penetration testing and red team engagements. By using Rogue, \
+                            penetration testers can easily perform targeted evil twin attacks against a variety of wireless network types.",
+                            usage="python rogue.py -i wlan0 -h g -c 6 -e rogue --auth open --internet",
+                            add_help=False
                             )
 
     hostapd_config = parser.add_argument_group(
@@ -54,6 +416,12 @@ def set_options():
                     default=None,
                     help='Write all collected wireless frames to a pcap file.')
 
+    parser.add_argument('-m', '--manual',
+                    dest='hostapd_manual_conf',
+                    type=str,
+                    default=None,
+                    help='Loads a custom hostapd config file instead of dynamically generating a file')
+
     parser.add_argument('--internet',
                     dest='internet',
                     action='store_true',
@@ -63,8 +431,8 @@ def set_options():
                     dest='auth',
                     type=str,
                     choices=['open','wep','wpa-personal','wpa-enterprise'],
-                    default='open',
-                    help='Specify auth type. (Default: open)')
+                    default=config.rogue_auth,
+                    help='Specify auth type. (Default: %s)' % config.rogue_auth)
 
     parser.add_argument('--cert-wizard',
                     dest='cert_wizard',
@@ -95,7 +463,7 @@ def set_options():
                     Note: httrack will create a directory in this location with the name of the site cloned. \r\n\
                     (Default: %s)' % config.httrack_dest)
 
-    parser.add_argument('-I', '--interface',
+    parser.add_argument('-i', '--interface',
                     dest='interface',
                     type=str,
                     help='The phy interface on which to create the AP')
@@ -118,42 +486,42 @@ def set_options():
                     default=False,
                     help='show even more hostapd-wpe debug messages')
 
-    ieee80211_config.add_argument('-B', '--bssid',
+    ieee80211_config.add_argument('-b', '--bssid',
                     dest='bssid',
-                    default='00:11:22:33:44:00',
+                    default=config.rogue_bssid,
                     type=str,
-                    help='Specify access point BSSID')
+                    help='Specify access point BSSID (Default: %s)' % (config.rogue_bssid))
 
-    ieee80211_config.add_argument('-E', '--essid',
+    ieee80211_config.add_argument('-e', '--essid',
                     dest='essid',
                     type=str,
-                    default='rogue',
-                    help='Specify access point ESSID')
+                    default=config.rogue_essid,
+                    help='Specify access point ESSID (Default: %s)' % config.rogue_essid)
 
-    ieee80211_config.add_argument('-H', '--hw-mode',
+    ieee80211_config.add_argument('-h', '--hw-mode',
                     dest='hw_mode',
                     type=str,
                     choices=['a','b','g','n','ac'],
-                    default='g',
-                    help='Specify access point hardware mode (Default: g).')
+                    default=config.rogue_hw_mode,
+                    help='Specify access point hardware mode (Default: %s).' % config.rogue_hw_mode)
 
     ieee80211_config.add_argument('--freq',
                     dest='freq',
                     type=int,
                     choices=[2,5],
-                    default=2,
-                    help='Specify the radio band to use (Default: 2GHz).')
+                    default=config.rogue_default_frequency,
+                    help='Specify the radio band to use (Default: %sGHz).' % config.rogue_default_frequency)
 
     ieee80211n_config.add_argument('--ht-mode',
                     dest='ht_mode',
                     type=int,
                     choices=[0,1,2],
-                    default=0,
+                    default=config.rogue_ht_mode,
                     help='Configure supported channel width set\
                     0 = Feature disabled\
                     1 = [HT40-] (2.4 GHz = 5-13, 5 GHz = 40,48,56,64)\
                     2 = [HT40+] (2.4 GHz = 1-7 (1-9 in Europe/Japan), 5 GHz = 36,44,52,60)\
-                    (Default = 0). ')
+                    (Default = %s). ' % config.rogue_ht_mode)
 
     ieee80211n_config.add_argument('--disable-short20',
                     dest='short20',
@@ -167,24 +535,24 @@ def set_options():
                     default=True,
                     help='Disables Short GI for 40 MHz for HT capabilities.')
 
-    ieee80211_config.add_argument('-C', '--channel',
+    ieee80211_config.add_argument('-c', '--channel',
                     dest='channel',
                     type=int,
-                    default=0,
-                    help='Specify access point channel. (Default: 0 - with ACS to find an unused channel)')
+                    default=config.rogue_channel,
+                    help='Specify access point channel. (Default: %s - with ACS to find an unused channel)' % config.rogue_channel)
 
     ieee80211_config.add_argument('--country',
                     dest='country_code',
                     type=str,
-                    choices=config.hostapd_country_options,
+                    choices=config.rogue_country_options,
                     help='Configures of country of operation')
 
     ieee80211_config.add_argument('--macaddr-acl',
                     dest='macaddr_acl',
                     type=int,
                     choices=[0,1,2],
-                    default=0,
-                    help='Station MAC address -based authentication\r\n0 = accept unless in deny list\r\n  1 = deny unless in accept list\r\n  2 = use external RADIUS (accept/deny will be searched first)\r\n(Default: 0)')
+                    default=config.rogue_macaddr_acl,
+                    help='Station MAC address -based authentication\r\n0 = accept unless in deny list\r\n  1 = deny unless in accept list\r\n  2 = use external RADIUS (accept/deny will be searched first)\r\n(Default: %s)' % config.rogue_macaddr_acl)
 
     ieee80211_config.add_argument('--mac-accept-file',
                     dest='macaddr_accept_file',
@@ -202,8 +570,8 @@ def set_options():
                     dest='auth_algs',
                     type=int,
                     choices=[1,2,3],
-                    default=3,
-                    help='IEEE 802.11 specifies two authentication algorithms. 1 allows only WPA2 authentication algorithms. 2 is WEP. 3 allows both.')
+                    default=config.rogue_auth_algs,
+                    help='IEEE 802.11 specifies two authentication algorithms. 1 allows only WPA2 authentication algorithms. 2 is WEP. 3 allows both. (Default: %s)' % config.rogue_auth_algs)
 
     ieee80211_config.add_argument('--wmm-enabled',
                     dest='wmm_enabled',
@@ -238,21 +606,21 @@ def set_options():
                     dest='vht_oper_chwidth',
                     type=int,
                     choices=[0,1,2,3],
-                    default=1,
-                    help='VHT channel width (Default: 1).')
+                    default=config.rogue_vht_index,
+                    help='VHT channel width (Default: %s).' % config.rogue_vht_index)
 
     ieee80211ac_config.add_argument('--vht-operation',
                     dest='vht_oper',
                     type=int,
                     choices=[0,1],
-                    default=0,
-                    help='Enable toggling between vht_oper_centr_freq_seg0_idx and vht_oper_centr_freq_seg1_idx (Default: 1 for vht_oper_centr_freq_seg0_idx).')
+                    default=config.rogue_vht_operations,
+                    help='Enable toggling between 0 for vht_oper_centr_freq_seg0_idx and 1 for vht_oper_centr_freq_seg1_idx (Default: %s).' % config.rogue_vht_operations)
 
     ieee80211ac_config.add_argument('--vht-index',
                     dest='vht_index',
                     type=int,
-                    default=42,
-                    help='Enables control of vht_oper_centr_freq_seg[0/1]_idx index value (Default: 42).')
+                    default=config.rogue_vht_index_options,
+                    help='Enables control of vht_oper_centr_freq_seg[0/1]_idx index value (Default: %s).' % (config.rogue_vht_index_options))
 
     ieee80211ac_config.add_argument('--require-vht',
                     dest='require_vht',
@@ -280,8 +648,8 @@ def set_options():
                     dest='wpa',
                     type=int,
                     choices=[1,2,3],
-                    default=2,
-                    help='Specify WPA type (Default: 2).')
+                    default=config.rogue_wpa_version,
+                    help='Specify WPA type (Default: %s).' % config.rogue_wpa_version)
 
     wpa_psk_config.add_argument('--wpa-pairwise',
                     dest='wpa_pairwise',
@@ -307,8 +675,8 @@ def set_options():
                     dest='eapol_version',
                     type=int,
                     choices=[1,2],
-                    default=2,
-                    help='IEEE 802.1X/EAPOL version')
+                    default=config.rogue_eapol_version,
+                    help='IEEE 802.1X/EAPOL version (Default: %s)' % config.rogue_eapol_version)
 
     ieee8021x_config.add_argument('--eapol-workaround',
                     dest='eapol_workaround',
@@ -316,17 +684,17 @@ def set_options():
                     default=False,
                     help='EAPOL-Key index workaround (set bit7) for WinXP Supplicant')
 
-    radius_config.add_argument('--log-badpass',
+    radius_config.add_argument('--no-log-badpass',
                     dest='log_badpass',
                     action='store_true',
-                    default=True,
-                    help='logs password if it\'s rejected')
+                    default=False,
+                    help='When set, incorrect passwords will not be logged')
 
-    radius_config.add_argument('--log-goodpass',
+    radius_config.add_argument('--no-log-goodpass',
                     dest='log_goodpass',
                     action='store_true',
-                    default=True,
-                    help='logs password if it\'s correct')
+                    default=False,
+                    help='When set, valid passwords will not be logged')
 
     radius_config.add_argument('--own-address',
                     dest='own_ip_addr',
@@ -377,12 +745,19 @@ def set_options():
                     choices=['udp','tcp','*'],
                     help='(Default: *)')
 
-    radius_config.add_argument('--eap-type',
+    radius_config.add_argument('--default-eap',
                     dest='default_eap_type',
                     type=str,
-                    default='md5',
-                    choices=['fast','peap','ttls','tls','leap','pwd','md5','gtc'],
-                    help='(Default: md5)')
+                    default=config.rogue_default_eap_type,
+                    choices=config.rogue_default_eap_types,
+                    help='Specify the default EAP method used in RADIUS authentication. (Default: %s)' % (config.rogue_default_eap_type))
+
+    radius_config.add_argument('-E','--supported-eap',
+                    dest='supported_eap_type',
+                    type=str,
+                    default=config.rogue_supported_eap_type,
+                    choices=config.rogue_supported_eap_types,
+                    help='Specify the default EAP method used in RADIUS authentication. (Default: %s)' % (config.rogue_supported_eap_type))    
 
     radius_config.add_argument('--print-creds',
                     dest='print_creds',
@@ -408,12 +783,12 @@ def set_options():
                     dest='essid_mask',
                     type=int,
                     choices=[0,1,2],
-                    default=0,
+                    default=config.rogue_essid_mask,
                     help='Send empty SSID in beacons and ignore probe request frames that do not specify full SSID. \
                     1 = send empty (length=0) SSID in beacon and ignore probe request for broadcast SSID \
                     2 = clear SSID (ASCII 0), but keep the original length (this may be required with some clients \
                     that do not support empty SSID) and ignore probe requests for broadcast SSID \
-                    (Default: 0)')
+                    (Default: %s)' % config.rogue_essid_mask)
 
     attacks.add_argument('--hostile-portal',
                     dest='hostile_portal',
@@ -506,7 +881,7 @@ def set_options():
                     dest='secondary_interface',
                     type=str,
                     default=config.secondary_interface,
-                    help='Used to specify the second phy interface used to bridge the hostapd-wpe interface (-I) with another network (Default: %s)' % (config.secondary_interface))
+                    help='Used to specify the second phy interface used to bridge the hostapd-wpe interface (-i) with another network (Default: %s)' % (config.secondary_interface))
 
     dhcp.add_argument('--pool-start',
                     dest='dhcp_pool_start',
@@ -558,200 +933,38 @@ def set_options():
     args, leftovers = parser.parse_known_args()
     options = args.__dict__
 
-    # Set driver value
-    if(options['driver'] is not None):
-        options['driver'] = ("driver=" + options['driver'])
-    else:
-        options['driver'] = ("#driver=hostap")
+    o = optionsClass(options, parser)
 
-    if(options['ddebug'] is True and options['debug'] is True):
-        parser.error('[!] Specify only -d or -dd')
 
-    # comments out the country_code line in hostapd-wpe config file if not specified
-    if(options['country_code'] is not None):
-        options['country_code'] = ("country_code=" + options['country_code'])
-    else:
-        options['country_code'] = "#country_code=AU"
-
-    if(options['ieee80211d']):
-        if(options['country_code'] is None):
-            parser.error('[!] --ieee80211d has been provided without --country-code.')
-        else:
-            options['ieee80211d'] = 1
-    else:
-        pass
-
-    if(options['ieee80211h']):
-        options['ieee80211h'] = 1
-    else:
-        pass
-
-    if(options['ieee80211h']):
-        if(options['ieee80211d']):
-            pass
-        else:
-            parser.error('[!] --ieee80211h has been provided without --ieee80211d.')
-    else:
-        pass
-
-    # 802.11 Operation Modes
-    if(options['hw_mode'] == 'n'):
-        if(options['freq'] == 2):
-            options['hw_mode'] = 'g'
-            if(options['channel'] > 13):
-                parser.error("[!] The provided channel %d can not be used with Radio Band 2.4GHz." % (options['channel']))
-            else:
-                pass
-        else:
-            options['hw_mode'] = 'a'
-            if(options['channel'] == 0):
-                pass
-            elif(options['channel'] < 13):
-                parser.error("[!] The provided channel %d can not be used with Radio Band 5.0GHz." % (options['channel']))
-            else:
-                pass
-        options['ieee80211n'] = 1
-        options['ieee80211ac'] = 0
-        options['wmm_enabled'] = 1
-    elif(options['hw_mode'] == 'a'):
-        options['hw_mode'] = 'a'
-        options['ieee80211n'] = 0
-        options['ieee80211ac'] = 0
-    elif options['hw_mode'] == 'ac':
-        options['hw_mode'] = 'a'
-        if(options['channel'] == 0):
-            pass
-        elif(options['channel'] < 13):
-            parser.error("[!] The provided channel %d can not be used with Radio Band 5.0GHz." % (options['channel']))
-        else:
-            pass
-        options['ieee80211n'] = 1
-        options['ieee80211ac'] = 1
-    else:
-        options['ieee80211n'] = 0
-        options['ieee80211ac'] = 0
-
-    # Configures HT Capabilities
-    if(options['require_ht']):
-        options['require_ht'] = 1
-    else:
-        options['require_ht'] = 0
-
-    if(options['ht_mode'] == 0):
-        options['ht_capab'] = '#ht_capab='
-    else:
-        options['ht_capab'] = 'ht_capab='
-        if(options['ht_mode'] == 1):
-            options['ht_capab'] += '[HT40-]'
-        else:
-            options['ht_capab'] += '[HT40+]'
-    if(options['short20']):
-        options['ht_capab'] += '[SHORT-GI-20]'
-    else:
-        pass
-    if(options['short40']):
-        options['ht_capab'] += '[SHORT-GI-40]'
-    else:
-        pass
-
-    # Configures VHT Capabilities
-    if(options['require_vht']):
-        options['require_vht'] = 1
-    else:
-        options['require_vht'] = 0
-
-    if(options['vht_oper'] == 1):
-        options['vht_oper'] = "vht_oper_centr_freq_seg1_idx"
-    else:
-        options['vht_oper'] = "vht_oper_centr_freq_seg0_idx"
-    options['vht_operations'] = ("%s=%s" % (options['vht_oper'], options['vht_index']))
-
-    # comments out the Wireless Multimedia Extensions (WMM) in hostapd-wpe config file if not specified
-    if(options['wmm_enabled']):
-        options['wmm_enabled'] = "wmm_enabled=1"
-    else:
-        options['wmm_enabled'] = "#wmm_enabled=1"
-
-    if(options['auth'] == 'wep'):
-        if (options['wep_default_key'] is None) or (options['wep_key'] is None):
-            paser.error("[!] Please configure wep related configuration options: ['%s','%s']" % ("wep-key-version", "wep-key"))
-        else:
-            # Set wep-key object
-            if (options['wep_default_key'] == 1) or (options['wep_default_key'] == 3):
-                options['wep_key'] = ("wep_key" + str(options['wep_default_key']) + "=" + "\"" + options['wep_key'] + "\"")
-            else:
-                options['wep_key'] = ("wep_key" + str(options['wep_default_key']) + "=" + options['wep_key'])
-    else:
-        pass
-
-    if(options['auth'] == 'wpa'):
-        if (options['wpa_passphrase'] is None):
-            parser.error("[!] Please configure provide the following wpa-personal configuration options: ['%s']" % ("wpa-passphrase"))
-
-    # 802.11 Configuration
-    if(options['ap_isolate']):
-        options['ap_isolate'] = 1
-    else:
-        options['ap_isolate'] = 0
+    o.check_debug()
+    o.check_driver()
+    o.check_country()
+    o.check_80211d()
+    o.check_80211h()
+    o.check_hw_mode()
+    o.check_channel()
+    o.check_require_ht()
+    o.check_require_vht()
+    o.check_vht_operations()
+    o.check_wmm_enabled()
+    o.check_ap_isolate()
+    o.check_auth()
 
     # 802.1x Configuration
-    if(options['ieee8021x']):
-        options['ieee8021x'] = 1
-    else:
-        options['ieee8021x'] = 0
+    o.check_8021x()
+    o.check_eapol_workaround()
 
-    if(options['eapol_workaround']):
-        options['eapol_workaround'] = 1
-    else:
-        options['eapol_workaround'] = 0
+    # RADIUS Configuration
+    o.check_log_goodpass()
+    o.check_log_badpass()
+    o.check_default_supported_eap_types(config.rogue_supported_eap_types)
 
-    # Radius Configuration
-    if(options['log_goodpass']):
-        options['log_goodpass'] = 'yes'
-    else:
-        options['log_goodpass'] = 'no'
+    # Attack Configurations
+    o.check_clone_wizard()
+    o.check_hostile_portal()
+    o.check_hostile_mode()
+    o.check_hostile_location()
 
-    if(options['log_badpass']):
-        options['log_badpass'] = 'yes'
-    else:
-        options['log_badpass'] = 'no'
-
-    if(options['clone_wizard']):
-        if options['clone_target'] is None:
-            parser.error("[!] Please set a target site to clone")
-
-    if(options['hostile_portal']):
-        if(options['hostile_mode'] is None):
-            parser.error("[!] Please select a hostile portal operation mode using --hostile-mode")
-        else:
-            pass
-
-    if(options['hostile_mode'] is not None):
-        if(options['hostile_portal'] is not True):
-            parser.error("[!] A --hostile-mode has been specified without enabling --hostile-portal.")
-
-    if(options['hostile_hook'] is None):
-        if(options['hostile_mode'] == 'beef'):
-            options['hostile_hook'] = config.beef_hook
-        elif(options['hostile_mode'] == 'responder'):
-            options['hostile_hook'] = config.responder_hook
-            options['responder'] = True
-        else:
-            pass
-    else:
-        pass
-
-    if(options['hostile_location'] is not None):
-        options['httpd_root'] = options['hostile_location']
-    else:
-        pass
-
-    if(options['httpd_ssl']):
-        options['httpd_port'] = options['http_ssl_port']
-
-    if(options['hostile_portal']):
-        options['enable_httpd'] = True
-    else:
-        options['enable_httpd'] = False
+    options = o.__reassemble__()
 
     return options
