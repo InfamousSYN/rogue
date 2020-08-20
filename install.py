@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import os
 import config
 
@@ -8,7 +8,7 @@ def read_deps_file(deps_file):
 
 if __name__ == "__main__":
   try:
-    if raw_input("Do you want update your package list ('apt-get update')? [y/N]").lower() == "y":
+    if input("Do you want update your package list ('apt-get update')? [y/N]").lower() == "y":
       print("[*] Downloading package lists from repositories")
       os.system("apt-get update -y")
   
@@ -17,7 +17,7 @@ if __name__ == "__main__":
     print("[*] complete!")
   
     print("[*] Installing Rogue's Python dependencies...")
-    os.system("pip install -r %s" % config.pip_dep)
+    os.system("pip3 install -r %s" % config.pip_dep)
     print("[*] complete!")
 
     # Check if required directories exist
