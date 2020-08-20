@@ -2,8 +2,12 @@
 **.pyc
 
 ### log files ###
+logs/
 **.log
 
-## Certificate files ###
+### Certificate files ###
 core/certs/
 **.cnf
+
+### Temporary files ###
+tmp/*

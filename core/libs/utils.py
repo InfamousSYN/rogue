@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import os
 import time
 import config
@@ -5,12 +6,12 @@ from tqdm import tqdm
 
 def sleep_bar(sleep_time, text=''):
 
-    print
+    print()
     
     if text:
 
-        print text
-        print
+        print(text)
+        print()
 
     interval = sleep_time % 1
     if interval == 0:
@@ -22,7 +23,7 @@ def sleep_bar(sleep_time, text=''):
     for i in tqdm(range(iterations)):
         time.sleep(interval)
 
-    print
+    print()
         
 
 class Service(object):
