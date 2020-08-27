@@ -1,5 +1,6 @@
 The Rogue Toolkit
 =================
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/infamoussyn/rogue) 
 
 ## Getting Started
 * [Introduction](https://github.com/InfamousSYN/rogue#introduction)

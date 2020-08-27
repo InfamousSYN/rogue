@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 from argparse import *
 import sys
 import config
@@ -9,7 +9,7 @@ class optionsClass():
     def __init__(self, options, parser):
         self.options = options
         self.parser = parser
-        for key, value in options.iteritems():
+        for key, value in options.items():
             setattr(self, key, value)
         del self.options
 

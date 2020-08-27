@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import os
 
 import config
@@ -448,7 +448,7 @@ class hostapd_open_cnf(object):
         assert ieee80211h is not None
         assert ap_isolate is not None
     
-    	try:
+        try:
             print("[+] Creating hostapd-wpe.confg file: %s" % cls.path)
             with open(cls.path, 'w') as fd:
                 fd.write(cls.template %\
