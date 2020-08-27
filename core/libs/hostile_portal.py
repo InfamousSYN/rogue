@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 
 def insert(webroot, target_file, addr, hook, marker):

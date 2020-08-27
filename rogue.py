@@ -1,6 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import os
-import thread
+import _thread
 import time
 import subprocess
 import select
@@ -78,7 +78,7 @@ class rogueClass():
 
     @staticmethod
     def CatchThread(input, threadType):
-        raw_input('Press enter to quit %s...' % threadType)
+        input('Press enter to quit %s...' % threadType)
 
         input.append(True)
 
@@ -109,7 +109,7 @@ class rogueClass():
 
             while not input:
                 if p.poll(1):
-                    print f.stdout.readline().strip("\n")
+                    print(f.stdout.readline().strip("\n"))
                 time.sleep(1)
 
         f.kill()
@@ -346,7 +346,6 @@ if __name__ == '__main__':
             )
 
             if(options['supported_eap_type'] == 'all'):
-                print("hit")
                 conf_manager.freeradius_eap_conf.configure(
                     default_eap_type=options['default_eap_type'],
                     private_key_file=config.private_key,
@@ -564,7 +563,7 @@ if __name__ == '__main__':
             pass
 
         # pause execution until user quits
-        raw_input('Press enter to quit...')
+        input('Press enter to quit...')
 
     except KeyboardInterrupt:
         rogueClass.rogue_shutdown(options)
