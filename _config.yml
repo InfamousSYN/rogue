@@ -16,7 +16,7 @@
 title: Rogue Documentation
 description: A documentation site for the rogue toolkit
 baseurl: "/" # the subpath of your site, e.g. /blog
-url: "https://rogue.github.com" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://rogue.infamoussyn.com" # the base hostname & protocol for your site, e.g. http://example.com
 
 permalink: pretty
 exclude: ["node_modules/", "*.gemspec", "*.gem", "Gemfile", "Gemfile.lock", "package.json", "package-lock.json",  "script/", "LICENSE.txt", "lib/", "bin/", "README.md", "Rakefile"]
