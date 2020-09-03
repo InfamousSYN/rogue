@@ -43,7 +43,7 @@ python3 rogue.py -i wlan0 -h g -c 6 -e rogue --auth open --internet
 
 ### Check out Rogue's capabilities
 
-- [See utilities options]({{ site.baseurl }}{% link docs/utilities.md %})
+- [See utilities options]({{ site.baseurl }}{% link docs/utilities/utilities.md %})
 
 ---
 
