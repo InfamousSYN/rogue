@@ -18,13 +18,21 @@ An extensible toolkit providing penetration testers an easy-to-use platform to d
 
 ## About
 
-Forked from s0lst1c3's [eaphammer](https://github.com/s0lst1c3/eaphammer) project, The Rogue Toolkit is an extensible toolkit aimed at providing penetration testers an easy-to-use platform to deploy software-defined Access Points (AP) for the purpose of conducting wireless penetration testing and red team engagements. By using Rogue, penetration testers can easily perform targeted evil twin attacks against a variety of wireless network types. 
+Forked from s0lst1c3's [eaphammer](https://github.com/s0lst1c3/eaphammer) project, Rogue is an extensible toolkit aimed at providing penetration testers an easy-to-use platform to deploy software-defined Access Points (AP) for the purpose of conducting wireless penetration testing and red team engagements. By using Rogue, penetration testers can easily perform targeted evil twin attacks against a variety of wireless network types. 
 
-## Getting started
+## Get Started
 
 ### Dependencies
 
-Just the Docs is built for [Jekyll](https://jekyllrb.com), a static site generator. View the [quick start guide](https://jekyllrb.com/docs/) for more information. Just the Docs requires no special plugins and can run on GitHub Pages' standard Jekyll compiler. The [Jekyll SEO Tag plugin](https://github.com/jekyll/jekyll-seo-tag) is included by default (no need to run any special installation) to inject SEO and open graph metadata on docs pages. For information on how to configure SEO and open graph metadata visit the [Jekyll SEO Tag usage guide](https://jekyll.github.io/jekyll-seo-tag/usage/).
+Rogue is a Python3 project, built to run on debian systems such as Kali Linux and Ubuntu. As a toolkit, Rogue is used to automatically configure a number of applications in consistent manner to provide the testing platform, these applications include:
+* hostapd-wpe
+* freeradius-wpe
+* isc-dhcp-server
+* Apache 2.0
+* sslsplit
+* responder
+* beef
+* tcpdump
 
 ### Quick start:
 
