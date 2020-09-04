@@ -16,11 +16,8 @@ An extensible toolkit providing penetration testers an easy-to-use platform to d
 
 ---
 
-## About
-
-Forked from s0lst1c3's [eaphammer](https://github.com/s0lst1c3/eaphammer) project, Rogue is an extensible toolkit aimed at providing penetration testers an easy-to-use platform to deploy software-defined Access Points (AP) for the purpose of conducting wireless penetration testing and red team engagements. By using Rogue, penetration testers can easily perform targeted evil twin attacks against a variety of wireless network types. 
-
 ## Get Started
+Rogue is a Python3 project, built to run on debian systems such as Kali Linux and Ubuntu. The toolkit provides a highly configurable platform to automate the standardised configuration of services and applications to conduct evil twin attacks.
 
 1. Download [rogue](https://github.com/InfamousSYN/rogue) 
 ```
@@ -38,6 +35,8 @@ python3 rogue.py -i wlan0 -h g -c 6 -e rogue --auth open --internet
 ---
 
 ## About the project
+
+Forked from s0lst1c3's [eaphammer](https://github.com/s0lst1c3/eaphammer) project, Rogue is an extensible toolkit aimed at providing penetration testers an easy-to-use platform to deploy software-defined Access Points (AP) for the purpose of conducting wireless penetration testing and red team engagements. By using Rogue, penetration testers can easily perform targeted evil twin attacks against a variety of wireless network types. 
 
 ### License
 
