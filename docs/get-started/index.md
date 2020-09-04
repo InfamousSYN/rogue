@@ -1,5 +1,5 @@
 ---
 layout: default
-title: Color
+title: Usage
 has_children: true
 ---
