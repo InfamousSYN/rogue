@@ -7,4 +7,4 @@ responder
 apache2
 tcpdump
 beef-xss
-python-pip
+python3-pip
