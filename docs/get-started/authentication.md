@@ -35,4 +35,4 @@ python rogue.py --cert-wizard
 python rogue.py -i wlan0 -h n -c 6 --auth wpa-enterprise --wpa 2 --ieee8021x 1 --internet
 ```
 
-*Note: Captured credentials will be stored in `/var/log/freeradius-server-wpe.log`*
+*Note: Captured credentials will be stored in `rogue/logs/freeradius-server-wpe.log`*
