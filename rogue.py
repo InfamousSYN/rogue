@@ -345,6 +345,10 @@ if __name__ == '__main__':
                 log_badpass=options['log_badpass']
             )
 
+            conf_manager.freeradius_default_available_site_conf.configure(
+
+            )
+
             if(options['supported_eap_type'] == 'all'):
                 conf_manager.freeradius_eap_conf.configure(
                     default_eap_type=options['default_eap_type'],

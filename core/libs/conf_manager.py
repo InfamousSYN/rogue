@@ -162,6 +162,21 @@ class freeradius_radiusd_conf(object):
             print("[!] Error: %s" % e)
             return 1
 
+class freeradius_default_available_site_conf(object):
+
+    path = config.freeradius_default_site_full
+    template = freeradius_cnf.freeradius_default_site_conf
+
+    @classmethod
+    def configure(cls):
+        try:
+            print("[+] Rewriting the default site file: {}".format(cls.path))
+            with open(cls.path, 'w') as fd:
+                fd.write(cls.template)
+        except Exception as e:
+            print("[!] Error: {}".format(e))
+            return 1
+
 class freeradius_eap_conf(object):
 
     path = config.freeradius_mods_dir_eap_full
