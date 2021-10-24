@@ -2,22 +2,16 @@
 layout: default
 title: Get Started
 nav_order: 3
-has_children: false
+has_children: true
 has_toc: false
 permalink: /get-started
 ---
 
 # Getting Started
 
-## Table of Contents
-{: .no_toc .text-delta }
-
-{:toc}
-
 ---
 
 ## Usage
-
 
 ```
 usage: python rogue.py -i wlan0 -h g -c 6 -e rogue --auth open --internet
