@@ -12,6 +12,8 @@ permalink: /get-started
 ## Table of Contents
 {: .no_toc .text-delta }
 
+{:toc}
+
 ---
 
 ## Usage
