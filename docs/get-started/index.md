@@ -14,7 +14,7 @@ permalink: /get-started
 ## Usage
 
 ```
-usage: python rogue.py -i wlan0 -h g -c 6 -e rogue --auth open --internet
+usage: python3 rogue.py -i wlan0 -h g -c 6 -e rogue --auth open --internet
 
 The Rogue Toolkit is an extensible toolkit aimed at providing penetration
 testers an easy-to-use platform to deploy software-defined Access Points (AP)
