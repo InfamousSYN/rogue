@@ -1,9 +1,10 @@
 ---
 layout: default
-title: Usage
+title: Get Started
 nav_order: 3
 has_children: true
-has_toc: true
+//has_toc: true
+permalink: /get-started
 ---
 
 # Getting Started
