@@ -3,6 +3,7 @@ layout: default
 title: hashcatifier
 parent: Tools
 nav_order: 2
+permalink: /tools/hashcatifier
 ---
 
 ## hashcatifer
