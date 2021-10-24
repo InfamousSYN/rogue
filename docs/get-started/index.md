@@ -9,6 +9,8 @@ permalink: /get-started
 
 # Getting Started
 
+## Table of Contents
+{:toc}
 
 ## Dependencies
 
