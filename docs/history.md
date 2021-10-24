@@ -2,7 +2,7 @@
 layout: default
 title: History
 nav_order: 999
-has_children: true
+//has_children: true
 //has_toc: true
 permalink: /history
 ---
