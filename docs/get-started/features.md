@@ -2,7 +2,7 @@
 layout: default
 title: Features
 nav_order: 2
-permalink: /features
+permalink: /get-started/features
 ---
 
 # Features
