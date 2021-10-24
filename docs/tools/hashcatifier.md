@@ -1,13 +1,9 @@
 ---
 layout: default
-title: Tools
-nav_order: 4
-permalink: /tools
+title: hashcatifier
+parent: Tools
+nav_order: 2
 ---
-
-# Tools
-
-The Rogue toolkit includes additional tools to aid in testing.
 
 ## hashcatifer
 hashcatifer allows the user to convert hashes captured by rogue from the standard john the ripper format to a format accepted by hashcat.
