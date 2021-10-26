@@ -353,8 +353,9 @@ if __name__ == '__main__':
             if(options['supported_eap_type'] == 'all'):
                 conf_manager.freeradius_eap_conf.configure(
                     default_eap_type=options['default_eap_type'],
-                    private_key_file=config.private_key,
-                    certificate_file=config.server_pem,
+                    private_key_password=options['server_private_key_password'],
+                    private_key_file=options['server_private_key'],
+                    certificate_file=options['server_certificate'],
                     ca_file=options['ca_certificate'],
                     dh_file=config.dh_file,
                     ca_path=config.certs_dir
@@ -370,8 +371,9 @@ if __name__ == '__main__':
             elif(options['supported_eap_type'] == 'peap'):
                 conf_manager.freeradius_eap_peap_conf.configure(
                     default_eap_type=options['default_eap_type'],
-                    private_key_file=config.private_key,
-                    certificate_file=config.server_pem,
+                    private_key_password=options['server_private_key_password'],
+                    private_key_file=options['server_private_key'],
+                    certificate_file=options['server_certificate'],
                     ca_file=options['ca_certificate'],
                     dh_file=config.dh_file,
                     ca_path=config.certs_dir
@@ -379,8 +381,9 @@ if __name__ == '__main__':
             elif(options['supported_eap_type'] == 'ttls'):
                 conf_manager.freeradius_eap_ttls_conf.configure(
                     default_eap_type=options['default_eap_type'],
-                    private_key_file=config.private_key,
-                    certificate_file=config.server_pem,
+                    private_key_password=options['server_private_key_password'],
+                    private_key_file=options['server_private_key'],
+                    certificate_file=options['server_certificate'],
                     ca_file=options['ca_certificate'],
                     dh_file=config.dh_file,
                     ca_path=config.certs_dir
@@ -388,8 +391,9 @@ if __name__ == '__main__':
             elif(options['supported_eap_type'] == 'tls'):
                 conf_manager.freeradius_eap_tls_conf.configure(
                     default_eap_type=options['default_eap_type'],
-                    private_key_file=config.private_key,
-                    certificate_file=config.server_pem,
+                    private_key_password=options['server_private_key_password'],
+                    private_key_file=options['server_private_key'],
+                    certificate_file=options['server_certificate'],
                     ca_file=options['ca_certificate'],
                     dh_file=config.dh_file,
                     ca_path=config.certs_dir

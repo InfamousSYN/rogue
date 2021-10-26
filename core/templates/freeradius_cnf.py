@@ -502,7 +502,7 @@ eap {
 	#  ANYONE who has a certificate signed by them can
 	#  authenticate via EAP-TLS!  This is likely not what you want.
 	tls-config tls-common {
-		private_key_password = whatever
+		private_key_password = %s
 		private_key_file = %s
 
 		#  If Private key & Certificate are located in
@@ -2819,7 +2819,7 @@ eap {
 	#  ANYONE who has a certificate signed by them can
 	#  authenticate via EAP-TLS!  This is likely not what you want.
 	tls-config tls-common {
-		private_key_password = whatever
+		private_key_password = %s
 		private_key_file = %s
 
 		#  If Private key & Certificate are located in
@@ -3468,7 +3468,7 @@ eap {
 	#  ANYONE who has a certificate signed by them can
 	#  authenticate via EAP-TLS!  This is likely not what you want.
 	tls-config tls-common {
-		private_key_password = whatever
+		private_key_password = %s
 		private_key_file = %s
 
 		#  If Private key & Certificate are located in
@@ -4051,7 +4051,7 @@ eap {
 	#  ANYONE who has a certificate signed by them can
 	#  authenticate via EAP-TLS!  This is likely not what you want.
 	tls-config tls-common {
-		private_key_password = whatever
+		private_key_password = %s
 		private_key_file = %s
 
 		#  If Private key & Certificate are located in

@@ -185,6 +185,7 @@ class freeradius_eap_conf(object):
     @classmethod
     def configure(cls,
             default_eap_type=None,
+            private_key_password=None,
             private_key_file=None,
             certificate_file=None,
             ca_file=None,
@@ -193,6 +194,7 @@ class freeradius_eap_conf(object):
             ):
 
         assert default_eap_type is not None
+        assert private_key_password is not None
         assert private_key_file is not None
         assert certificate_file is not None
         assert ca_file is not None
@@ -203,7 +205,7 @@ class freeradius_eap_conf(object):
             print("[+] Creating eap.conf file: %s" % cls.path)
             with open(cls.path, 'w') as fd:
                 fd.write(cls.template %\
-                    (default_eap_type, private_key_file, certificate_file, ca_file, dh_file, ca_path))
+                    (default_eap_type, private_key_password, private_key_file, certificate_file, ca_file, dh_file, ca_path))
         except Exception as e:
             print("[!] Error: %s" % e)
             return 1
@@ -322,6 +324,7 @@ class freeradius_eap_peap_conf(object):
     @classmethod
     def configure(cls,
             default_eap_type=None,
+            private_key_password=None,
             private_key_file=None,
             certificate_file=None,
             ca_file=None,
@@ -330,6 +333,7 @@ class freeradius_eap_peap_conf(object):
             ):
 
         assert default_eap_type is not None
+        assert private_key_password is not None
         assert private_key_file is not None
         assert certificate_file is not None
         assert ca_file is not None
@@ -340,7 +344,7 @@ class freeradius_eap_peap_conf(object):
             print("[+] Creating eap.conf file: %s" % cls.path)
             with open(cls.path, 'w') as fd:
                 fd.write(cls.template %\
-                    (default_eap_type, private_key_file, certificate_file, ca_file, dh_file, ca_path))
+                    (default_eap_type, private_key_password, private_key_file, certificate_file, ca_file, dh_file, ca_path))
         except Exception as e:
             print("[!] Error: %s" % e)
             return 1
@@ -353,6 +357,7 @@ class freeradius_eap_ttls_conf(object):
     @classmethod
     def configure(cls,
             default_eap_type=None,
+            private_key_password=None,
             private_key_file=None,
             certificate_file=None,
             ca_file=None,
@@ -361,6 +366,7 @@ class freeradius_eap_ttls_conf(object):
             ):
 
         assert default_eap_type is not None
+        assert private_key_password is not None
         assert private_key_file is not None
         assert certificate_file is not None
         assert ca_file is not None
@@ -371,7 +377,7 @@ class freeradius_eap_ttls_conf(object):
             print("[+] Creating eap.conf file: %s" % cls.path)
             with open(cls.path, 'w') as fd:
                 fd.write(cls.template %\
-                    (default_eap_type, private_key_file, certificate_file, ca_file, dh_file, ca_path))
+                    (default_eap_type, private_key_password, private_key_file, certificate_file, ca_file, dh_file, ca_path))
         except Exception as e:
             print("[!] Error: %s" % e)
             return 1
@@ -384,6 +390,7 @@ class freeradius_eap_tls_conf(object):
     @classmethod
     def configure(cls,
             default_eap_type=None,
+            private_key_password=None,
             private_key_file=None,
             certificate_file=None,
             ca_file=None,
@@ -392,6 +399,7 @@ class freeradius_eap_tls_conf(object):
             ):
 
         assert default_eap_type is not None
+        assert private_key_password is not None
         assert private_key_file is not None
         assert certificate_file is not None
         assert ca_file is not None
@@ -402,7 +410,7 @@ class freeradius_eap_tls_conf(object):
             print("[+] Creating eap.conf file: %s" % cls.path)
             with open(cls.path, 'w') as fd:
                 fd.write(cls.template %\
-                    (default_eap_type, private_key_file, certificate_file, ca_file, dh_file, ca_path))
+                    (default_eap_type, private_key_password, private_key_file, certificate_file, ca_file, dh_file, ca_path))
         except Exception as e:
             print("[!] Error: %s" % e)
             return 1
