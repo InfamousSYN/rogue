@@ -330,9 +330,10 @@ if __name__ == '__main__':
                     acct_server_shared_secret=options['acct_server_shared_secret'],
                     acct_server_port=options['acct_server_port'],
                     eap_user_file=config.eap_user_file,
-                    ca_pem=config.ca_pem,
-                    server_pem=config.server_pem,
-                    private_key=config.private_pem,
+                    ca_pem=options['ca_certificate'],
+                    server_pem=options['server_certificate'],
+                    private_key=options['server_private_key'],
+                    private_key_passwd=options['server_private_key_password'],
                     dh_file=config.dh_file
                 )
 
@@ -354,7 +355,7 @@ if __name__ == '__main__':
                     default_eap_type=options['default_eap_type'],
                     private_key_file=config.private_key,
                     certificate_file=config.server_pem,
-                    ca_file=config.ca_pem,
+                    ca_file=options['ca_certificate'],
                     dh_file=config.dh_file,
                     ca_path=config.certs_dir
                 )
@@ -371,7 +372,7 @@ if __name__ == '__main__':
                     default_eap_type=options['default_eap_type'],
                     private_key_file=config.private_key,
                     certificate_file=config.server_pem,
-                    ca_file=config.ca_pem,
+                    ca_file=options['ca_certificate'],
                     dh_file=config.dh_file,
                     ca_path=config.certs_dir
                 )
@@ -380,7 +381,7 @@ if __name__ == '__main__':
                     default_eap_type=options['default_eap_type'],
                     private_key_file=config.private_key,
                     certificate_file=config.server_pem,
-                    ca_file=config.ca_pem,
+                    ca_file=options['ca_certificate'],
                     dh_file=config.dh_file,
                     ca_path=config.certs_dir
                 )
@@ -389,7 +390,7 @@ if __name__ == '__main__':
                     default_eap_type=options['default_eap_type'],
                     private_key_file=config.private_key,
                     certificate_file=config.server_pem,
-                    ca_file=config.ca_pem,
+                    ca_file=options['ca_certificate'],
                     dh_file=config.dh_file,
                     ca_path=config.certs_dir
                 )

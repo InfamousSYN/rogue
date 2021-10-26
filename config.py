@@ -25,11 +25,14 @@ ca_cnf = certs_dir + "/ca.cnf"
 server_cnf = certs_dir + "/server.cnf"
 client_cnf = certs_dir + "/client.cnf"
 bootstrap_file = certs_dir + "/bootstrap"
-ca_pem = certs_dir + "/ca.pem"
-ca_key = certs_dir + "/ca_no_pass.key"
-ca_crt = certs_dir + "/ca.crt"
+
+### Trusted Root Certificate Settings (PEM or DER file)
+trusted_root_ca_pem = certs_dir + "/ca.pem"
+
+### RADIUS Server Certificate Settings (PEM or DER file)
 server_pem = certs_dir + "/server.pem"
 private_key = certs_dir + "/server.key"
+private_key_passwd = "whatever"
 private_pem = certs_dir + "/server.pem"
 dh_file = certs_dir + "/dh"
 
@@ -128,6 +131,8 @@ http_root = '/var/www/html'
 httrack_dest = http_root
 
 # sslsplit
+ca_key = certs_dir + "/ca_no_pass.key"
+ca_crt = certs_dir + "/ca.crt"
 sslsplit_log = logdir + "/sslsplit.log"
 sslsplit_tmp = working_dir + "/sslsplit"
 sslsplit_jail = sslsplit_tmp + "/jail"

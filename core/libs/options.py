@@ -764,6 +764,36 @@ def set_options():
                     action='store_true',
                     help='Print intercepted credentials')
 
+    radius_config.add_argument('--ca-certificate',
+                    dest='ca_certificate',
+                    type=str,
+                    default=config.trusted_root_ca_pem,
+                    help='specify trusted root CA certificate in PEM format. (Default: {})'.format(config.trusted_root_ca_pem))
+
+    radius_config.add_argument('--server-certificate',
+                    dest='server_certificate',
+                    type=str,
+                    default=config.server_pem,
+                    help='specify RADIUS server certificate in PEM format. (Default: {})'.format(config.server_pem))
+
+    radius_config.add_argument('--server-private-key',
+                    dest='server_private_key',
+                    type=str,
+                    default=config.private_key,
+                    help='specify RADIUS private key. (Default: {})'.format(config.private_key))
+
+    radius_config.add_argument('--server-private-password',
+                    dest='server_private_key_password',
+                    type=str,
+                    default=config.private_key_passwd,
+                    help='provide the password RADIUS private key. (Default: {})'.format(config.private_key_passwd))
+
+    radius_config.add_argument('--private-certificate',
+                    dest='server_private_certificate',
+                    type=str,
+                    default=config.private_pem,
+                    help='specify RADIUS private certificate')
+
     attacks.add_argument('--karma',
                     dest='karma',
                     action='store_true',
