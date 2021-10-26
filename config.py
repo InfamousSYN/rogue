@@ -33,7 +33,6 @@ trusted_root_ca_pem = certs_dir + "/ca.pem"
 server_pem = certs_dir + "/server.pem"
 private_key = certs_dir + "/server.key"
 private_key_passwd = "whatever"
-private_pem = certs_dir + "/server.pem"
 dh_file = certs_dir + "/dh"
 
 # rogue options default values

@@ -788,12 +788,6 @@ def set_options():
                     default=config.private_key_passwd,
                     help='provide the password RADIUS private key. (Default: {})'.format(config.private_key_passwd))
 
-    radius_config.add_argument('--private-certificate',
-                    dest='server_private_certificate',
-                    type=str,
-                    default=config.private_pem,
-                    help='specify RADIUS private certificate')
-
     attacks.add_argument('--karma',
                     dest='karma',
                     action='store_true',
