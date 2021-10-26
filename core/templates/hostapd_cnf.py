@@ -1027,7 +1027,7 @@ eap_user_file=%s
 ca_cert=%s 				# ca_pem
 server_cert=%s 			# server_pem
 private_key=%s
-private_key_passwd=whatever
+private_key_passwd=%s
 dh_file=%s
 
 ##### IEEE 802.11 related configuration #######################################
