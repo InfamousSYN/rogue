@@ -12,28 +12,28 @@ The Rogue Toolkit allows users to set any of the 802.11 authentication methods s
 
 ## OPEN
 ```
-python rogue.py -i wlan0 -h g -c 6 --auth open --internet
+sudo python3 /opt/rogue/rogue.py -i wlan0 --auth open --internet --preset-profile wifi4 --channel-randomiser
 ```
 
 ## WEP
 ```
-python rogue.py -i wlan0 -h g -c 6 --auth wep --wep-key-version 0 --wep-key 4141414141 --internet
+sudo python3 /opt/rogue/rogue.py -i wlan0 --auth wep --wep-key-version 0 --wep-key 4141414141 --internet --preset-profile wifi4 --channel-randomiser
 ```
 
 ## WPA1-PSK
 ```
-python rogue.py -i wlan0 -h g -c 6 --auth wpa-personal --wpa 1 --wpa-passphrase "test test" --internet
+sudo python3 /opt/rogue/rogue.py -i wlan0 --auth wpa-personal --wpa 1 --wpa-passphrase "test test" --internet --preset-profile wifi4 --channel-randomiser
 ```
 
 ## WPA2-PSK
 ```
-python rogue.py -i wlan0 -h g -c 6 --auth wpa-personal --wpa 2 --wpa-passphrase "test test" --internet
+sudo python3 /opt/rogue/rogue.py -i wlan0 --auth wpa-personal --wpa 2 --wpa-passphrase "test test" --internet --preset-profile wifi4 --channel-randomiser
 ```
 
 ## WPA2-Enterprise
 ```
-python rogue.py --cert-wizard
-python rogue.py -i wlan0 -h n -c 6 --auth wpa-enterprise --wpa 2 --ieee8021x 1 --internet
+sudo python3 /opt/rogue/rogue.py --cert-wizard
+sudo python3 /opt/rogue/rogue.py -i wlan0 --auth wpa-enterprise --internet --preset-profile wifi4 --channel-randomiser --default-eap peap -E all
 ```
 
 *Note: Captured credentials will be stored in `rogue/logs/freeradius-server-wpe.log`*
