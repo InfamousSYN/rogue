@@ -8,7 +8,7 @@ permalink: /usage/protocols
 
 # Setting 802.11 Protocols
 
-The Rogue Toolkit allows users to set any of the 802.11 protocols supports by the hostapd-wpe software. Below is examples of the minimum requirements for selecting a 802.11 protocol (`--hw-mode`/`-h`). However, some additional arguments may also be supported by the toolkit to allow for fine-tuning.
+The Rogue Toolkit allows users to set any of the 802.11 protocols supports by the hostapd-wpe software. Below is examples of the minimum requirements for selecting a 802.11 protocol (`--hw-mode` / `-hw` / `--preset-profile`). However, some additional arguments may also be supported by the toolkit to allow for fine-tuning.
 
 ## 802.11b ( wifi1 )
 ```
