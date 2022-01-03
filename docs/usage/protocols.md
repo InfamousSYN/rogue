@@ -15,11 +15,6 @@ The Rogue Toolkit allows users to set any of the 802.11 protocols supports by th
 sudo python3 /opt/rogue/rogue.py -i wlan0 --auth open --internet --preset-profile wifi1 --channel-randomiser
 ```
 
-## 802.11g ( wifi3 )
-```
-sudo python3 /opt/rogue/rogue.py -i wlan0 --auth open --internet --preset-profile wifi3 --channel-randomiser
-```
-
 ## 802.11a ( wifi2 )
 ```
 sudo python3 /opt/rogue/rogue.py -i wlan0 --auth open --internet --preset-profile wifi2 --channel-randomiser
@@ -29,6 +24,11 @@ sudo python3 /opt/rogue/rogue.py -i wlan0 --auth open --internet --preset-profil
 #   freq        HT40-       HT40+
 #   2.4 GHz     5-13        1-7 (1-9 in Europe/Japan)
 #   5 GHz       40,48,56,64 36,44,52,60
+```
+
+## 802.11g ( wifi3 )
+```
+sudo python3 /opt/rogue/rogue.py -i wlan0 --auth open --internet --preset-profile wifi3 --channel-randomiser
 ```
 
 ## 802.11n (2.4 GHz) ( wifi4 )
