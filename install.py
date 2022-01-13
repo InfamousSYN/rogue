@@ -17,7 +17,7 @@ if __name__ == "__main__":
     print("[*] complete!")
   
     print("[*] Installing Rogue's Python dependencies...")
-    os.system("pip3 install -r %s" % config.pip_dep)
+    os.system("python3 -m pip install -r %s" % config.pip_dep)
     print("[*] complete!")
 
     # Check if required directories exist

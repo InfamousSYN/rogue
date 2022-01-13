@@ -12,8 +12,6 @@ from core.libs import utils
 from core.libs import options as Options
 from core.libs import conf_manager
 from core.libs import cert_wizard
-from core.libs import clone_wizard
-from core.libs import hostile_portal
 
 class rogueClass():
 
@@ -38,29 +36,12 @@ class rogueClass():
         if(options['responder']):
             utils.Responder.kill_by_name('Responder')
             print("[+] Restoring default responder configuration")
-            conf_manager.responder_default_conf.configure()
-
-        if(options['pcap_filename'] is not None):
-            utils.Tcpdump.kill()
-
-        if(options['hostile_portal']):
-            if(options['hostile_mode'] == "beef"):
-                utils.Beef.stop()
-            else:
-                pass
+            conf_manager.responder_default_conf.configure(do_not_respond_to_own_ip_addr='')
         else:
             pass
 
-        if(options['enable_httpd']):
-            utils.Httpd.stop()
-
-            utils.Httpd.disableSite(config.http_name_conf, config.http_sites_available)
-            utils.Httpd.enableDefault()
-            if(options['httpd_ssl']):
-                utils.Httpd.disableModule()
-
-        else:
-            pass
+        if(options['modlishka']):
+            utils.Modlishka.kill()
 
         rogueClass.iptablesStop()
 
@@ -81,38 +62,6 @@ class rogueClass():
         input('Press enter to quit %s...' % threadType)
 
         input.append(True)
-
-        return
-
-    @staticmethod
-    def ReadFreeRadiusLog(options):
-        print("[*] Displaying of captured credentials mode enabled")
-        input = []
-        thread.start_new_thread(rogueClass.CatchThread, (input, 'freeradius_log'))
-        while not input:
-            print("[-] Checking if freeradius-server-wpe.log is empty, path: %s" % config.wpelogfile)
-            if(os.stat(config.wpelogfile).st_size == 0):
-                print("[-] %s is empty, checking default freeradius install location: %s" % (config.wpelogfile, config.wpelogfile_default_install))
-                if(os.stat(config.wpelogfile_default_install).st_size != 0):
-                    print("[-] It appears %s has content, proceeding with the monitoring of this file" % config.wpelogfile_default_install)
-                    target_file = config.wpelogfile_default_install
-            elif(os.stat(config.wpelogfile).st_size != 0):
-                print("[-] It appears %s has content, proceeding with the monitoring of this file" % config.wpelogfile)
-                target_file = config.wpelogfile
-            else:
-                raise 
-            f = subprocess.Popen(['tail','-f',target_file],\
-                    stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-
-            p = select.poll()
-            p.register(f.stdout)
-
-            while not input:
-                if p.poll(1):
-                    print(f.stdout.readline().strip("\n"))
-                time.sleep(1)
-
-        f.kill()
 
         return
 
@@ -158,20 +107,31 @@ class rogueClass():
 
 
 if __name__ == '__main__':
+    print("[*] Launching the rogue toolkit v{}\r\n[-]".format(config.__version__))
     options = Options.set_options()
     if options == 1:
         exit(1)
+    if(options['show_options']):
+        print("[+] Options:\r\n[-]   {}\r\n[-]".format(options))
 
     if options['cert_wizard']:
         cert_wizard.cert_wizard()
         exit(0)
-    else:
-        pass
-
-    if options['clone_wizard']:
-        if (clone_wizard.clone_wizard(config.httrack_bin, options['clone_target'], options['clone_dest']) != 0):
-            exit(1)
-        else:
+    elif(options['auth'] == 'wpa-enterprise'):
+        import os
+        try:
+            print('[-] Checking required RADIUS certificate files exist...')
+            if(not os.path.isfile(config.server_pem)):
+                print('[!]   \'{}\' does not exist!'.format(config.server_pem))
+            if(not os.path.isfile(config.private_key)):
+                print('[!]   \'{}\' does not exist!'.format(config.private_key))
+            if(not os.path.isfile(config.trusted_root_ca_pem)):
+                print('[!]   \'{}\' does not exist!'.format(config.trusted_root_ca_pem))
+            if(not os.path.isfile(config.dh_file)):
+                print('[!]   \'{}\' does not exist!'.format(config.dh_file))
+            print('[-] Check RADIUS certificate files exist passed...')
+        except Exception as e:
+            print('[!]   Run \'sudo python3 rogue.py --cert-wizard\' command to generate the required certificate files')
             exit(0)
     else:
         pass
@@ -191,27 +151,24 @@ if __name__ == '__main__':
         if rogueClass.is_interface_up(options['interface']):
             pass
     except Exception as e:
-        print("Interface %s does not exist, %s" % (options['interface'], e))
+        print("[!] Interface {} does not exist, {}".format(options['interface'], e))
         exit(1)
 
     try:
-        print("[*] Launching the rogue toolkit v%s" % config.__version__)
-        if(options['show_options']):
-            print("[+] Options: %s" % options)
-
         utils.nmcli.set_unmanaged(options['interface'])
 
-        if(options['hostapd_manual_conf'] is not None):
-            conf_manager.hostapd_custom_cnf.configure(
-                hostapd_location=options['hostapd_manual_conf']
-            )
-        else:
-            # creates the required hostapd-wpe.conf
-            if options['auth'] == 'open':
+        # creates the required hostapd-wpe.conf
+        if options['auth'] == 'open':
+            if(options['hostapd_manual_conf'] is not None):
+                conf_manager.hostapd_custom_cnf.configure(
+                    hostapd_location=options['hostapd_manual_conf']
+                )
+            else:
                 conf_manager.hostapd_open_cnf.configure(
                     driver=options['driver'],
                     interface=options['interface'],
                     ssid=options['essid'],
+                    beacon_interval=options['beacon_interval'],
                     hw_mode=options['hw_mode'],
                     ieee80211n=options['ieee80211n'],
                     bssid=options['bssid'],
@@ -223,21 +180,48 @@ if __name__ == '__main__':
                     auth_algs=options['auth_algs'],
                     essid_mask=options['essid_mask'],
                     wmm_enabled=options['wmm_enabled'],
+                    wmm_ac_bk_cwmin=options['wmm_ac_bk_cwmin'],
+                    wmm_ac_bk_cwmax=options['wmm_ac_bk_cwmax'],
+                    wmm_ac_bk_aifs=options['wmm_ac_bk_aifs'],
+                    wmm_ac_bk_txop_limit=options['wmm_ac_bk_txop_limit'],
+                    wmm_ac_bk_acm=options['wmm_ac_bk_acm'],
+                    wmm_ac_be_aifs=options['wmm_ac_be_aifs'],
+                    wmm_ac_be_cwmin=options['wmm_ac_be_cwmin'],
+                    wmm_ac_be_cwmax=options['wmm_ac_be_cwmax'],
+                    wmm_ac_be_txop_limit=options['wmm_ac_be_txop_limit'],
+                    wmm_ac_be_acm=options['wmm_ac_be_acm'],
+                    wmm_ac_vi_aifs=options['wmm_ac_vi_aifs'],
+                    wmm_ac_vi_cwmin=options['wmm_ac_vi_cwmin'],
+                    wmm_ac_vi_cwmax=options['wmm_ac_vi_cwmax'],
+                    wmm_ac_vi_txop_limit=options['wmm_ac_vi_txop_limit'],
+                    wmm_ac_vi_acm=options['wmm_ac_vi_acm'],
+                    wmm_ac_vo_aifs=options['wmm_ac_vo_aifs'],
+                    wmm_ac_vo_cwmin=options['wmm_ac_vo_cwmin'],
+                    wmm_ac_vo_cwmax=options['wmm_ac_vo_cwmax'],
+                    wmm_ac_vo_txop_limit=options['wmm_ac_vo_txop_limit'],
+                    wmm_ac_vo_acm=options['wmm_ac_vo_acm'],
                     ht_capab=options['ht_capab'],
                     require_ht=options['require_ht'],
                     ieee80211ac=options['ieee80211ac'],
                     vht_oper_chwidth=options['vht_oper_chwidth'],
                     vht_operations=options['vht_operations'],
+                    vht_capability=options['vht_capab'],
                     require_vht=options['require_vht'],
                     ieee80211d=options['ieee80211d'],
                     ieee80211h=options['ieee80211h'],
                     ap_isolate=options['ap_isolate']
                 )
-            elif options['auth'] == 'wep':
+        elif options['auth'] == 'wep':
+            if(options['hostapd_manual_conf'] is not None):
+                conf_manager.hostapd_custom_cnf.configure(
+                    hostapd_location=options['hostapd_manual_conf']
+                )
+            else:
                 conf_manager.hostapd_wep_cnf.configure(
                     driver=options['driver'],
                     interface=options['interface'],
                     ssid=options['essid'],
+                    beacon_interval=options['beacon_interval'],
                     hw_mode=options['hw_mode'],
                     ieee80211n=options['ieee80211n'],
                     bssid=options['bssid'],
@@ -249,11 +233,32 @@ if __name__ == '__main__':
                     auth_algs=options['auth_algs'],
                     essid_mask=options['essid_mask'],
                     wmm_enabled=options['wmm_enabled'],
+                    wmm_ac_bk_cwmin=options['wmm_ac_bk_cwmin'],
+                    wmm_ac_bk_cwmax=options['wmm_ac_bk_cwmax'],
+                    wmm_ac_bk_aifs=options['wmm_ac_bk_aifs'],
+                    wmm_ac_bk_txop_limit=options['wmm_ac_bk_txop_limit'],
+                    wmm_ac_bk_acm=options['wmm_ac_bk_acm'],
+                    wmm_ac_be_aifs=options['wmm_ac_be_aifs'],
+                    wmm_ac_be_cwmin=options['wmm_ac_be_cwmin'],
+                    wmm_ac_be_cwmax=options['wmm_ac_be_cwmax'],
+                    wmm_ac_be_txop_limit=options['wmm_ac_be_txop_limit'],
+                    wmm_ac_be_acm=options['wmm_ac_be_acm'],
+                    wmm_ac_vi_aifs=options['wmm_ac_vi_aifs'],
+                    wmm_ac_vi_cwmin=options['wmm_ac_vi_cwmin'],
+                    wmm_ac_vi_cwmax=options['wmm_ac_vi_cwmax'],
+                    wmm_ac_vi_txop_limit=options['wmm_ac_vi_txop_limit'],
+                    wmm_ac_vi_acm=options['wmm_ac_vi_acm'],
+                    wmm_ac_vo_aifs=options['wmm_ac_vo_aifs'],
+                    wmm_ac_vo_cwmin=options['wmm_ac_vo_cwmin'],
+                    wmm_ac_vo_cwmax=options['wmm_ac_vo_cwmax'],
+                    wmm_ac_vo_txop_limit=options['wmm_ac_vo_txop_limit'],
+                    wmm_ac_vo_acm=options['wmm_ac_vo_acm'],
                     ht_capab=options['ht_capab'],
                     require_ht=options['require_ht'],
                     ieee80211ac=options['ieee80211ac'],
                     vht_oper_chwidth=options['vht_oper_chwidth'],
                     vht_operations=options['vht_operations'],
+                    vht_capability=options['vht_capab'],
                     require_vht=options['require_vht'],
                     ieee80211d=options['ieee80211d'],
                     ieee80211h=options['ieee80211h'],
@@ -261,11 +266,17 @@ if __name__ == '__main__':
                     wep_default_key=options['wep_default_key'],
                     wep_key=options['wep_key'],
                 )
-            elif (options['auth'] == 'wpa-personal'):
+        elif (options['auth'] == 'wpa-personal'):
+            if(options['hostapd_manual_conf'] is not None):
+                conf_manager.hostapd_custom_cnf.configure(
+                    hostapd_location=options['hostapd_manual_conf']
+                )
+            else:
                 conf_manager.hostapd_wpa_psk_cnf.configure(
                     driver=options['driver'],
                     interface=options['interface'],
                     ssid=options['essid'],
+                    beacon_interval=options['beacon_interval'],
                     hw_mode=options['hw_mode'],
                     ieee80211n=options['ieee80211n'],
                     bssid=options['bssid'],
@@ -277,11 +288,32 @@ if __name__ == '__main__':
                     auth_algs=options['auth_algs'],
                     essid_mask=options['essid_mask'],
                     wmm_enabled=options['wmm_enabled'],
+                    wmm_ac_bk_cwmin=options['wmm_ac_bk_cwmin'],
+                    wmm_ac_bk_cwmax=options['wmm_ac_bk_cwmax'],
+                    wmm_ac_bk_aifs=options['wmm_ac_bk_aifs'],
+                    wmm_ac_bk_txop_limit=options['wmm_ac_bk_txop_limit'],
+                    wmm_ac_bk_acm=options['wmm_ac_bk_acm'],
+                    wmm_ac_be_aifs=options['wmm_ac_be_aifs'],
+                    wmm_ac_be_cwmin=options['wmm_ac_be_cwmin'],
+                    wmm_ac_be_cwmax=options['wmm_ac_be_cwmax'],
+                    wmm_ac_be_txop_limit=options['wmm_ac_be_txop_limit'],
+                    wmm_ac_be_acm=options['wmm_ac_be_acm'],
+                    wmm_ac_vi_aifs=options['wmm_ac_vi_aifs'],
+                    wmm_ac_vi_cwmin=options['wmm_ac_vi_cwmin'],
+                    wmm_ac_vi_cwmax=options['wmm_ac_vi_cwmax'],
+                    wmm_ac_vi_txop_limit=options['wmm_ac_vi_txop_limit'],
+                    wmm_ac_vi_acm=options['wmm_ac_vi_acm'],
+                    wmm_ac_vo_aifs=options['wmm_ac_vo_aifs'],
+                    wmm_ac_vo_cwmin=options['wmm_ac_vo_cwmin'],
+                    wmm_ac_vo_cwmax=options['wmm_ac_vo_cwmax'],
+                    wmm_ac_vo_txop_limit=options['wmm_ac_vo_txop_limit'],
+                    wmm_ac_vo_acm=options['wmm_ac_vo_acm'],
                     ht_capab=options['ht_capab'],
                     require_ht=options['require_ht'],
                     ieee80211ac=options['ieee80211ac'],
                     vht_oper_chwidth=options['vht_oper_chwidth'],
                     vht_operations=options['vht_operations'],
+                    vht_capability=options['vht_capab'],
                     require_vht=options['require_vht'],
                     ieee80211d=options['ieee80211d'],
                     ieee80211h=options['ieee80211h'],
@@ -291,11 +323,17 @@ if __name__ == '__main__':
                     wpa_pairwise=options['wpa_pairwise'],
                     rsn_pairwise=options['rsn_pairwise']
                 )
+        else:
+            if(options['hostapd_manual_conf'] is not None):
+                conf_manager.hostapd_custom_cnf.configure(
+                    hostapd_location=options['hostapd_manual_conf']
+                )
             else:
                 conf_manager.hostapd_wpa_eap_cnf.configure(
-                    driver=options['driver'],
+                driver=options['driver'],
                     interface=options['interface'],
                     ssid=options['essid'],
+                    beacon_interval=options['beacon_interval'],
                     hw_mode=options['hw_mode'],
                     ieee80211n=options['ieee80211n'],
                     bssid=options['bssid'],
@@ -307,11 +345,32 @@ if __name__ == '__main__':
                     auth_algs=options['auth_algs'],
                     essid_mask=options['essid_mask'],
                     wmm_enabled=options['wmm_enabled'],
+                    wmm_ac_bk_cwmin=options['wmm_ac_bk_cwmin'],
+                    wmm_ac_bk_cwmax=options['wmm_ac_bk_cwmax'],
+                    wmm_ac_bk_aifs=options['wmm_ac_bk_aifs'],
+                    wmm_ac_bk_txop_limit=options['wmm_ac_bk_txop_limit'],
+                    wmm_ac_bk_acm=options['wmm_ac_bk_acm'],
+                    wmm_ac_be_aifs=options['wmm_ac_be_aifs'],
+                    wmm_ac_be_cwmin=options['wmm_ac_be_cwmin'],
+                    wmm_ac_be_cwmax=options['wmm_ac_be_cwmax'],
+                    wmm_ac_be_txop_limit=options['wmm_ac_be_txop_limit'],
+                    wmm_ac_be_acm=options['wmm_ac_be_acm'],
+                    wmm_ac_vi_aifs=options['wmm_ac_vi_aifs'],
+                    wmm_ac_vi_cwmin=options['wmm_ac_vi_cwmin'],
+                    wmm_ac_vi_cwmax=options['wmm_ac_vi_cwmax'],
+                    wmm_ac_vi_txop_limit=options['wmm_ac_vi_txop_limit'],
+                    wmm_ac_vi_acm=options['wmm_ac_vi_acm'],
+                    wmm_ac_vo_aifs=options['wmm_ac_vo_aifs'],
+                    wmm_ac_vo_cwmin=options['wmm_ac_vo_cwmin'],
+                    wmm_ac_vo_cwmax=options['wmm_ac_vo_cwmax'],
+                    wmm_ac_vo_txop_limit=options['wmm_ac_vo_txop_limit'],
+                    wmm_ac_vo_acm=options['wmm_ac_vo_acm'],
                     ht_capab=options['ht_capab'],
                     require_ht=options['require_ht'],
                     ieee80211ac=options['ieee80211ac'],
                     vht_oper_chwidth=options['vht_oper_chwidth'],
                     vht_operations=options['vht_operations'],
+                    vht_capability=options['vht_capab'],
                     require_vht=options['require_vht'],
                     ieee80211d=options['ieee80211d'],
                     ieee80211h=options['ieee80211h'],
@@ -329,14 +388,13 @@ if __name__ == '__main__':
                     acct_server_addr=options['acct_server_addr'],
                     acct_server_shared_secret=options['acct_server_shared_secret'],
                     acct_server_port=options['acct_server_port'],
-                    eap_user_file=config.eap_user_file,
+                    eap_user_file=options['eap_user_file'],
                     ca_pem=options['ca_certificate'],
                     server_pem=options['server_certificate'],
                     private_key=options['server_private_key'],
                     private_key_passwd=options['server_private_key_password'],
                     dh_file=config.dh_file
                 )
-
             conf_manager.freeradius_radiusd_conf.configure(
                 logdir=config.logdir,
                 radiuslog=config.radiuslog,
@@ -345,81 +403,23 @@ if __name__ == '__main__':
                 log_goodpass=options['log_goodpass'],
                 log_badpass=options['log_badpass']
             )
-
             conf_manager.freeradius_default_available_site_conf.configure(
-
             )
-
-            if(options['supported_eap_type'] == 'all'):
-                conf_manager.freeradius_eap_conf.configure(
-                    default_eap_type=options['default_eap_type'],
-                    private_key_password=options['server_private_key_password'],
-                    private_key_file=options['server_private_key'],
-                    certificate_file=options['server_certificate'],
-                    ca_file=options['ca_certificate'],
-                    dh_file=config.dh_file,
-                    ca_path=config.certs_dir
-                )
-            elif(options['supported_eap_type'] == 'fast'):
-                conf_manager.freeradius_eap_fast_conf.configure(
-                    default_eap_type=options['default_eap_type']
-                )
-            elif(options['supported_eap_type'] == 'md5'):
-                conf_manager.freeradius_eap_md5_conf.configure(
-                    default_eap_type=options['default_eap_type']
-                )
-            elif(options['supported_eap_type'] == 'peap'):
-                conf_manager.freeradius_eap_peap_conf.configure(
-                    default_eap_type=options['default_eap_type'],
-                    private_key_password=options['server_private_key_password'],
-                    private_key_file=options['server_private_key'],
-                    certificate_file=options['server_certificate'],
-                    ca_file=options['ca_certificate'],
-                    dh_file=config.dh_file,
-                    ca_path=config.certs_dir
-                )
-            elif(options['supported_eap_type'] == 'ttls'):
-                conf_manager.freeradius_eap_ttls_conf.configure(
-                    default_eap_type=options['default_eap_type'],
-                    private_key_password=options['server_private_key_password'],
-                    private_key_file=options['server_private_key'],
-                    certificate_file=options['server_certificate'],
-                    ca_file=options['ca_certificate'],
-                    dh_file=config.dh_file,
-                    ca_path=config.certs_dir
-                )
-            elif(options['supported_eap_type'] == 'tls'):
-                conf_manager.freeradius_eap_tls_conf.configure(
-                    default_eap_type=options['default_eap_type'],
-                    private_key_password=options['server_private_key_password'],
-                    private_key_file=options['server_private_key'],
-                    certificate_file=options['server_certificate'],
-                    ca_file=options['ca_certificate'],
-                    dh_file=config.dh_file,
-                    ca_path=config.certs_dir
-                )
-            elif(options['supported_eap_type'] == 'leap'):
-                conf_manager.freeradius_eap_leap_conf.configure(
-                    default_eap_type=options['default_eap_type']
-                )
-            elif(options['supported_eap_type'] == 'pwd'):
-                conf_manager.freeradius_eap_pwd_conf.configure(
-                    default_eap_type=options['default_eap_type']
-                )
-            elif(options['supported_eap_type'] == 'gtc'):
-                conf_manager.freeradius_eap_gtc_conf.configure(
-                    default_eap_type=options['default_eap_type']
-                )
-            else:
-                print("[!] No freeradius EAP configuration is created, exiting...")
-                exit(1)
-
+            conf_manager.freeradius_eap_conf.configure(
+                default_eap_type=options['default_eap_type'],
+                private_key_password=options['server_private_key_password'],
+                private_key_file=options['server_private_key'],
+                certificate_file=options['server_certificate'],
+                ca_file=options['ca_certificate'],
+                dh_file=config.dh_file,
+                ca_path=config.certs_dir,
+                supported_eap_type=options['supported_eap_type']
+            )
             conf_manager.freeradius_clients_conf.configure(
                 own_ip_addr=options['own_ip_addr'],
                 auth_server_shared_secret=options['auth_server_shared_secret'],
                 radius_protocol=options['radius_protocol']
             )
-
             print("[*] Launching freeradius-wpe")
             utils.Freeradius.hardstart(config.freeradius_command % (config.freeradius_log, config.freeradius_working_dir), verbose=False)
 
@@ -461,11 +461,6 @@ if __name__ == '__main__':
 
         ##### Middle Operations #####
 
-        if(options['pcap_filename'] is not None):
-            print("[*] Enabling log capturing for interface: %s" % options['interface'])
-            utils.Tcpdump.hardstart(config.tcpdump_cmd % (options['interface'], (config.tcpdump_logdir + '/' + options['pcap_filename'])), verbose=False)
-        else:
-            pass
 
         if(options['internet']):
             print("[*] Enabling IP forwarding")
@@ -473,22 +468,28 @@ if __name__ == '__main__':
         else:
             pass
 
-        if (options['auth'] == 'wpa-enterprise'):
-            if options['print_creds']:
-                rogueClass.ReadFreeRadiusLog(options)
+        if(options['responder'] is True):
+            print("[+] Generating responder configuration file...")
+            if(options['responder'] is True and options['modlishka'] is False):
+                conf_manager.responder_default_conf.configure(
+                    do_not_respond_to_own_ip_addr=config.default_ip_address
+                    )
+                utils.Responder.hardstart(config.responder_cmd % (
+                    options['interface']
+                    ),
+                    verbose=False
+                )
+            elif(options['responder'] is True and options['modlishka'] is True):
+                conf_manager.responder_no_http_conf.configure(
+                    do_not_respond_to_own_ip_addr=config.default_ip_address
+                    )
+                utils.Responder.hardstart(config.responder_cmd % (
+                    options['interface']
+                    ),
+                    verbose=False
+                )
             else:
                 pass
-        else:
-            pass
-
-        if(options['responder'] is True and options['hostile_mode'] != 'responder'):
-            print("[+] Pushing default responder configuration file")
-            conf_manager.responder_default_conf.configure()
-            utils.Responder.hardstart(config.responder_cmd % (
-                options['interface']
-                ),
-                verbose=False
-            )
         else:
             pass
 
@@ -507,69 +508,14 @@ if __name__ == '__main__':
         else:
             pass
 
-        if(options['hostile_portal']):
-            if(options['hostile_mode'] == "beef"):
-                utils.Beef.start()
-
-                hostile_portal.insert(
-                    webroot=options['httpd_root'],
-                    target_file=options['target_file'],
-                    addr=options['ip_address'],
-                    hook=options['hostile_hook'],
-                    marker=options['hostile_marker']
-                )
-
-                subprocess.Popen([config.default_browser + " http://127.0.0.1:3000/ui/authentication"], shell=True)
-            elif(options['hostile_mode'] == 'responder'):
-                print("[+] Pushing custom responder configuration file")
-                conf_manager.responder_no_http_conf.configure()
-                utils.Responder.hardstart(config.responder_cmd % (
-                    options['interface']
-                    ),
-                    verbose=False
-                )
-
-                hostile_portal.insert(
-                    webroot=options['httpd_root'],
-                    target_file=options['target_file'],
-                    addr=options['ip_address'],
-                    hook=options['hostile_hook'],
-                    marker=options['hostile_marker']
-                )
-            else:
-                pass
-        else:
-            pass
-
-        if(options['enable_httpd']):
-
-            if(options['httpd_ssl']):
-                conf_manager.http_ssl_cnf.configure(
-                    port=options['httpd_port'],
-                    addr=options['ip_address'],
-                    webroot=options['httpd_root'],
-                    error_log=config.http_error_log,
-                    custom_log=config.http_custom_log,
-                    server_pem=config.ca_crt,
-                    private_key=config.ca_key
-                )
-
-                utils.Httpd.enableModule()
-            else:
-                conf_manager.http_cnf.configure(
-                    port=options['httpd_port'],
-                    webroot=options['httpd_root'],
-                    error_log=config.http_error_log,
-                    custom_log=config.http_custom_log
-                )
-
-            utils.Httpd.disableDefault()
-            utils.Httpd.enableSite(config.http_name_conf)
-    
-            utils.Httpd.start()
-
-        else:
-            pass
+        if(options['modlishka'] is True):
+            utils.Modlishka.hardstart(config.modlishka_cmd % (
+                options['modlishka_proxydomain'],
+                options['modlishka_proxyaddress'],
+                options['modlishka_controlURL'],
+                options['modlishka_controlCreds'],
+                options['modlishka_listeningaddress'],
+                options['modlishka_target']))
 
         # pause execution until user quits
         input('Press enter to quit...')

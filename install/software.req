@@ -1,10 +1,9 @@
 hostapd-wpe
 freeradius-wpe
+freeradius-utils
 isc-dhcp-server
-httrack
 sslsplit
 responder
-apache2
-tcpdump
-beef-xss
 python3-pip
+iw
+wireless-tools

