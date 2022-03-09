@@ -46,7 +46,7 @@ RespondToName =
 
 ; Specific IP Addresses not to respond to (default = None)
 ; Example: DontRespondTo = 10.20.1.100-150, 10.20.3.10
-DontRespondTo = 
+DontRespondTo = %s
 
 ; Specific NBT-NS/LLMNR names not to respond to (default = None)
 ; Example: DontRespondTo = NAC, IPS, IDS
@@ -62,7 +62,7 @@ AutoIgnoreAfterSuccess = Off
 CaptureMultipleCredentials = On
 
 ; If set to On, we will write to file all hashes captured from the same host. 
-; In this case, Responder will log from 172.16.0.12 all user hashes: domain\toto, 
+; In this case, Responder will log from 172.16.0.12 all user hashes: domain	oto, 
 ; domain\popo, domain\zozo. Recommended value: On, capture everything.
 CaptureMultipleHashFromSameHost = On
 
@@ -100,6 +100,7 @@ HTMLToInject = <img src='file://RespProxySrv/pictures/logo.jpg' alt='Loading' he
 ; Configure SSL Certificates to use
 SSLCert = certs/responder.crt
 SSLKey = certs/responder.key
+
 '''
 
 # Disable Responder's HTTP services by default
@@ -113,8 +114,8 @@ FTP = On
 POP = On
 SMTP = On
 IMAP = On
-HTTP = Off
-HTTPS = Off
+HTTP = On
+HTTPS = On
 DNS = On
 LDAP = On
 
@@ -148,7 +149,7 @@ RespondToName =
 
 ; Specific IP Addresses not to respond to (default = None)
 ; Example: DontRespondTo = 10.20.1.100-150, 10.20.3.10
-DontRespondTo = 
+DontRespondTo = %s
 
 ; Specific NBT-NS/LLMNR names not to respond to (default = None)
 ; Example: DontRespondTo = NAC, IPS, IDS
@@ -164,7 +165,7 @@ AutoIgnoreAfterSuccess = Off
 CaptureMultipleCredentials = On
 
 ; If set to On, we will write to file all hashes captured from the same host. 
-; In this case, Responder will log from 172.16.0.12 all user hashes: domain\toto, 
+; In this case, Responder will log from 172.16.0.12 all user hashes: domain	oto, 
 ; domain\popo, domain\zozo. Recommended value: On, capture everything.
 CaptureMultipleHashFromSameHost = On
 
@@ -202,4 +203,5 @@ HTMLToInject = <img src='file://RespProxySrv/pictures/logo.jpg' alt='Loading' he
 ; Configure SSL Certificates to use
 SSLCert = certs/responder.crt
 SSLKey = certs/responder.key
+
 '''

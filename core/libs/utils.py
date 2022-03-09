@@ -127,12 +127,6 @@ class Freeradius(Service):
     bin_path = config.freeradius_bin
     sleep_time = config.freeradius_sleep
 
-class Beef(Service):
-
-    service_name = config.beef
-    bin_path = None
-    sleep_time = config.beef_sleep
-
 class Sslsplit(Service):
 
     service_name = None
@@ -146,17 +140,17 @@ class Responder(Service):
     bin_Killname = 'Responder'
     sleep_time = config.responder_sleep
 
+class Modlishka(Service):
+
+    service_name = None
+    bin_path = config.modlishka_bin
+    sleep_time = config.generic_sleep
+
 class WPASupplicant(Service):
 
     service_name = config.wpa_supplicant
     bin_path = config.wpa_supplicant_bin
     sleep_time = config.wpa_supplicant_sleep
-
-class Tcpdump(Service):
-
-    service_name = None
-    bin_path = config.tcpdump_bin
-    sleep_time = config.tcpdump_sleep
 
 def wlan_clean(iface, verbose=True):
 
@@ -184,39 +178,6 @@ def set_ipforward(value):
 
     with open(config.proc_ipforward, 'w') as fd:
         fd.write('%d' % int(value))
-
-class Httpd(Service):
-
-    service_name = config.httpd
-    bin_path = config.httpd_bin
-    sleep_time = config.hostapd_sleep
-
-    @staticmethod
-    def enableModule():
-        os.system("a2enmod ssl")
-
-    @staticmethod
-    def disableModule():
-        os.system("a2dismod ssl")
-
-    @staticmethod
-    def enableSite(site_name):
-        os.system("a2ensite %s" % site_name)
-
-    @staticmethod
-    def enableDefault():
-        os.system("a2ensite 000-default")
-
-    @staticmethod
-    def disableSite(site_name, sites_available):
-        os.system("a2dissite %s" % site_name)
-        os.chdir(sites_available)
-        os.system("rm %s" % (site_name))
-
-    @staticmethod
-    def disableDefault():
-        os.system("a2dissite 000-default")
-
 
 class Iptables(object):
 
