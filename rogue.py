@@ -123,12 +123,16 @@ if __name__ == '__main__':
             print('[-] Checking required RADIUS certificate files exist...')
             if(not os.path.isfile(config.server_pem)):
                 print('[!]   \'{}\' does not exist!'.format(config.server_pem))
+                raise
             if(not os.path.isfile(config.private_key)):
                 print('[!]   \'{}\' does not exist!'.format(config.private_key))
+                raise
             if(not os.path.isfile(config.trusted_root_ca_pem)):
                 print('[!]   \'{}\' does not exist!'.format(config.trusted_root_ca_pem))
+                raise
             if(not os.path.isfile(config.dh_file)):
                 print('[!]   \'{}\' does not exist!'.format(config.dh_file))
+                raise
             print('[-] Check RADIUS certificate files exist passed...')
         except Exception as e:
             print('[!]   Run \'sudo python3 rogue.py --cert-wizard\' command to generate the required certificate files')
