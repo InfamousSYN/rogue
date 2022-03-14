@@ -14,9 +14,9 @@ git clone https://github.com/InfamousSYN/rogue ; cd ./rogue
 ```
 2. Run installer
 ```
-python3 ./install.py
+sudo python3 ./install.py
 ```
 3. Run rogue
 ```
-python3 rogue.py -i wlan0 -h g -c 6 -e rogue --auth open --internet
+sudo python3 /opt/rogue/rogue.py -i wlan0 --auth wpa-enterprise --internet --essid rogue --preset-profile wifi4 --channel-randomiser --default-eap peap
 ```
