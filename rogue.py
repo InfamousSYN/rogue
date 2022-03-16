@@ -121,18 +121,20 @@ if __name__ == '__main__':
         import os
         try:
             print('[-] Checking required RADIUS certificate files exist...')
-            if(not os.path.isfile(config.server_pem)):
-                print('[!]   \'{}\' does not exist!'.format(config.server_pem))
+            if(not os.path.isfile(options['server_certificate'])):
+                print('[!]   \'{}\' does not exist!'.format(options['server_certificate']))
                 raise
-            if(not os.path.isfile(config.private_key)):
-                print('[!]   \'{}\' does not exist!'.format(config.private_key))
+            if(not os.path.isfile(options['server_private_key'])):
+                print('[!]   \'{}\' does not exist!'.format(options['server_private_key']))
                 raise
-            if(not os.path.isfile(config.trusted_root_ca_pem)):
-                print('[!]   \'{}\' does not exist!'.format(config.trusted_root_ca_pem))
+            if(not os.path.isfile(options['ca_certificate'])):
+                print('[!]   \'{}\' does not exist!'.format(options['ca_certificate']))
                 raise
             if(not os.path.isfile(config.dh_file)):
                 print('[!]   \'{}\' does not exist!'.format(config.dh_file))
-                raise
+                print('[-]   creating dh file in location \'{}\''.format(config.certs_dir))
+                import os
+                os.system('openssl dhparam -check -text -5 1024 -out {}/dh'.format(config.certs_dir))
             print('[-] Check RADIUS certificate files exist passed...')
         except Exception as e:
             print('[!]   Run \'sudo python3 rogue.py --cert-wizard\' command to generate the required certificate files')
