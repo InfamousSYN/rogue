@@ -1307,7 +1307,8 @@ def set_options():
     o.set_wmm_enabled()
     o.set_ap_isolate()
     o.check_auth()
-    o.check_hardware_mode()
+    if(options['80211_preset_profile'] is None):
+        o.check_hardware_mode()
 
     # 802.1x Configuration
     o.set_8021x()
