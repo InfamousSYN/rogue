@@ -21,3 +21,7 @@ jobs:
       - name: Install
         run: |
           echo "y" | sudo python3 install.py install
+      
+      - name: rogue [helper]
+        run: |
+          sudo python3 rogue.py --help
