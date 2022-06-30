@@ -1,7 +1,7 @@
 The Rogue Toolkit
 =================
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/infamoussyn/rogue) 
-[![Install](https://github.com/InfamousSYN/rogue/actions/workflows/main.yml/badge.svg)](https://github.com/InfamousSYN/rogue/actions/workflows/main.yml)
+[![Install](https://github.com/InfamousSYN/rogue/actions/workflows/install.yml/badge.svg)](https://github.com/InfamousSYN/rogue/actions/workflows/install.yml)
 
 Getting Started
 -----
