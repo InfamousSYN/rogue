@@ -28,12 +28,10 @@ jobs:
 
       - name: rogue [cert-wizard]
         run: |
-          echo "US" > $FILENAME
-          echo "Texas" >> $FILENAME
-          echo "Austin" >> $FILENAME
-          echo "rogue" >> $FILENAME
-          echo "rogue@rogue.rogue" >> $FILENAME
-          echo "rogue" >> $FILENAME
-          cat $FILENAME | sudo python3 rogue.py --cert-wizard
-        env:
-          $FILENAME: responses.txt
+          echo "US" > responses.txt
+          echo "Texas" >> responses.txt
+          echo "Austin" >> responses.txt
+          echo "rogue" >> responses.txt
+          echo "rogue@rogue.rogue" >> responses.txt
+          echo "rogue" >> responses.txt
+          cat responses.txt | sudo python3 rogue.py --cert-wizard
