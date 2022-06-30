@@ -160,6 +160,9 @@ if __name__ == '__main__':
         print("[!] Interface {} does not exist, {}".format(options['interface'], e))
         exit(1)
 
+    from datetime import datetime
+    starttime=datetime.now()
+    print("[-] Launching rogue at: {}".format(starttime))
     try:
         utils.nmcli.set_unmanaged(options['interface'])
 
@@ -531,5 +534,8 @@ if __name__ == '__main__':
         exit(0)
 
     rogueClass.rogue_shutdown(options)
+    endtime=datetime.now()
+    print("[-] Ending rogue at: {}".format(endtime))
+    print("[-] Rogue Duration: {} seconds".format((endtime-starttime).seconds))
 
     exit(0)

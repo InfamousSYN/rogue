@@ -3,7 +3,7 @@ import os
 import argparse
 
 # application version
-__version__ = "3.0.2"
+__version__ = "3.0.3"
 
 # application site
 __location__ = "https://rogue.infamoussyn.com/"
@@ -79,6 +79,7 @@ hostapd_deny_file_full = working_dir + hostapd_deny_file
 
 # freeradius-wpe settings
 freeradius_dir = "/usr/sbin"
+#freeradius_bin = freeradius_dir + "/freeradius-wpe"
 freeradius_bin = freeradius_dir + "/freeradius-wpe"
 freeradius_log = logdir + "/freeradius-wpe.log"
 freeradius_working_dir = "/etc/freeradius-wpe/3.0"
