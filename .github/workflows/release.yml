@@ -1,0 +1,16 @@
+name: "tagged-release"
+
+on:
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  tagged-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.API_TOKEN }}"
+          prerelease: false
+        id: "automatic_releases"

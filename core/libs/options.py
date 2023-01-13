@@ -1245,9 +1245,9 @@ def set_options():
             options['wmm_ac_vo_acm'] = 0
             options['require_ht'] = True
             options['require_vht'] = False if('--require-vht' not in sys.argv) else options['require_vht']
-            options['ht_rx_stbc1'] = True
-            options['ht_msdu7935'] = True
-            options['ht_dsss_cck'] = True
+            options['ht_rx_stbc1'] = False if('--enable-rx-stbc1' not in sys.argv) else options['ht_rx_stbc1']
+            options['ht_msdu7935'] = False if('--enable-msdu7935' not in sys.argv) else options['ht_msdu7935']
+            options['ht_dsss_cck'] = False if('--enable-cck' not in sys.argv) else options['ht_dsss_cck']
         elif(options['80211_preset_profile'] == 'wifi5'):
             options['hw_mode'] = 'a'
             options['freq'] = 5
@@ -1276,9 +1276,9 @@ def set_options():
             options['wmm_ac_vo_acm'] = 0
             options['require_ht'] = True
             options['require_vht'] = True
-            options['ht_rx_stbc1'] = True
-            options['ht_msdu7935'] = True
-            options['ht_dsss_cck'] = True
+            options['ht_rx_stbc1'] = False if('--enable-rx-stbc1' not in sys.argv) else options['ht_rx_stbc1']
+            options['ht_msdu7935'] = False if('--enable-msdu7935' not in sys.argv) else options['ht_msdu7935']
+            options['ht_dsss_cck'] = False if('--enable-cck' not in sys.argv) else options['ht_dsss_cck']
         elif(options['80211_preset_profile'] == 'wifi6'):
             parser.error("[!] Functionality not implemented yet!")
         else:

@@ -1,0 +1,37 @@
+name: Install
+
+on:
+  pull_request:
+    branches: [ "master" ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Add kali repositories
+        run: |
+          sudo sh -c "echo 'deb https://http.kali.org/kali kali-rolling main non-free contrib' > /etc/apt/sources.list.d/kali.list"
+          wget 'https://archive.kali.org/archive-key.asc'
+          sudo apt-key add archive-key.asc
+
+      - name: Install
+        run: |
+          echo "y" | sudo python3 install.py install
+      
+      - name: rogue [helper]
+        run: |
+          sudo python3 rogue.py --help
+
+      - name: rogue [cert-wizard]
+        run: |
+          echo "US" > responses.txt
+          echo "Texas" >> responses.txt
+          echo "Austin" >> responses.txt
+          echo "rogue" >> responses.txt
+          echo "rogue@rogue.rogue" >> responses.txt
+          echo "rogue" >> responses.txt
+          cat responses.txt | sudo python3 rogue.py --cert-wizard
