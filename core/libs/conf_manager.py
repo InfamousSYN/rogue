@@ -972,6 +972,177 @@ class hostapd_wpa_eap_cnf(object):
             print("[!] Error: %s" % e)
             return 1
 
+class hostapd_wpa3_sae_cnf(object):
+    import config
+    from core.templates.hostapd import hostapd_wpa3_sae_cnf
+
+    path = config.hostapd_conf_full
+    template = hostapd_wpa3_sae_cnf.hostapd_wpa3_sae_cnf
+
+    @classmethod
+    def configure(cls,
+            driver=None,
+            interface=None,
+            ssid=None,
+            beacon_interval=None,
+            hw_mode=None,
+            ieee80211n=None,
+            bssid=None,
+            channel=None,
+            country_code=None,
+            macaddr_acl=None,
+            macaddr_accept_file=None,
+            macaddr_deny_file=None,
+            auth_algs=None,
+            essid_mask=None,
+            wmm_enabled=None,
+            wmm_ac_bk_cwmin=None,
+            wmm_ac_bk_cwmax=None,
+            wmm_ac_bk_aifs=None,
+            wmm_ac_bk_txop_limit=None,
+            wmm_ac_bk_acm=None,
+            wmm_ac_be_aifs=None,
+            wmm_ac_be_cwmin=None,
+            wmm_ac_be_cwmax=None,
+            wmm_ac_be_txop_limit=None,
+            wmm_ac_be_acm=None,
+            wmm_ac_vi_aifs=None,
+            wmm_ac_vi_cwmin=None,
+            wmm_ac_vi_cwmax=None,
+            wmm_ac_vi_txop_limit=None,
+            wmm_ac_vi_acm=None,
+            wmm_ac_vo_aifs=None,
+            wmm_ac_vo_cwmin=None,
+            wmm_ac_vo_cwmax=None,
+            wmm_ac_vo_txop_limit=None,
+            wmm_ac_vo_acm=None,
+            ht_capab=None,
+            require_ht=None,
+            ieee80211ac=None,
+            vht_oper_chwidth=None,
+            vht_operations=None,
+            vht_capability=None,
+            require_vht=None,
+            ieee80211d=None,
+            ieee80211h=None,
+            ap_isolate=None,
+            wpa=None,
+            wpa_passphrase=None,
+            wpa_pairwise=None,
+            rsn_pairwise=None,
+            ieee80211w=None
+            ):
+
+        assert driver is not None
+        assert interface is not None
+        assert ssid is not None
+        assert beacon_interval is not None
+        assert hw_mode is not None
+        assert ieee80211n is not None
+        assert bssid is not None
+        assert channel is not None
+        assert country_code is not None
+        assert macaddr_acl is not None
+        assert macaddr_accept_file is not None
+        assert macaddr_deny_file is not None
+        assert auth_algs is not None
+        assert essid_mask is not None
+        assert wmm_enabled is not None
+        assert wmm_ac_bk_cwmin is not None
+        assert wmm_ac_bk_cwmax is not None
+        assert wmm_ac_bk_aifs is not None
+        assert wmm_ac_bk_txop_limit is not None
+        assert wmm_ac_bk_acm is not None
+        assert wmm_ac_be_aifs is not None
+        assert wmm_ac_be_cwmin is not None
+        assert wmm_ac_be_cwmax is not None
+        assert wmm_ac_be_txop_limit is not None
+        assert wmm_ac_be_acm is not None
+        assert wmm_ac_vi_aifs is not None
+        assert wmm_ac_vi_cwmin is not None
+        assert wmm_ac_vi_cwmax is not None
+        assert wmm_ac_vi_txop_limit is not None
+        assert wmm_ac_vi_acm is not None
+        assert wmm_ac_vo_aifs is not None
+        assert wmm_ac_vo_cwmin is not None
+        assert wmm_ac_vo_cwmax is not None
+        assert wmm_ac_vo_txop_limit is not None
+        assert wmm_ac_vo_acm is not None
+        assert ht_capab is not None
+        assert require_ht is not None
+        assert ieee80211ac is not None
+        assert vht_oper_chwidth is not None
+        assert vht_operations is not None
+        assert vht_capability is not None
+        assert require_vht is not None
+        assert ieee80211d is not None
+        assert ieee80211h is not None
+        assert ap_isolate is not None
+        assert wpa is not None
+        assert wpa_passphrase is not None
+        assert wpa_pairwise is not None
+        assert rsn_pairwise is not None
+        assert ieee80211w is not None
+    
+        try:
+            print("[+] Creating hostapd-wpe.confg file: %s" % cls.path)
+            with open(cls.path, 'w') as fd:
+                fd.write(cls.template %(\
+                    interface,
+                    driver,
+                    ssid,
+                    country_code,
+                    ieee80211d,
+                    ieee80211h,
+                    hw_mode,
+                    channel,
+                    beacon_interval,
+                    macaddr_acl,
+                    macaddr_accept_file,
+                    macaddr_deny_file,
+                    auth_algs,
+                    essid_mask,
+                    wmm_enabled,
+                    wmm_ac_bk_cwmin,
+                    wmm_ac_bk_cwmax,
+                    wmm_ac_bk_aifs,
+                    wmm_ac_bk_txop_limit,
+                    wmm_ac_bk_acm,
+                    wmm_ac_be_aifs,
+                    wmm_ac_be_cwmin,
+                    wmm_ac_be_cwmax,
+                    wmm_ac_be_txop_limit,
+                    wmm_ac_be_acm,
+                    wmm_ac_vi_aifs,
+                    wmm_ac_vi_cwmin,
+                    wmm_ac_vi_cwmax,
+                    wmm_ac_vi_txop_limit,
+                    wmm_ac_vi_acm,
+                    wmm_ac_vo_aifs,
+                    wmm_ac_vo_cwmin,
+                    wmm_ac_vo_cwmax,
+                    wmm_ac_vo_txop_limit,
+                    wmm_ac_vo_acm,
+                    ap_isolate,
+                    ieee80211n,
+                    ht_capab,
+                    require_ht,
+                    ieee80211ac,
+                    vht_capability,
+                    require_vht,
+                    vht_oper_chwidth,
+                    vht_operations,
+                    wpa,
+                    wpa_passphrase,
+                    wpa_pairwise,
+                    rsn_pairwise,
+                    ieee80211w,
+                    bssid
+                ))
+        except Exception as e:
+            print("[!] Error: %s" % e)
+            return 1
+
 class hostapd_custom_cnf(object):
     path = config.hostapd_conf_full
 

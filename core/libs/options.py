@@ -178,6 +178,9 @@ class optionsClass():
         elif(self.auth == 'wpa-enterprise'):
             self.auth_algs=1
             self.eap_user_file = 'eap_user_file={}'.format(config.eap_user_file) if not self.disable_eap_user_file else '#eap_user_file=/etc/hostapd.eap_user'
+        elif(self.auth == 'wpa3-sae'):
+            self.ieee80211w = 2
+
         else:
             pass
 
@@ -314,7 +317,7 @@ def set_options():
     parser.add_argument('--auth',
                     dest='auth',
                     type=str,
-                    choices=['open','wep','wpa-personal','wpa-enterprise'],
+                    choices=['open','wep','wpa-personal','wpa-enterprise','wpa3-sae'],
                     default=config.rogue_auth,
                     help='Specify auth type. (Default: {})'.format(config.rogue_auth))
 
@@ -687,6 +690,12 @@ def set_options():
                     action='store_true',
                     default=False,
                     help='Enable client isolation to prevent low-level bridging of frames between associated stations in the BSS. (Default: disabled)')
+
+    ieee80211_config.add_argument('--ieee80211w',
+                    dest='ieee80211w',
+                    choices=[0,1,2],
+                    default=0,
+                    help='Control whether Protected Management Frames (PMF) is disabled, optional or required. (Default: 0)')
 
     ieee80211ac_config.add_argument('--vht-width',
                     dest='vht_oper_chwidth',

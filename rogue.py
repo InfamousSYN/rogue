@@ -332,7 +332,7 @@ if __name__ == '__main__':
                     wpa_pairwise=options['wpa_pairwise'],
                     rsn_pairwise=options['rsn_pairwise']
                 )
-        else:
+        elif(options['auth'] == 'wpa-enterprise'):
             if(options['hostapd_manual_conf'] is not None):
                 conf_manager.hostapd_custom_cnf.configure(
                     hostapd_location=options['hostapd_manual_conf']
@@ -431,7 +431,67 @@ if __name__ == '__main__':
             )
             print("[*] Launching freeradius-wpe")
             utils.Freeradius.hardstart(config.freeradius_command % (config.freeradius_log, config.freeradius_working_dir), verbose=False)
-
+        elif (options['auth'] == 'wpa3-sae'):
+            if(options['hostapd_manual_conf'] is not None):
+                conf_manager.hostapd_custom_cnf.configure(
+                    hostapd_location=options['hostapd_manual_conf']
+                )
+            else:
+                conf_manager.hostapd_wpa3_sae_cnf.configure(
+                    driver=options['driver'],
+                    interface=options['interface'],
+                    ssid=options['essid'],
+                    beacon_interval=options['beacon_interval'],
+                    hw_mode=options['hw_mode'],
+                    ieee80211n=options['ieee80211n'],
+                    bssid=options['bssid'],
+                    channel=options['channel'],
+                    country_code=options['country_code'],
+                    macaddr_acl=options['macaddr_acl'],
+                    macaddr_accept_file=options['macaddr_accept_file'],
+                    macaddr_deny_file=options['macaddr_deny_file'],
+                    auth_algs=options['auth_algs'],
+                    essid_mask=options['essid_mask'],
+                    wmm_enabled=options['wmm_enabled'],
+                    wmm_ac_bk_cwmin=options['wmm_ac_bk_cwmin'],
+                    wmm_ac_bk_cwmax=options['wmm_ac_bk_cwmax'],
+                    wmm_ac_bk_aifs=options['wmm_ac_bk_aifs'],
+                    wmm_ac_bk_txop_limit=options['wmm_ac_bk_txop_limit'],
+                    wmm_ac_bk_acm=options['wmm_ac_bk_acm'],
+                    wmm_ac_be_aifs=options['wmm_ac_be_aifs'],
+                    wmm_ac_be_cwmin=options['wmm_ac_be_cwmin'],
+                    wmm_ac_be_cwmax=options['wmm_ac_be_cwmax'],
+                    wmm_ac_be_txop_limit=options['wmm_ac_be_txop_limit'],
+                    wmm_ac_be_acm=options['wmm_ac_be_acm'],
+                    wmm_ac_vi_aifs=options['wmm_ac_vi_aifs'],
+                    wmm_ac_vi_cwmin=options['wmm_ac_vi_cwmin'],
+                    wmm_ac_vi_cwmax=options['wmm_ac_vi_cwmax'],
+                    wmm_ac_vi_txop_limit=options['wmm_ac_vi_txop_limit'],
+                    wmm_ac_vi_acm=options['wmm_ac_vi_acm'],
+                    wmm_ac_vo_aifs=options['wmm_ac_vo_aifs'],
+                    wmm_ac_vo_cwmin=options['wmm_ac_vo_cwmin'],
+                    wmm_ac_vo_cwmax=options['wmm_ac_vo_cwmax'],
+                    wmm_ac_vo_txop_limit=options['wmm_ac_vo_txop_limit'],
+                    wmm_ac_vo_acm=options['wmm_ac_vo_acm'],
+                    ht_capab=options['ht_capab'],
+                    require_ht=options['require_ht'],
+                    ieee80211ac=options['ieee80211ac'],
+                    vht_oper_chwidth=options['vht_oper_chwidth'],
+                    vht_operations=options['vht_operations'],
+                    vht_capability=options['vht_capab'],
+                    require_vht=options['require_vht'],
+                    ieee80211d=options['ieee80211d'],
+                    ieee80211h=options['ieee80211h'],
+                    ap_isolate=options['ap_isolate'],
+                    wpa=options['wpa'],
+                    wpa_passphrase=options['wpa_passphrase'],
+                    wpa_pairwise=options['wpa_pairwise'],
+                    rsn_pairwise=options['rsn_pairwise'],
+                    ieee80211w=options['ieee80211w']
+                )
+        else:
+            print('[!] Could not configure hostapd-wpe!')
+            raise
         ##### Launching Program #####
 
         conf_manager.default_dhcp.configure(
