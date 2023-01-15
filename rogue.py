@@ -489,6 +489,106 @@ if __name__ == '__main__':
                     rsn_pairwise=options['rsn_pairwise'],
                     ieee80211w=options['ieee80211w']
                 )
+        elif (options['auth'] == 'wpa3-eap'):
+            if(options['hostapd_manual_conf'] is not None):
+                conf_manager.hostapd_custom_cnf.configure(
+                    hostapd_location=options['hostapd_manual_conf']
+                )
+            else:
+                conf_manager.hostapd_wpa3_eap_cnf.configure(
+                driver=options['driver'],
+                    interface=options['interface'],
+                    ssid=options['essid'],
+                    beacon_interval=options['beacon_interval'],
+                    hw_mode=options['hw_mode'],
+                    ieee80211n=options['ieee80211n'],
+                    bssid=options['bssid'],
+                    channel=options['channel'],
+                    country_code=options['country_code'],
+                    macaddr_acl=options['macaddr_acl'],
+                    macaddr_accept_file=options['macaddr_accept_file'],
+                    macaddr_deny_file=options['macaddr_deny_file'],
+                    auth_algs=options['auth_algs'],
+                    essid_mask=options['essid_mask'],
+                    wmm_enabled=options['wmm_enabled'],
+                    wmm_ac_bk_cwmin=options['wmm_ac_bk_cwmin'],
+                    wmm_ac_bk_cwmax=options['wmm_ac_bk_cwmax'],
+                    wmm_ac_bk_aifs=options['wmm_ac_bk_aifs'],
+                    wmm_ac_bk_txop_limit=options['wmm_ac_bk_txop_limit'],
+                    wmm_ac_bk_acm=options['wmm_ac_bk_acm'],
+                    wmm_ac_be_aifs=options['wmm_ac_be_aifs'],
+                    wmm_ac_be_cwmin=options['wmm_ac_be_cwmin'],
+                    wmm_ac_be_cwmax=options['wmm_ac_be_cwmax'],
+                    wmm_ac_be_txop_limit=options['wmm_ac_be_txop_limit'],
+                    wmm_ac_be_acm=options['wmm_ac_be_acm'],
+                    wmm_ac_vi_aifs=options['wmm_ac_vi_aifs'],
+                    wmm_ac_vi_cwmin=options['wmm_ac_vi_cwmin'],
+                    wmm_ac_vi_cwmax=options['wmm_ac_vi_cwmax'],
+                    wmm_ac_vi_txop_limit=options['wmm_ac_vi_txop_limit'],
+                    wmm_ac_vi_acm=options['wmm_ac_vi_acm'],
+                    wmm_ac_vo_aifs=options['wmm_ac_vo_aifs'],
+                    wmm_ac_vo_cwmin=options['wmm_ac_vo_cwmin'],
+                    wmm_ac_vo_cwmax=options['wmm_ac_vo_cwmax'],
+                    wmm_ac_vo_txop_limit=options['wmm_ac_vo_txop_limit'],
+                    wmm_ac_vo_acm=options['wmm_ac_vo_acm'],
+                    ht_capab=options['ht_capab'],
+                    require_ht=options['require_ht'],
+                    ieee80211ac=options['ieee80211ac'],
+                    vht_oper_chwidth=options['vht_oper_chwidth'],
+                    vht_operations=options['vht_operations'],
+                    vht_capability=options['vht_capab'],
+                    require_vht=options['require_vht'],
+                    ieee80211d=options['ieee80211d'],
+                    ieee80211h=options['ieee80211h'],
+                    ap_isolate=options['ap_isolate'],
+                    wpa=options['wpa'],
+                    wpa_pairwise=options['wpa_pairwise'],
+                    rsn_pairwise=options['rsn_pairwise'],
+                    ieee8021x=options['ieee8021x'],
+                    eapol_version=options['eapol_version'],
+                    eapol_workaround=options['eapol_workaround'],
+                    own_ip_addr=options['own_ip_addr'],
+                    auth_server_addr=options['auth_server_addr'],
+                    auth_server_shared_secret=options['auth_server_shared_secret'],
+                    auth_server_port=options['auth_server_port'],
+                    acct_server_addr=options['acct_server_addr'],
+                    acct_server_shared_secret=options['acct_server_shared_secret'],
+                    acct_server_port=options['acct_server_port'],
+                    eap_user_file=options['eap_user_file'],
+                    ca_pem=options['ca_certificate'],
+                    server_pem=options['server_certificate'],
+                    private_key=options['server_private_key'],
+                    private_key_passwd=options['server_private_key_password'],
+                    dh_file=config.dh_file,
+                    ieee80211w=options['ieee80211w']
+                )
+            conf_manager.freeradius_radiusd_conf.configure(
+                logdir=config.logdir,
+                radiuslog=config.radiuslog,
+                wpelogfile=config.wpelogfile,
+                cert_dir=config.certs_dir,
+                log_goodpass=options['log_goodpass'],
+                log_badpass=options['log_badpass']
+            )
+            conf_manager.freeradius_default_available_site_conf.configure(
+            )
+            conf_manager.freeradius_eap_conf.configure(
+                default_eap_type=options['default_eap_type'],
+                private_key_password=options['server_private_key_password'],
+                private_key_file=options['server_private_key'],
+                certificate_file=options['server_certificate'],
+                ca_file=options['ca_certificate'],
+                dh_file=config.dh_file,
+                ca_path=config.certs_dir,
+                supported_eap_type=options['supported_eap_type']
+            )
+            conf_manager.freeradius_clients_conf.configure(
+                own_ip_addr=options['own_ip_addr'],
+                auth_server_shared_secret=options['auth_server_shared_secret'],
+                radius_protocol=options['radius_protocol']
+            )
+            print("[*] Launching freeradius-wpe")
+            utils.Freeradius.hardstart(config.freeradius_command % (config.freeradius_log, config.freeradius_working_dir), verbose=False)
         else:
             print('[!] Could not configure hostapd-wpe!')
             raise

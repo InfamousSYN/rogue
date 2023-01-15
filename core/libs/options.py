@@ -180,7 +180,14 @@ class optionsClass():
             self.eap_user_file = 'eap_user_file={}'.format(config.eap_user_file) if not self.disable_eap_user_file else '#eap_user_file=/etc/hostapd.eap_user'
         elif(self.auth == 'wpa3-sae'):
             self.ieee80211w = 2
-
+            #self.rsn_pairwise = 'GCMP-256'
+            #self.wpa_pairwise = 'GCMP-256'
+        elif(self.auth == 'wpa3-eap'):
+            self.auth_algs=1
+            self.ieee80211w = 2
+            self.eap_user_file = 'eap_user_file={}'.format(config.eap_user_file) if not self.disable_eap_user_file else '#eap_user_file=/etc/hostapd.eap_user'
+            #self.rsn_pairwise = 'GCMP-256'
+            #self.wpa_pairwise = 'GCMP-256'
         else:
             pass
 
@@ -317,7 +324,7 @@ def set_options():
     parser.add_argument('--auth',
                     dest='auth',
                     type=str,
-                    choices=['open','wep','wpa-personal','wpa-enterprise','wpa3-sae'],
+                    choices=['open','wep','wpa-personal','wpa-enterprise','wpa3-sae','wpa3-eap'],
                     default=config.rogue_auth,
                     help='Specify auth type. (Default: {})'.format(config.rogue_auth))
 
