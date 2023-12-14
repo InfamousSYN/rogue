@@ -13,15 +13,29 @@ An extensible toolkit providing penetration testers an easy-to-use platform to d
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Additional Tools
+   :caption: Arguments
 
-   Additional Tools/hashcatifier
-
+   Arguments/general
+   Arguments/802-11
+   Arguments/802-11n
+   Arguments/802-11ac
+   Arguments/WEP
+   Arguments/WPA-PSK
+   Arguments/802-1x
+   Arguments/radius
+   Arguments/dhcp
+   Arguments/attack
 
 .. toctree::
    :maxdepth: 2
    :hidden:
    :caption: Examples
 
-   Examples/index
+   Examples/Generate a self-signed radius certificate
 
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Additional Tools
+
+   Additional Tools/hashcatifier
