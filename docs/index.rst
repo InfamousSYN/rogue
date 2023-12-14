@@ -8,7 +8,7 @@ An extensible toolkit providing penetration testers an easy-to-use platform to d
    :hidden:
    :caption: Installation
 
-   Installation/index
+   Installation/linux
 
 .. toctree::
    :maxdepth: 2
