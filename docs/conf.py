@@ -31,8 +31,11 @@ release = '3.0.3'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 import sphinx_rtd_theme
+import myst_parser
+
 extensions = [
     "sphinx_rtd_theme",
+    "myst_parser"
 ]
 
 # Add any paths that contain templates here, relative to this directory.
