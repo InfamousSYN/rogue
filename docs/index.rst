@@ -13,6 +13,14 @@ An extensible toolkit providing penetration testers an easy-to-use platform to d
 .. toctree::
    :maxdepth: 2
    :hidden:
+   :caption: Additional Tools
+
+   Additional Tools/hashcatifier
+
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
    :caption: Examples
 
    Examples/index
