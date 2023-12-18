@@ -38,7 +38,7 @@ class optionsClass():
 
     @classmethod
     def set_country(self):
-        self.country_code = "country_code={}".format(self.country_code) if self.country_code is not None else "#country_code=00"
+        self.country_code = "country_code={}".format(self.country_code) if (self.country_code is not None and self.country_code != '00') else "#country_code=00"
 
     @classmethod
     def check_80211d(self):
@@ -508,7 +508,7 @@ def set_options():
     ieee80211_config.add_argument('--country',
                     dest='country_code',
                     type=str,
-                    default=00,
+                    default='00',
                     choices=config.rogue_country_options,
                     help='Configures of country of operation')
 
