@@ -32,6 +32,13 @@ An extensible toolkit providing penetration testers an easy-to-use platform to d
    :caption: Examples
 
    Examples/Generate a self-signed radius certificate
+   Examples/Configuring evil-twin AP with different authentication methods
+   Examples/Configuring evil-twin AP with different 802.11 protocols
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Troubleshooting
 
 .. toctree::
    :maxdepth: 2
