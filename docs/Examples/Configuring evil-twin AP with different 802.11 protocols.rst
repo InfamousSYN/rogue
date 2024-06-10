@@ -43,6 +43,20 @@ sudo python3 /opt/rogue/rogue.py -i wlan0 --auth open --preset-profile wifi4 --f
 sudo python3 /opt/rogue/rogue.py -i wlan0 --auth open --preset-profile wifi5 --channel-randomiser
 ```
 
+802.11ax (wifi 6)
+^^^^^^^^^^^^^^^^
+
+```bash
+coming soon...
+```
+
+802.11be (wifi 7)
+^^^^^^^^^^^^^^^^
+
+```bash
+coming soon...
+```
+
 Manual 802.11 configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
