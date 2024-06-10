@@ -526,6 +526,10 @@ if __name__ == '__main__':
                 options['modlishka_listeningaddress'],
                 options['modlishka_target']))
 
+        # sets the ipv6 link-local address of the wireless interface
+        print('[-] Enabling IPv6 on %s interface, setting link-local address: %s' % (options['interface'], options['ipv6_address']))
+        os.system('sudo ifconfig %s inet6 add %s/64' % (options['interface'], options['ipv6_address']))
+
         # pause execution until user quits
         input('Press enter to quit...')
 

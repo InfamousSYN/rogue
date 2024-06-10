@@ -171,3 +171,4 @@ wpa_supplicant_sleep = 4
 secondary_interface = "eth0"
 proc_ipforward = "/proc/sys/net/ipv4/ip_forward"
 default_browser = "firefox"
+default_ipv6_address = 'fe80::aefe:ef01'
