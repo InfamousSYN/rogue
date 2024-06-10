@@ -367,7 +367,7 @@ def set_options():
     ieee80211_config.add_argument('-p', '--preset-profile',
                     dest='80211_preset_profile',
                     type=str,
-                    choices=['wifi1','wifi2','wifi3','wifi4','wifi5','wifi6'],
+                    choices=['wifi1','wifi2','wifi3','wifi4','wifi5','wifi6','wifi7'],
                     default=None,
                     help='Use a preset 802.11 profile')
 
@@ -1285,6 +1285,8 @@ def set_options():
             options['ht_msdu7935'] = False if('--enable-msdu7935' not in sys.argv) else options['ht_msdu7935']
             options['ht_dsss_cck'] = False if('--enable-cck' not in sys.argv) else options['ht_dsss_cck']
         elif(options['80211_preset_profile'] == 'wifi6'):
+            parser.error("[!] Functionality not implemented yet!")
+        elif(options['80211_preset_profile'] == 'wifi7'):
             parser.error("[!] Functionality not implemented yet!")
         else:
             parser.error("[!] Unknown 802.11 preset profile specified")
