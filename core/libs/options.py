@@ -33,14 +33,6 @@ class optionsClass():
             self.parser.error('[!] --beacon-interval has to be within 15 - 65535.')
 
     @classmethod
-    def set_driver(self):
-        self.driver = "driver={}".format(self.driver) if self.driver is not None else "#driver=hostap"
-
-    @classmethod
-    def set_country(self):
-        self.country_code = "country_code={}".format(self.country_code) if (self.country_code is not None and self.country_code != '00') else "#country_code=00"
-
-    @classmethod
     def check_80211d(self):
         if((self.ieee80211d) and (self.country_code is None)):
             self.parser.error('[!] --ieee80211d has been provided without --country-code.')
@@ -336,9 +328,9 @@ def set_options():
     hostapd_config.add_argument('--driver',
                     dest='driver',
                     type=str,
-                    default=None,
+                    default=config.default_hostapd_driver,
                     choices=['hostap','nl80211','atheros','wired','none','bsd'],
-                    help='Choose the hostapd-wpe driver')
+                    help='Choose the hostapd-wpe driver (Default: {})'.format(config.default_hostapd_driver))
 
     hostapd_config.add_argument('-d',
                     dest='debug',
@@ -1141,93 +1133,53 @@ def set_options():
         if(options['80211_preset_profile'] == 'wifi1'):
             options['hw_mode'] = 'b'
             options['freq'] = 2
-            options['ieee80211n'] = 0
-            options['ieee80211ac'] = 0
-            options['wmm_enabled'] = False if('--wmm-enabled' not in sys.argv) else options['wmm_enabled']
-            options['wmm_ac_bk_cwmin'] = 5
-            options['wmm_ac_bk_cwmax'] = 10
-            options['wmm_ac_bk_aifs'] = 7
-            options['wmm_ac_bk_txop_limit'] = 0
-            options['wmm_ac_bk_acm'] = 0
-            options['wmm_ac_be_aifs'] = 3
-            options['wmm_ac_be_cwmin'] = 5
-            options['wmm_ac_be_cwmax'] = 7
-            options['wmm_ac_be_txop_limit'] = 0
-            options['wmm_ac_be_acm'] = 0
-            options['wmm_ac_vi_aifs'] = 2
-            options['wmm_ac_vi_cwmin'] = 4
-            options['wmm_ac_vi_cwmax'] = 5
-            options['wmm_ac_vi_txop_limit'] = 188
-            options['wmm_ac_vi_acm'] = 0
-            options['wmm_ac_vo_aifs'] = 2
-            options['wmm_ac_vo_cwmin'] = 3
-            options['wmm_ac_vo_cwmax'] = 4
-            options['wmm_ac_vo_txop_limit'] = 47
-            options['wmm_ac_vo_acm'] = 0
-            options['require_ht'] = False if('--require-ht' not in sys.argv) else options['require_ht']
-            options['require_vht'] = False if('--require-vht' not in sys.argv) else options['require_vht']
         elif(options['80211_preset_profile'] == 'wifi2'):
             options['hw_mode'] = 'a'
             options['freq'] = 5
-            options['ieee80211n'] = 0
-            options['ieee80211ac'] = 0
-            options['wmm_enabled'] = False if('--wmm-enabled' not in sys.argv) else options['wmm_enabled']
-            options['wmm_ac_bk_cwmin'] = 5
-            options['wmm_ac_bk_cwmax'] = 10
-            options['wmm_ac_bk_aifs'] = 7
-            options['wmm_ac_bk_txop_limit'] = 0
-            options['wmm_ac_bk_acm'] = 0
-            options['wmm_ac_be_aifs'] = 3
-            options['wmm_ac_be_cwmin'] = 5
-            options['wmm_ac_be_cwmax'] = 7
-            options['wmm_ac_be_txop_limit'] = 0
-            options['wmm_ac_be_acm'] = 0
-            options['wmm_ac_vi_aifs'] = 2
-            options['wmm_ac_vi_cwmin'] = 4
-            options['wmm_ac_vi_cwmax'] = 5
-            options['wmm_ac_vi_txop_limit'] = 188
-            options['wmm_ac_vi_acm'] = 0
-            options['wmm_ac_vo_aifs'] = 2
-            options['wmm_ac_vo_cwmin'] = 3
-            options['wmm_ac_vo_cwmax'] = 4
-            options['wmm_ac_vo_txop_limit'] = 47
-            options['wmm_ac_vo_acm'] = 0
-            options['require_ht'] = False if('--require-ht' not in sys.argv) else options['require_ht']
-            options['require_vht'] = False if('--require-vht' not in sys.argv) else options['require_vht']
+            options['tx_queue_data3_aifs'] = 7
+            options['tx_queue_data3_cwmin'] = 15
+            options['tx_queue_data3_cwmax'] = 1023
+            options['tx_queue_data3_burst'] = 0
+            options['tx_queue_data2_aifs'] = 3
+            options['tx_queue_data2_cwmin'] = 15
+            options['tx_queue_data2_cwmax'] = 63
+            options['tx_queue_data2_burst'] = 0
+            options['tx_queue_data1_aifs'] = 1
+            options['tx_queue_data1_cwmin'] = 7
+            options['tx_queue_data1_cwmax'] = 15
+            options['tx_queue_data1_burst'] = 3.0
+            options['tx_queue_data0_aifs'] = 1
+            options['tx_queue_data0_cwmin'] = 3
+            options['tx_queue_data0_cwmax'] = 7
+            options['tx_queue_data0_burst'] = 1.5
         elif(options['80211_preset_profile'] == 'wifi3'):
             options['hw_mode'] = 'g'
             options['freq'] = 2
-            options['ieee80211n'] = 0
-            options['ieee80211ac'] = 0
-            options['wmm_enabled'] = False if('--wmm-enabled' not in sys.argv) else options['wmm_enabled']
-            options['wmm_ac_bk_cwmin'] = 5
-            options['wmm_ac_bk_cwmax'] = 10
-            options['wmm_ac_bk_aifs'] = 7
-            options['wmm_ac_bk_txop_limit'] = 0
-            options['wmm_ac_bk_acm'] = 0
-            options['wmm_ac_be_aifs'] = 3
-            options['wmm_ac_be_cwmin'] = 5
-            options['wmm_ac_be_cwmax'] = 7
-            options['wmm_ac_be_txop_limit'] = 0
-            options['wmm_ac_be_acm'] = 0
-            options['wmm_ac_vi_aifs'] = 2
-            options['wmm_ac_vi_cwmin'] = 4
-            options['wmm_ac_vi_cwmax'] = 5
-            options['wmm_ac_vi_txop_limit'] = 188
-            options['wmm_ac_vi_acm'] = 0
-            options['wmm_ac_vo_aifs'] = 2
-            options['wmm_ac_vo_cwmin'] = 3
-            options['wmm_ac_vo_cwmax'] = 4
-            options['wmm_ac_vo_txop_limit'] = 47
-            options['wmm_ac_vo_acm'] = 0
-            options['require_ht'] = False if('--require-ht' not in sys.argv) else options['require_ht']
-            options['require_vht'] = False if('--require-vht' not in sys.argv) else options['require_vht']
+            options['tx_queue_data3_aifs'] = 7
+            options['tx_queue_data3_cwmin'] = 15
+            options['tx_queue_data3_cwmax'] = 1023
+            options['tx_queue_data3_burst'] = 0
+            options['tx_queue_data2_aifs'] = 3
+            options['tx_queue_data2_cwmin'] = 15
+            options['tx_queue_data2_cwmax'] = 63
+            options['tx_queue_data2_burst'] = 0
+            options['tx_queue_data1_aifs'] = 1
+            options['tx_queue_data1_cwmin'] = 7
+            options['tx_queue_data1_cwmax'] = 15
+            options['tx_queue_data1_burst'] = 3.0
+            options['tx_queue_data0_aifs'] = 1
+            options['tx_queue_data0_cwmin'] = 3
+            options['tx_queue_data0_cwmax'] = 7
+            options['tx_queue_data0_burst'] = 1.5
         elif(options['80211_preset_profile'] == 'wifi4'):
             options['hw_mode'] = 'a' if options['freq'] == 5 else 'g'
             options['freq'] = 5 if options['freq'] == 5 else 2
+            options['require_ht'] = True
             options['ieee80211n'] = 1
-            options['ieee80211ac'] = 0
             options['wmm_enabled'] = False if('--wmm-enabled' not in sys.argv) else options['wmm_enabled']
+            options['ht_rx_stbc1'] = False if('--enable-rx-stbc1' not in sys.argv) else options['ht_rx_stbc1']
+            options['ht_msdu7935'] = False if('--enable-msdu7935' not in sys.argv) else options['ht_msdu7935']
+            options['ht_dsss_cck'] = False if('--enable-cck' not in sys.argv) else options['ht_dsss_cck']
             options['wmm_ac_bk_cwmin'] = 5
             options['wmm_ac_bk_cwmax'] = 10
             options['wmm_ac_bk_aifs'] = 7
@@ -1248,11 +1200,22 @@ def set_options():
             options['wmm_ac_vo_cwmax'] = 4
             options['wmm_ac_vo_txop_limit'] = 47
             options['wmm_ac_vo_acm'] = 0
-            options['require_ht'] = True
-            options['require_vht'] = False if('--require-vht' not in sys.argv) else options['require_vht']
-            options['ht_rx_stbc1'] = False if('--enable-rx-stbc1' not in sys.argv) else options['ht_rx_stbc1']
-            options['ht_msdu7935'] = False if('--enable-msdu7935' not in sys.argv) else options['ht_msdu7935']
-            options['ht_dsss_cck'] = False if('--enable-cck' not in sys.argv) else options['ht_dsss_cck']
+            options['tx_queue_data3_aifs'] = 7
+            options['tx_queue_data3_cwmin'] = 15
+            options['tx_queue_data3_cwmax'] = 1023
+            options['tx_queue_data3_burst'] = 0
+            options['tx_queue_data2_aifs'] = 3
+            options['tx_queue_data2_cwmin'] = 15
+            options['tx_queue_data2_cwmax'] = 63
+            options['tx_queue_data2_burst'] = 0
+            options['tx_queue_data1_aifs'] = 1
+            options['tx_queue_data1_cwmin'] = 7
+            options['tx_queue_data1_cwmax'] = 15
+            options['tx_queue_data1_burst'] = 3.0
+            options['tx_queue_data0_aifs'] = 1
+            options['tx_queue_data0_cwmin'] = 3
+            options['tx_queue_data0_cwmax'] = 7
+            options['tx_queue_data0_burst'] = 1.5
         elif(options['80211_preset_profile'] == 'wifi5'):
             options['hw_mode'] = 'a'
             options['freq'] = 5
@@ -1279,17 +1242,86 @@ def set_options():
             options['wmm_ac_vo_cwmax'] = 4
             options['wmm_ac_vo_txop_limit'] = 47
             options['wmm_ac_vo_acm'] = 0
+            options['tx_queue_data3_aifs'] = 7
+            options['tx_queue_data3_cwmin'] = 15
+            options['tx_queue_data3_cwmax'] = 1023
+            options['tx_queue_data3_burst'] = 0
+            options['tx_queue_data2_aifs'] = 3
+            options['tx_queue_data2_cwmin'] = 15
+            options['tx_queue_data2_cwmax'] = 63
+            options['tx_queue_data2_burst'] = 0
+            options['tx_queue_data1_aifs'] = 1
+            options['tx_queue_data1_cwmin'] = 7
+            options['tx_queue_data1_cwmax'] = 15
+            options['tx_queue_data1_burst'] = 3.0
+            options['tx_queue_data0_aifs'] = 1
+            options['tx_queue_data0_cwmin'] = 3
+            options['tx_queue_data0_cwmax'] = 7
+            options['tx_queue_data0_burst'] = 1.5
             options['require_ht'] = True
             options['require_vht'] = True
             options['ht_rx_stbc1'] = False if('--enable-rx-stbc1' not in sys.argv) else options['ht_rx_stbc1']
             options['ht_msdu7935'] = False if('--enable-msdu7935' not in sys.argv) else options['ht_msdu7935']
             options['ht_dsss_cck'] = False if('--enable-cck' not in sys.argv) else options['ht_dsss_cck']
         elif(options['80211_preset_profile'] == 'wifi6'):
-            parser.error("[!] Functionality not implemented yet!")
-        elif(options['80211_preset_profile'] == 'wifi7'):
-            parser.error("[!] Functionality not implemented yet!")
-        else:
-            parser.error("[!] Unknown 802.11 preset profile specified")
+            options['hw_mode'] = 'a' if options['freq'] == 5 else 'g'
+            options['freq'] = 5 if options['freq'] == 5 else 2
+            options['ieee80211n'] = 1
+            options['ieee80211ac'] = 1
+            options['wmm_enabled'] = True
+            options['wmm_ac_bk_cwmin'] = 5
+            options['wmm_ac_bk_cwmax'] = 10
+            options['wmm_ac_bk_aifs'] = 7
+            options['wmm_ac_bk_txop_limit'] = 0
+            options['wmm_ac_bk_acm'] = 0
+            options['wmm_ac_be_aifs'] = 3
+            options['wmm_ac_be_cwmin'] = 5
+            options['wmm_ac_be_cwmax'] = 7
+            options['wmm_ac_be_txop_limit'] = 0
+            options['wmm_ac_be_acm'] = 0
+            options['wmm_ac_vi_aifs'] = 2
+            options['wmm_ac_vi_cwmin'] = 4
+            options['wmm_ac_vi_cwmax'] = 5
+            options['wmm_ac_vi_txop_limit'] = 188
+            options['wmm_ac_vi_acm'] = 0
+            options['wmm_ac_vo_aifs'] = 2
+            options['wmm_ac_vo_cwmin'] = 3
+            options['wmm_ac_vo_cwmax'] = 4
+            options['wmm_ac_vo_txop_limit'] = 47
+            options['wmm_ac_vo_acm'] = 0
+            options['tx_queue_data3_aifs'] = 7
+            options['tx_queue_data3_cwmin'] = 15
+            options['tx_queue_data3_cwmax'] = 1023
+            options['tx_queue_data3_burst'] = 0
+            options['tx_queue_data2_aifs'] = 3
+            options['tx_queue_data2_cwmin'] = 15
+            options['tx_queue_data2_cwmax'] = 63
+            options['tx_queue_data2_burst'] = 0
+            options['tx_queue_data1_aifs'] = 1
+            options['tx_queue_data1_cwmin'] = 7
+            options['tx_queue_data1_cwmax'] = 15
+            options['tx_queue_data1_burst'] = 3.0
+            options['tx_queue_data0_aifs'] = 1
+            options['tx_queue_data0_cwmin'] = 3
+            options['tx_queue_data0_cwmax'] = 7
+            options['tx_queue_data0_burst'] = 1.5
+            options['require_ht'] = True
+            options['require_vht'] = True
+            options['ht_rx_stbc1'] = False if('--enable-rx-stbc1' not in sys.argv) else options['ht_rx_stbc1']
+            options['ht_msdu7935'] = False if('--enable-msdu7935' not in sys.argv) else options['ht_msdu7935']
+            options['ht_dsss_cck'] = False if('--enable-cck' not in sys.argv) else options['ht_dsss_cck']
+            options['ieee80211ax'] = 1
+            options['require_he'] = 1
+            options['he_su_beamformer'] = 1
+            options['he_su_beamformee'] = 1
+            options['he_mu_beamformer'] = 1
+            options['he_bss_color'] = 1
+            options['he_default_pe_duration'] = 0
+            options['he_basic_mcs_nss_set'] = 2
+#        elif(options['80211_preset_profile'] == 'wifi7'):
+#            parser.error("[!] Functionality not implemented yet!")
+#        else:
+#            parser.error("[!] Unknown 802.11 preset profile specified")
 
     # Attack Configurations
     options['responder'] = True if('responder' in options['attack_modules']) else False
@@ -1301,8 +1333,6 @@ def set_options():
 
 
     o.check_debug()
-    o.set_driver()
-    o.set_country()
     o.check_80211d()
     o.check_80211h()
     o.check_channel()
@@ -1314,8 +1344,8 @@ def set_options():
     o.set_wmm_enabled()
     o.set_ap_isolate()
     o.check_auth()
-    if(options['80211_preset_profile'] is None):
-        o.check_hardware_mode()
+#    if(options['80211_preset_profile'] is None):
+#        o.check_hardware_mode()
 
     # 802.1x Configuration
     o.set_8021x()

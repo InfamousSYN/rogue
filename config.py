@@ -3,7 +3,7 @@ import os
 import argparse
 
 # application version
-__version__ = "3.0.6"
+__version__ = "3.1.0"
 
 # application site
 __location__ = "https://rogue.infamoussyn.com/"
@@ -172,3 +172,4 @@ secondary_interface = "eth0"
 proc_ipforward = "/proc/sys/net/ipv4/ip_forward"
 default_browser = "firefox"
 default_ipv6_address = 'fe80::aefe:ef01'
+default_hostapd_driver = 'nl80211'
