@@ -32,6 +32,10 @@ class optionsClass():
         if((self.beacon_interval < 15) or self.beacon_interval > 65535):
             self.parser.error('[!] --beacon-interval has to be within 15 - 65535.')
 
+    @staticmethod
+    def set_country_to_upper(value):
+        return value.upper()
+
     @classmethod
     def check_80211d(self):
         if((self.ieee80211d) and (self.country_code is None)):
@@ -499,7 +503,7 @@ def set_options():
 
     ieee80211_config.add_argument('--country',
                     dest='country_code',
-                    type=str,
+                    type=optionsClass.set_country_to_upper,
                     default='00',
                     choices=config.rogue_country_options,
                     help='Configures of country of operation')
