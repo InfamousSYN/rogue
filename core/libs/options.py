@@ -1356,7 +1356,8 @@ def set_options():
 
 
     o.check_debug()
-    o.check_custom_hostapd()
+    if(options['hostapd_manual_conf']):
+        o.check_custom_hostapd()
     o.check_80211d()
     o.check_80211h()
     o.check_channel()
