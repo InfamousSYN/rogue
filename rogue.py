@@ -112,7 +112,8 @@ if __name__ == '__main__':
     if options == 1:
         exit(1)
     if(options['show_options']):
-        print("[+] Options:\r\n[-]   {}\r\n[-]".format(options))
+        import types
+        print("[+] Options:\r\n[-]   {}\r\n[-]".format(dict(sorted(types.MappingProxyType(options).items()))))
 
     if options['cert_wizard']:
         cert_wizard.cert_wizard()
