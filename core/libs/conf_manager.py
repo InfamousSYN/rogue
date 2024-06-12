@@ -275,6 +275,27 @@ class freeradius_eap_conf(object):
 ### Hostapd Template Engines
 ##
 
+class HostapdCustom:
+
+    import config
+
+    path = config.hostapd_conf_full
+
+    @classmethod
+    def configure(cls,
+        hostapd_location=None,
+        ):
+
+        assert hostapd_location is not None
+
+        try:
+            print("[+] Copying custom hostapd-wpe.conf file to default rogue hostapd-wpe.conf file:\r\n %s -> %s" % (hostapd_location, cls.path))
+            os.system('cp %s %s' % (hostapd_location, cls.path))
+        except Exception as e:
+            print("[!] Error: %s" % e)
+            return 1
+        return 0
+
 class HostapdWifi1:
 
     class OpenCnf:

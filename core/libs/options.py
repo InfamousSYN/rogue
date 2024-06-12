@@ -37,6 +37,25 @@ class optionsClass():
         return value.upper()
 
     @classmethod
+    def check_custom_hostapd(self):
+        import re
+        filename = self.hostapd_manual_conf
+        pattern = r'^wpa_key_mgmt\=(.*)$'
+        value = ''
+        regex = re.compile(pattern)
+        with open(filename, 'r') as f:
+            for idx, line in enumerate(f,1):
+                match = re.match(pattern, line)
+                if match:
+                    value = match.group(1)
+        if('WPA-EAP' == value):
+            print('[-] Detected \'WPA-EAP\' as \'wpa_key_mgmt\'...\r\n[-] Manually setting the authentication mode to \'wpa-enterprise\'')
+            self.auth = 'wpa-enterprise'
+        else:
+            self.parser.error('[!] The supplied \'{}\' hostapd-wpe config file does not an active \'wpa_key_mgmt\' line!'.format(filename))
+        return 0
+
+    @classmethod
     def check_80211d(self):
         if((self.ieee80211d) and (self.country_code is None)):
             self.parser.error('[!] --ieee80211d has been provided without --country-code.')
@@ -1337,6 +1356,7 @@ def set_options():
 
 
     o.check_debug()
+    o.check_custom_hostapd()
     o.check_80211d()
     o.check_80211h()
     o.check_channel()
