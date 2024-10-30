@@ -127,6 +127,10 @@ class optionsClass():
         self.require_vht = 1 if self.require_vht is True else 0
 
     @classmethod
+    def set_require_he(self):
+        self.require_he = 1 if self.require_he is True else 0
+
+    @classmethod
     def set_vht_operations(self):
         if(self.require_vht):
             if(self.vht_operations == 0 and self.vht_index == 159):
@@ -147,7 +151,7 @@ class optionsClass():
             self.vht_capab = "vht_capab="
             self.vht_capab = self.vht_capab+"{}".format("[SHORT-GI-80]" if not self.vht_short80 else "")
             self.vht_capab = self.vht_capab+"{}".format("[SHORT-GI-160]" if not self.vht_short160 else "")
-            self.vht_capab = self.vht_capab+"{}".format("[HTC-VHT]" if not self.vht_htc_vht else "")
+            self.vht_capab = self.vht_capab+"{}".format("[+HTC-VHT]" if not self.vht_htc_vht else "")
             self.vht_capab = self.vht_capab+"{}".format("[MAX-MPDU-7991]" if self.vht_mpdu7991 else "")
             self.vht_capab = self.vht_capab+"{}".format("[MAX-MPDU-11454]" if self.vht_mpdu11454 else "")
             self.vht_capab = self.vht_capab+"{}".format("[RXLDPC]" if self.vht_rx_lpdc else "")
@@ -298,6 +302,8 @@ def set_options():
                     title='IEEE 802.11n related configuration')
     ieee80211ac_config = parser.add_argument_group(
                     title='IEEE 802.11ac related configuration')
+    he_config = parser.add_argument_group(
+                    title='The High Efficiency (HE) standard configuration')
     wep_config = parser.add_argument_group(
                     title='WEP authentication configuration')
     wpa_psk_config = parser.add_argument_group(
@@ -850,6 +856,19 @@ def set_options():
                     default=False,
                     help='Enables Rx Antenna Pattern Consistency: [RX-ANTENNA-PATTERN] for VHT capabilities.')
 
+    he_config.add_argument('--require-he',
+                    dest='require_he',
+                    action='store_true',
+                    default=False,
+                    help='Require stations to support the High Efficiency (HE) standard, required for 802.11ax (Default: disabled).')
+
+    he_config.add_argument('--he-width',
+                    dest='he_oper_chwidth',
+                    type=int,
+                    choices=[0,1,2,3],
+                    default=config.rogue_he_index,
+                    help='VHT channel width (Default: {}).'.format(config.rogue_he_index))
+
     wep_config.add_argument('--wep-key-version',
                     dest='wep_default_key',
                     type=int,
@@ -1334,7 +1353,7 @@ def set_options():
             options['ht_msdu7935'] = False if('--enable-msdu7935' not in sys.argv) else options['ht_msdu7935']
             options['ht_dsss_cck'] = False if('--enable-cck' not in sys.argv) else options['ht_dsss_cck']
             options['ieee80211ax'] = 1
-            options['require_he'] = 1
+            options['require_he'] = True
             options['he_su_beamformer'] = 1
             options['he_su_beamformee'] = 1
             options['he_mu_beamformer'] = 1
@@ -1362,8 +1381,9 @@ def set_options():
     o.check_80211h()
     o.check_channel()
     o.set_require_ht()
-    o.set_ht_capability()
     o.set_require_vht()
+    o.set_require_he()
+    o.set_ht_capability()
     o.set_vht_operations()
     o.set_vht_capability()
     o.set_wmm_enabled()

@@ -842,7 +842,7 @@ vht_oper_chwidth={{vht_oper_chwidth}}
 ieee80211ax={{ieee80211ax}}
 
 # Require stations to support HE PHY (reject association if they do not)
-#require_he={{require_he}}
+require_he={{require_he}}
 
 # disable_11ax: Boolean (0/1) to disable HE for a specific BSS
 #disable_11ax=0
@@ -906,6 +906,7 @@ he_default_pe_duration={{he_default_pe_duration}}
 #he_oper_chwidth (see vht_oper_chwidth)
 #he_oper_centr_freq_seg0_idx
 #he_oper_centr_freq_seg1_idx
+he_oper_chwidth={{he_oper_chwidth}}
 
 #he_basic_mcs_nss_set: Basic NSS/MCS set
 # 16-bit combination of 2-bit values of Max HE-MCS For 1..8 SS; each 2-bit
@@ -4203,7 +4204,7 @@ vht_oper_chwidth={{vht_oper_chwidth}}
 ieee80211ax={{ieee80211ax}}
 
 # Require stations to support HE PHY (reject association if they do not)
-#require_he={{require_he}}
+require_he={{require_he}}
 
 # disable_11ax: Boolean (0/1) to disable HE for a specific BSS
 #disable_11ax=0
@@ -4267,6 +4268,7 @@ he_default_pe_duration={{he_default_pe_duration}}
 #he_oper_chwidth (see vht_oper_chwidth)
 #he_oper_centr_freq_seg0_idx
 #he_oper_centr_freq_seg1_idx
+he_oper_chwidth={{he_oper_chwidth}}
 
 #he_basic_mcs_nss_set: Basic NSS/MCS set
 # 16-bit combination of 2-bit values of Max HE-MCS For 1..8 SS; each 2-bit
@@ -7563,7 +7565,7 @@ vht_oper_chwidth={{vht_oper_chwidth}}
 ieee80211ax={{ieee80211ax}}
 
 # Require stations to support HE PHY (reject association if they do not)
-#require_he={{require_he}}
+require_he={{require_he}}
 
 # disable_11ax: Boolean (0/1) to disable HE for a specific BSS
 #disable_11ax=0
@@ -7627,6 +7629,7 @@ he_default_pe_duration={{he_default_pe_duration}}
 #he_oper_chwidth (see vht_oper_chwidth)
 #he_oper_centr_freq_seg0_idx
 #he_oper_centr_freq_seg1_idx
+he_oper_chwidth={{he_oper_chwidth}}
 
 #he_basic_mcs_nss_set: Basic NSS/MCS set
 # 16-bit combination of 2-bit values of Max HE-MCS For 1..8 SS; each 2-bit
@@ -10923,7 +10926,7 @@ vht_oper_chwidth={{vht_oper_chwidth}}
 ieee80211ax={{ieee80211ax}}
 
 # Require stations to support HE PHY (reject association if they do not)
-#require_he={{require_he}}
+require_he={{require_he}}
 
 # disable_11ax: Boolean (0/1) to disable HE for a specific BSS
 #disable_11ax=0
@@ -10987,6 +10990,7 @@ he_default_pe_duration={{he_default_pe_duration}}
 #he_oper_chwidth (see vht_oper_chwidth)
 #he_oper_centr_freq_seg0_idx
 #he_oper_centr_freq_seg1_idx
+he_oper_chwidth={{he_oper_chwidth}}
 
 #he_basic_mcs_nss_set: Basic NSS/MCS set
 # 16-bit combination of 2-bit values of Max HE-MCS For 1..8 SS; each 2-bit

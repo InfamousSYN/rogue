@@ -1069,6 +1069,7 @@ if __name__ == '__main__':
                         he_bss_color=options['he_bss_color'],
                         he_default_pe_duration=options['he_default_pe_duration'],
                         he_basic_mcs_nss_set=options['he_basic_mcs_nss_set'],
+                        he_oper_chwidth=options['he_oper_chwidth'],
                     )
                 elif(options['auth'] == 'wep'):
                     conf_manager.HostapdWifi6.WepCnf.configure(
@@ -1140,6 +1141,7 @@ if __name__ == '__main__':
                         he_bss_color=options['he_bss_color'],
                         he_default_pe_duration=options['he_default_pe_duration'],
                         he_basic_mcs_nss_set=options['he_basic_mcs_nss_set'],
+                        he_oper_chwidth=options['he_oper_chwidth'],
                         wep_default_key=options['wep_default_key'],
                         wep_key=options['wep_key'],
                     )
@@ -1213,6 +1215,7 @@ if __name__ == '__main__':
                         he_bss_color=options['he_bss_color'],
                         he_default_pe_duration=options['he_default_pe_duration'],
                         he_basic_mcs_nss_set=options['he_basic_mcs_nss_set'],
+                        he_oper_chwidth=options['he_oper_chwidth'],
                         wpa=options['wpa'],
                         wpa_passphrase=options['wpa_passphrase'],
                         wpa_pairwise=options['wpa_pairwise'],
@@ -1288,6 +1291,7 @@ if __name__ == '__main__':
                         he_bss_color=options['he_bss_color'],
                         he_default_pe_duration=options['he_default_pe_duration'],
                         he_basic_mcs_nss_set=options['he_basic_mcs_nss_set'],
+                        he_oper_chwidth=options['he_oper_chwidth'],
                         wpa=options['wpa'],
                         wpa_pairwise=options['wpa_pairwise'],
                         rsn_pairwise=options['rsn_pairwise'],

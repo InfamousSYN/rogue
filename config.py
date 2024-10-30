@@ -60,6 +60,7 @@ rogue_vht_index_options = 42
 rogue_wpa_version = 2
 rogue_eapol_version = 2
 rogue_essid_mask = 0
+rogue_he_index = rogue_vht_index
 
 # hostapd-wpe settings
 hostapd_conf_file = "/hostapd-wpe.conf"
@@ -70,7 +71,8 @@ hostapd_command_with_debug = "%s -d"
 hostapd_command_with_ddebug = "%s -dd"
 hostapd_log = logdir + "/hostapd-wpe.log"
 hostapd_dir = "/usr/sbin"
-hostapd_bin = hostapd_dir + "/hostapd-wpe"
+#hostapd_bin = hostapd_dir + "/hostapd-wpe"
+hostapd_bin = "/home/kali/development/hostap-modified/hostapd/hostapd"		# do NOT commit this line
 eap_user_file = "/etc/hostapd-wpe/hostapd-wpe.eap_user"
 hostapd_accept_file = "/hostapd.accept"
 hostapd_accept_file_full = working_dir + hostapd_accept_file

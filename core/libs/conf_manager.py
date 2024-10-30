@@ -3161,6 +3161,7 @@ class HostapdWifi6:
             he_bss_color=None,
             he_default_pe_duration=None,
             he_basic_mcs_nss_set=None,
+            he_oper_chwidth=None,
         ):
 
             assert driver is not None
@@ -3231,6 +3232,7 @@ class HostapdWifi6:
             assert he_bss_color is not None
             assert he_default_pe_duration is not None
             assert he_basic_mcs_nss_set is not None
+            assert he_oper_chwidth is not None
 
             try:
                 print("[+] Creating hostapd-wpe.confg file: %s" % cls.path)
@@ -3305,6 +3307,7 @@ class HostapdWifi6:
                         he_bss_color=he_bss_color,
                         he_default_pe_duration=he_default_pe_duration,
                         he_basic_mcs_nss_set=he_basic_mcs_nss_set,
+                        he_oper_chwidth=he_oper_chwidth,
                     ))
 
             except Exception as e:
@@ -3389,6 +3392,7 @@ class HostapdWifi6:
             he_bss_color=None,
             he_default_pe_duration=None,
             he_basic_mcs_nss_set=None,
+            he_oper_chwidth=None,
             wep_default_key=None,
             wep_key=None
         ):
@@ -3458,6 +3462,7 @@ class HostapdWifi6:
             assert he_bss_color is not None
             assert he_default_pe_duration is not None
             assert he_basic_mcs_nss_set is not None
+            assert he_oper_chwidth is not None
             assert vht_oper_chwidth is not None
             assert vht_operations is not None
             assert vht_capability is not None
@@ -3537,6 +3542,7 @@ class HostapdWifi6:
                         he_bss_color=he_bss_color,
                         he_default_pe_duration=he_default_pe_duration,
                         he_basic_mcs_nss_set=he_basic_mcs_nss_set,
+                        he_oper_chwidth=he_oper_chwidth,
                         wep_key=wep_key,
                         wep_default_key=wep_default_key
                     ))
@@ -3623,6 +3629,7 @@ class HostapdWifi6:
             he_bss_color=None,
             he_default_pe_duration=None,
             he_basic_mcs_nss_set=None,
+            he_oper_chwidth=None,
             wpa=None,
             wpa_passphrase=None,
             wpa_pairwise=None,
@@ -3697,6 +3704,7 @@ class HostapdWifi6:
             assert he_bss_color is not None
             assert he_default_pe_duration is not None
             assert he_basic_mcs_nss_set is not None
+            assert he_oper_chwidth is not None
             assert wpa is not None
             assert wpa_passphrase is not None
             assert wpa_pairwise is not None
@@ -3775,6 +3783,7 @@ class HostapdWifi6:
                         he_bss_color=he_bss_color,
                         he_default_pe_duration=he_default_pe_duration,
                         he_basic_mcs_nss_set=he_basic_mcs_nss_set,
+                        he_oper_chwidth=he_oper_chwidth,
                         wpa=wpa,
                         wpa_passphrase=wpa_passphrase,
                         wpa_pairwise=wpa_pairwise,
@@ -3863,6 +3872,7 @@ class HostapdWifi6:
             he_bss_color=None,
             he_default_pe_duration=None,
             he_basic_mcs_nss_set=None,
+            he_oper_chwidth=None,
             wpa=None,
             wpa_pairwise=None,
             rsn_pairwise=None,
@@ -3952,6 +3962,7 @@ class HostapdWifi6:
             assert he_bss_color is not None
             assert he_default_pe_duration is not None
             assert he_basic_mcs_nss_set is not None
+            assert he_oper_chwidth is not None
             assert wpa is not None
             assert wpa_pairwise is not None
             assert rsn_pairwise is not None
@@ -4045,6 +4056,7 @@ class HostapdWifi6:
                         he_bss_color=he_bss_color,
                         he_default_pe_duration=he_default_pe_duration,
                         he_basic_mcs_nss_set=he_basic_mcs_nss_set,
+                        he_oper_chwidth=he_oper_chwidth,
                         wpa=wpa,
                         wpa_pairwise=wpa_pairwise,
                         rsn_pairwise=rsn_pairwise,
