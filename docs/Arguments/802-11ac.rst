@@ -1,2 +1,21 @@
 802.11ac Arguments
 =======================================
+
+The following arguments control the VHT (Very High Throughput) capabilities advertised by the rogue access point when 802.11ac is in use (for example with ``--preset-profile wifi5`` or ``--require-vht``). Each ``--disable-*`` flag removes the corresponding capability flag from the generated ``vht_capab`` line so that it is no longer advertised.
+
+disable-htc-vht
+^^^^^^^^^^^^^^^
+
+The ``--disable-htc-vht`` argument stops the ``[HTC-VHT]`` (VHT variant HT Control) capability from being advertised. Use this flag when the wireless driver does not support HTC-VHT and hostapd-wpe fails to initialise the interface with an error such as::
+
+    Driver does not support configured VHT capability [VHT_CAP_HTC_VHT]
+
+disable-short80
+^^^^^^^^^^^^^^^
+
+The ``--disable-short80`` argument stops the ``[SHORT-GI-80]`` (Short Guard Interval for 80 MHz) capability from being advertised.
+
+disable-short160
+^^^^^^^^^^^^^^^^
+
+The ``--disable-short160`` argument stops the ``[SHORT-GI-160]`` (Short Guard Interval for 160 MHz) capability from being advertised.

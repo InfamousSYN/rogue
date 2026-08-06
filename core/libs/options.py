@@ -786,7 +786,7 @@ def set_options():
                     dest='vht_htc_vht',
                     action='store_true',
                     default=False,
-                    help='Enables Indicates whether or not the STA supports receiving a VHT variant HT Control for VHT capabilities.')
+                    help='Disables VHT variant HT Control: [HTC-VHT] for VHT capabilities. Use this when the driver reports "Driver does not support configured VHT capability [VHT_CAP_HTC_VHT]".')
 
     ieee80211ac_config.add_argument('--enable-mpdu7991',
                     dest='vht_mpdu7991',
