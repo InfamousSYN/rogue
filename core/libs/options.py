@@ -170,6 +170,61 @@ class optionsClass():
         self.hw_mode = 'a' if self.ieee80211ac else 'g'
 
     @classmethod
+    def detect_manual_auth(self):
+        '''
+        When a manual hostapd-wpe config is supplied via -m/--manual, the
+        authentication method is detected from the file contents rather than
+        trusting the --auth flag (which defaults to 'open'). This ensures the
+        correct auth branch is taken so dependant services (e.g. freeradius)
+        are started. The job is aborted if the file cannot be read, if no
+        method can be detected, or if an explicitly-provided --auth conflicts
+        with the detected method.
+        '''
+        if(self.hostapd_manual_conf is None):
+            return
+
+        try:
+            with open(self.hostapd_manual_conf, 'r') as f:
+                lines = f.readlines()
+        except Exception as e:
+            self.parser.error("[!] --manual file '{}' could not be read; aborting. ({})".format(self.hostapd_manual_conf, e))
+
+        directives = {}
+        for line in lines:
+            line = line.strip()
+            if((not line) or line.startswith('#') or ('=' not in line)):
+                continue
+            key, _, value = line.partition('=')
+            directives[key.strip().lower()] = value.strip()
+
+        def _present(key):
+            return (key in directives) and (directives[key] != '')
+
+        wpa_key_mgmt = directives.get('wpa_key_mgmt', '').upper()
+
+        if((directives.get('ieee8021x') == '1') or ('WPA-EAP' in wpa_key_mgmt) or (directives.get('eap_server') == '1') or _present('auth_server_addr')):
+            detected = 'wpa-enterprise'
+        elif(('WPA-PSK' in wpa_key_mgmt) or _present('wpa_passphrase') or _present('wpa_psk')):
+            detected = 'wpa-personal'
+        elif(_present('wep_key0') or _present('wep_key1') or _present('wep_key2') or _present('wep_key3') or _present('wep_default_key')):
+            detected = 'wep'
+        elif(not _present('wpa')):
+            detected = 'open'
+        else:
+            detected = None
+
+        if(detected is None):
+            self.parser.error("[!] Could not detect an authentication method from the provided hostapd-wpe config '{}'; aborting.".format(self.hostapd_manual_conf))
+
+        if('--auth' in sys.argv):
+            if(self.auth != detected):
+                self.parser.error("[!] --auth '{}' conflicts with the detected authentication method '{}' in the hostapd-wpe config '{}'; aborting.".format(self.auth, detected, self.hostapd_manual_conf))
+        else:
+            self.auth = detected
+
+        print("[+] Detected '{}' authentication method from manual hostapd-wpe config".format(detected))
+
+    @classmethod
     def check_auth(self):
         if(self.auth == 'wep'):
             self.check_wep()
@@ -1311,6 +1366,7 @@ def set_options():
     o.set_vht_capability()
     o.set_wmm_enabled()
     o.set_ap_isolate()
+    o.detect_manual_auth()
     o.check_auth()
     if(options['80211_preset_profile'] is None):
         o.check_hardware_mode()

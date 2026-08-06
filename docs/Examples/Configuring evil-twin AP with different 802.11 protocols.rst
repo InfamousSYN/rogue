@@ -69,8 +69,10 @@ sudo python3 /opt/rogue/rogue.py -i wlan0 --auth open -hm ac --freq 5 -c 36 --ht
 Custom hostapd-wpe configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The [`--manual`](https://the-rogue-toolkit.readthedocs.io/en/latest/Arguments/general.html#manual) argument allows an external `hostapd-wpe.conf` file to be used to configure the hostapd-wpe component. This is different to manually configuring the 802.11 settings, as rogue is still used in the alternative methods to dynamically generate the `hostapd-wpe.conf` file.  
+The [`--manual`](https://the-rogue-toolkit.readthedocs.io/en/latest/Arguments/general.html#manual) argument allows an external `hostapd-wpe.conf` file to be used to configure the hostapd-wpe component. This is different to manually configuring the 802.11 settings, as rogue is still used in the alternative methods to dynamically generate the `hostapd-wpe.conf` file.
 
-```bash 
-sudo python3 /opt/rogue/rogue.py --manual /opt/rogue/tmp/hostapd-wpe.conf
+When `--manual` is used the authentication method is detected from the supplied file, so dependant services (such as freeradius for `wpa-enterprise` networks) are started correctly. `--auth` is optional here, but if supplied it must match the method detected in the file or the job is aborted.
+
+```bash
+sudo python3 /opt/rogue/rogue.py -i wlan0 --manual /opt/rogue/tmp/hostapd-wpe.conf
 ```
