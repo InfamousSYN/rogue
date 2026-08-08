@@ -38,6 +38,26 @@ class optionsClass():
         self.driver = "driver={}".format(self.driver) if self.driver is not None else "#driver=hostap"
 
     @classmethod
+    def check_country(self):
+        '''
+        The regulatory domain (country code) is required for any runtime mode
+        where rogue generates the hostapd-wpe config, so the correct channels,
+        transmit power and (for 5/6 GHz) HT/VHT/HE operation are used. It is a
+        user argument only; it is intentionally not set by any preset profile.
+
+        Exceptions (no --country required):
+          * --cert-wizard  -- generates certificates and exits, no AP is started.
+          * --manual       -- the user supplies a complete hostapd-wpe config,
+                              which is assumed to already set country_code.
+        '''
+        if(self.cert_wizard):
+            return
+        if(self.hostapd_manual_conf is not None):
+            return
+        if((self.country_code is None) or (self.country_code == '00')):
+            self.parser.error("[!] --country is required: set the regulatory domain with a valid ISO 3166-1 alpha-2 country code (e.g. --country US).")
+
+    @classmethod
     def set_country(self):
         self.country_code = "country_code={}".format(self.country_code) if (self.country_code is not None and self.country_code != '00') else "#country_code=00"
 
@@ -327,7 +347,7 @@ def set_options():
     The Rogue Toolkit is an extensible toolkit aimed at providing penetration testers an easy-to-use platform to deploy software-defined Access Points (AP) for the purpose of conducting penetration testing and red team engagements. By using Rogue, penetration testers can easily perform targeted evil twin attacks against a variety of wireless network types. 
                             
     For more information: {}""".format(config.__location__),
-                            usage="sudo python3 /opt/rogue/rogue.py -i wlan0 --auth wpa-enterprise --internet --essid rogue --preset-profile wifi4 --channel-randomiser --default-eap peap",
+                            usage="sudo python3 /opt/rogue/rogue.py -i wlan0 --auth wpa-enterprise --internet --essid rogue --country US --preset-profile wifi4 --channel-randomiser --default-eap peap",
                             add_help=True,
                             formatter_class=RawFormatter,
                             )
@@ -567,7 +587,7 @@ def set_options():
                     type=str,
                     default='00',
                     choices=config.rogue_country_options,
-                    help='Configures of country of operation')
+                    help='(Required for runtime) Sets the regulatory domain / country of operation using an ISO 3166-1 alpha-2 country code (e.g. US). Not required for --cert-wizard or --manual (a manual hostapd-wpe config is assumed to set country_code itself).')
 
     ieee80211_config.add_argument('--macaddr-acl',
                     dest='macaddr_acl',
@@ -1216,6 +1236,7 @@ def set_options():
 
     o.check_debug()
     o.set_driver()
+    o.check_country()
     o.set_country()
     o.check_80211d()
     o.check_80211h()
