@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 import os
+import sys
 import config
+from install import build_hostapd
 
 def read_deps_file(deps_file):
   with open(deps_file) as fd:
@@ -18,6 +20,12 @@ if __name__ == "__main__":
   
     print("[*] Installing Rogue's Python dependencies...")
     os.system("python3 -m pip install -r %s" % config.pip_dep)
+    print("[*] complete!")
+
+    print("[*] Building hostapd-wpe from source...")
+    if build_hostapd.build(force=('--force-hostapd' in sys.argv)) != 0:
+        print("[!] hostapd-wpe build failed; aborting install.")
+        exit(1)
     print("[*] complete!")
 
     # Check if required directories exist

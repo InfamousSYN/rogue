@@ -3,7 +3,7 @@ import os
 import argparse
 
 # application version
-__version__ = "3.2.2"
+__version__ = "3.3.0"
 
 # application site
 __location__ = "https://rogue.infamoussyn.com/"
@@ -22,6 +22,14 @@ hostapd_templates_dir = templates_dir + "/hostapd"
 install_dir = root_dir + "/install"
 software_dep = install_dir + "/software.req"
 pip_dep = install_dir + "/pip.req"
+
+# hostapd-wpe source build (replaces the apt hostapd-wpe package)
+hostapd_src_repo = "https://git.w1.fi/hostap.git"
+hostapd_src_ref = "hostap_2_11"   # pinned; needs >= 2.11 for 802.11be (Wi-Fi 7)
+hostapd_build_dir = core_dir + "/vendor/hostap"
+hostapd_prefix = core_dir + "/vendor/bin"
+hostapd_patch = install_dir + "/hostapd/rogue-karma.patch"
+hostapd_config_overlay = install_dir + "/hostapd/rogue-hostapd.config"
 
 ## Certificates
 certs_dir = core_dir + "/certs"
@@ -69,7 +77,7 @@ hostapd_command_with_karma = "%s -k"
 hostapd_command_with_debug = "%s -d"
 hostapd_command_with_ddebug = "%s -dd"
 hostapd_log = logdir + "/hostapd-wpe.log"
-hostapd_dir = "/usr/sbin"
+hostapd_dir = hostapd_prefix
 hostapd_bin = hostapd_dir + "/hostapd-wpe"
 eap_user_file = "/etc/hostapd-wpe/hostapd-wpe.eap_user"
 hostapd_accept_file = "/hostapd.accept"
