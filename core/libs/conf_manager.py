@@ -837,7 +837,6 @@ class hostapd_wpa_eap_cnf(object):
             acct_server_addr=None,
             acct_server_port=None,
             acct_server_shared_secret=None,
-            eap_user_file=None,
             ca_pem=None,
             server_pem=None,
             private_key=None,
@@ -904,7 +903,6 @@ class hostapd_wpa_eap_cnf(object):
         assert acct_server_addr is not None
         assert acct_server_port is not None
         assert acct_server_shared_secret is not None
-        assert eap_user_file is not None
         assert ca_pem is not None
         assert server_pem is not None
         assert private_key is not None
@@ -963,7 +961,6 @@ class hostapd_wpa_eap_cnf(object):
                     ieee8021x,
                     eapol_version,
                     eapol_workaround,
-                    eap_user_file,
                     ca_pem,
                     server_pem,
                     private_key,

@@ -341,7 +341,6 @@ class optionsClass():
             self.check_wpa_passphrase()
         elif(self.auth == 'wpa-enterprise'):
             self.auth_algs=1
-            self.eap_user_file = 'eap_user_file={}'.format(config.eap_user_file) if not self.disable_eap_user_file else '#eap_user_file=/etc/hostapd.eap_user'
         else:
             pass
 
@@ -1154,12 +1153,6 @@ def set_options():
                     type=str,
                     default=config.private_key_passwd,
                     help='provide the password RADIUS private key. (Default: {})'.format(config.private_key_passwd))
-
-    radius_config.add_argument('--disable-eap-user-file',
-                    dest='disable_eap_user_file',
-                    action='store_true',
-                    default=False,
-                    help='')
 
     attacks.add_argument('-M', '--modules',
                     dest='attack_modules',

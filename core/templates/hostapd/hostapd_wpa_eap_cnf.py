@@ -1117,8 +1117,9 @@ eapol_key_index_workaround=%d
 # Path for EAP server user database
 # If SQLite support is included, this can be set to "sqlite:/path/to/sqlite.db"
 # to use SQLite database instead of a text file.
+# Note: rogue relays EAP to freeradius-wpe, so hostapd's internal EAP server
+# (eap_server / eap_user_file) is intentionally not configured here.
 #eap_user_file=/etc/hostapd.eap_user
-%s
 
 # CA certificate (PEM or DER file) for EAP-TLS/PEAP/TTLS
 #ca_cert=/etc/hostapd.ca.pem

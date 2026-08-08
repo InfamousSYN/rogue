@@ -401,7 +401,6 @@ if __name__ == '__main__':
                     acct_server_addr=options['acct_server_addr'],
                     acct_server_shared_secret=options['acct_server_shared_secret'],
                     acct_server_port=options['acct_server_port'],
-                    eap_user_file=options['eap_user_file'],
                     ca_pem=options['ca_certificate'],
                     server_pem=options['server_certificate'],
                     private_key=options['server_private_key'],

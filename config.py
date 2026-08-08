@@ -79,7 +79,6 @@ hostapd_command_with_ddebug = "%s -dd"
 hostapd_log = logdir + "/hostapd-wpe.log"
 hostapd_dir = hostapd_prefix
 hostapd_bin = hostapd_dir + "/hostapd-wpe"
-eap_user_file = "/etc/hostapd-wpe/hostapd-wpe.eap_user"
 hostapd_accept_file = "/hostapd.accept"
 hostapd_accept_file_full = working_dir + hostapd_accept_file
 hostapd_deny_file = "/hostapd.deny"
