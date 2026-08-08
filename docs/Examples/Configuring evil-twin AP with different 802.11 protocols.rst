@@ -56,9 +56,18 @@ The ``wifi6`` profile defaults to the 5GHz band. Use ``--freq 2`` to run on 2.4G
 
    sudo python3 /opt/rogue/rogue.py -i wlan0 --auth open --preset-profile wifi6 --freq 2 --channel-randomiser
 
-.. note:: 
+802.11ax on 6 GHz (Wi-Fi 6E):
 
-   6GHz (Wi-Fi 6E, ``--freq 6``) is not yet supported for this profile; it requires WPA3-SAE/OWE, PMF and op_class handling.
+.. code-block:: bash
+
+   sudo python3 /opt/rogue/rogue.py -i wlan0 --auth open --preset-profile wifi6 --freq 6 --channel-randomiser --country AU
+
+.. note::
+
+   On 6 GHz, open and WPA2 are forbidden and PMF is mandatory. rogue auto-maps
+   the requested auth: ``open`` becomes OWE, and ``wpa-personal`` /
+   ``wpa-enterprise`` are upgraded to WPA3 (SAE / EAP-SHA256). ``wep`` is
+   rejected. The 6 GHz channel randomiser uses the Preferred Scanning Channels.
 
 802.11be (wifi 7)
 ^^^^^^^^^^^^^^^^

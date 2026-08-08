@@ -663,6 +663,15 @@ ieee80211ac=%d
 # directives are documented in the IEEE 802.11ax section below.
 ieee80211ax=%d
 
+# op_class: 6 GHz operating class (disambiguates the 6 GHz band and encodes the
+# channel width). Managed by rogue; commented out on 2.4/5 GHz.
+%s
+
+# he_oper_chwidth / he_oper_centr_freq_seg0_idx: HE operation for the 6 GHz band
+# (which has no VHT operation to inherit from). Managed by rogue; commented on
+# 2.4/5 GHz where hostapd derives HE operation from HT/VHT.
+%s
+
 # disable_11ac: Boolean (0/1) to disable VHT for a specific BSS
 #disable_11ac=0
 
@@ -1718,7 +1727,11 @@ wpa=%d
 # OSEN = Hotspot 2.0 online signup with encryption
 # (dot11RSNAConfigAuthenticationSuitesTable)
 #wpa_key_mgmt=WPA-PSK WPA-EAP
-wpa_key_mgmt=WPA-EAP
+wpa_key_mgmt=%s
+
+# ieee80211w: Management Frame Protection (MFP). 0=disabled, 1=optional, 2=required.
+# Required for WPA3-Enterprise.
+ieee80211w=%d
 
 # Set of accepted cipher suites (encryption algorithms) for pairwise keys
 # (unicast packets). This is a space separated list of algorithms:

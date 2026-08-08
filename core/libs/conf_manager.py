@@ -322,6 +322,8 @@ class hostapd_open_cnf(object):
             require_ht=None,
             ieee80211ac=None,
             ieee80211ax=None,
+            op_class=None,
+            he_operations=None,
             vht_oper_chwidth=None,
             vht_operations=None,
             vht_capability=None,
@@ -370,6 +372,8 @@ class hostapd_open_cnf(object):
         assert require_ht is not None
         assert ieee80211ac is not None
         assert ieee80211ax is not None
+        assert op_class is not None
+        assert he_operations is not None
         assert vht_oper_chwidth is not None
         assert vht_operations is not None
         assert vht_capability is not None
@@ -423,6 +427,8 @@ class hostapd_open_cnf(object):
                     require_ht,
                     ieee80211ac,
                     ieee80211ax,
+                    op_class,
+                    he_operations,
                     vht_capability,
                     require_vht,
                     vht_oper_chwidth,
@@ -481,6 +487,8 @@ class hostapd_wep_cnf(object):
             require_ht=None,
             ieee80211ac=None,
             ieee80211ax=None,
+            op_class=None,
+            he_operations=None,
             vht_oper_chwidth=None,
             vht_operations=None,
             vht_capability=None,
@@ -531,6 +539,8 @@ class hostapd_wep_cnf(object):
         assert require_ht is not None
         assert ieee80211ac is not None
         assert ieee80211ax is not None
+        assert op_class is not None
+        assert he_operations is not None
         assert vht_oper_chwidth is not None
         assert vht_operations is not None
         assert vht_capability is not None
@@ -588,6 +598,8 @@ class hostapd_wep_cnf(object):
                     require_ht,
                     ieee80211ac,
                     ieee80211ax,
+                    op_class,
+                    he_operations,
                     vht_capability,
                     require_vht,
                     vht_oper_chwidth,
@@ -646,6 +658,8 @@ class hostapd_wpa_psk_cnf(object):
             require_ht=None,
             ieee80211ac=None,
             ieee80211ax=None,
+            op_class=None,
+            he_operations=None,
             vht_oper_chwidth=None,
             vht_operations=None,
             vht_capability=None,
@@ -655,6 +669,9 @@ class hostapd_wpa_psk_cnf(object):
             ap_isolate=None,
             wpa=None,
             wpa_passphrase=None,
+            wpa_key_mgmt=None,
+            ieee80211w=None,
+            sae_pwe=None,
             wpa_pairwise=None,
             rsn_pairwise=None,
             ):
@@ -698,6 +715,8 @@ class hostapd_wpa_psk_cnf(object):
         assert require_ht is not None
         assert ieee80211ac is not None
         assert ieee80211ax is not None
+        assert op_class is not None
+        assert he_operations is not None
         assert vht_oper_chwidth is not None
         assert vht_operations is not None
         assert vht_capability is not None
@@ -707,6 +726,9 @@ class hostapd_wpa_psk_cnf(object):
         assert ap_isolate is not None
         assert wpa is not None
         assert wpa_passphrase is not None
+        assert wpa_key_mgmt is not None
+        assert ieee80211w is not None
+        assert sae_pwe is not None
         assert wpa_pairwise is not None
         assert rsn_pairwise is not None
     
@@ -755,12 +777,17 @@ class hostapd_wpa_psk_cnf(object):
                     require_ht,
                     ieee80211ac,
                     ieee80211ax,
+                    op_class,
+                    he_operations,
                     vht_capability,
                     require_vht,
                     vht_oper_chwidth,
                     vht_operations,
                     wpa,
                     wpa_passphrase,
+                    wpa_key_mgmt,
+                    ieee80211w,
+                    sae_pwe,
                     wpa_pairwise,
                     rsn_pairwise,
                     bssid
@@ -817,6 +844,8 @@ class hostapd_wpa_eap_cnf(object):
             require_ht=None,
             ieee80211ac=None,
             ieee80211ax=None,
+            op_class=None,
+            he_operations=None,
             vht_oper_chwidth=None,
             vht_operations=None,
             vht_capability=None,
@@ -825,6 +854,8 @@ class hostapd_wpa_eap_cnf(object):
             ieee80211h=None,
             ap_isolate=None,
             wpa=None,
+            wpa_key_mgmt=None,
+            ieee80211w=None,
             wpa_pairwise=None,
             rsn_pairwise=None,
             ieee8021x=None,
@@ -883,6 +914,8 @@ class hostapd_wpa_eap_cnf(object):
         assert require_ht is not None
         assert ieee80211ac is not None
         assert ieee80211ax is not None
+        assert op_class is not None
+        assert he_operations is not None
         assert vht_oper_chwidth is not None
         assert vht_operations is not None
         assert vht_capability is not None
@@ -891,6 +924,8 @@ class hostapd_wpa_eap_cnf(object):
         assert ieee80211h is not None
         assert ap_isolate is not None
         assert wpa is not None
+        assert wpa_key_mgmt is not None
+        assert ieee80211w is not None
         assert wpa_pairwise is not None
         assert rsn_pairwise is not None
         assert ieee8021x is not None
@@ -954,6 +989,8 @@ class hostapd_wpa_eap_cnf(object):
                     require_ht,
                     ieee80211ac,
                     ieee80211ax,
+                    op_class,
+                    he_operations,
                     vht_capability,
                     require_vht,
                     vht_oper_chwidth,
@@ -973,6 +1010,8 @@ class hostapd_wpa_eap_cnf(object):
                     acct_server_port,
                     acct_server_shared_secret,
                     wpa,
+                    wpa_key_mgmt,
+                    ieee80211w,
                     wpa_pairwise,
                     rsn_pairwise,
                     bssid

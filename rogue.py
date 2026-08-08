@@ -213,6 +213,8 @@ if __name__ == '__main__':
                     require_ht=options['require_ht'],
                     ieee80211ac=options['ieee80211ac'],
                     ieee80211ax=options['ieee80211ax'],
+                    op_class=options['op_class'],
+                    he_operations=options['he_operations'],
                     vht_oper_chwidth=options['vht_oper_chwidth'],
                     vht_operations=options['vht_operations'],
                     vht_capability=options['vht_capab'],
@@ -267,6 +269,8 @@ if __name__ == '__main__':
                     require_ht=options['require_ht'],
                     ieee80211ac=options['ieee80211ac'],
                     ieee80211ax=options['ieee80211ax'],
+                    op_class=options['op_class'],
+                    he_operations=options['he_operations'],
                     vht_oper_chwidth=options['vht_oper_chwidth'],
                     vht_operations=options['vht_operations'],
                     vht_capability=options['vht_capab'],
@@ -277,7 +281,7 @@ if __name__ == '__main__':
                     wep_default_key=options['wep_default_key'],
                     wep_key=options['wep_key'],
                 )
-        elif (options['auth'] == 'wpa-personal'):
+        elif (options['auth'] == 'wpa-personal' or options['auth'] == 'owe'):
             if(options['hostapd_manual_conf'] is not None):
                 conf_manager.hostapd_custom_cnf.configure(
                     hostapd_location=options['hostapd_manual_conf']
@@ -323,6 +327,8 @@ if __name__ == '__main__':
                     require_ht=options['require_ht'],
                     ieee80211ac=options['ieee80211ac'],
                     ieee80211ax=options['ieee80211ax'],
+                    op_class=options['op_class'],
+                    he_operations=options['he_operations'],
                     vht_oper_chwidth=options['vht_oper_chwidth'],
                     vht_operations=options['vht_operations'],
                     vht_capability=options['vht_capab'],
@@ -332,6 +338,9 @@ if __name__ == '__main__':
                     ap_isolate=options['ap_isolate'],
                     wpa=options['wpa'],
                     wpa_passphrase=options['wpa_passphrase'],
+                    wpa_key_mgmt=options['wpa_key_mgmt'],
+                    ieee80211w=options['ieee80211w'],
+                    sae_pwe=options['sae_pwe'],
                     wpa_pairwise=options['wpa_pairwise'],
                     rsn_pairwise=options['rsn_pairwise']
                 )
@@ -381,6 +390,8 @@ if __name__ == '__main__':
                     require_ht=options['require_ht'],
                     ieee80211ac=options['ieee80211ac'],
                     ieee80211ax=options['ieee80211ax'],
+                    op_class=options['op_class'],
+                    he_operations=options['he_operations'],
                     vht_oper_chwidth=options['vht_oper_chwidth'],
                     vht_operations=options['vht_operations'],
                     vht_capability=options['vht_capab'],
@@ -389,6 +400,8 @@ if __name__ == '__main__':
                     ieee80211h=options['ieee80211h'],
                     ap_isolate=options['ap_isolate'],
                     wpa=options['wpa'],
+                    wpa_key_mgmt=options['wpa_key_mgmt'],
+                    ieee80211w=options['ieee80211w'],
                     wpa_pairwise=options['wpa_pairwise'],
                     rsn_pairwise=options['rsn_pairwise'],
                     ieee8021x=options['ieee8021x'],

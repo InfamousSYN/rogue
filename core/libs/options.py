@@ -5,10 +5,12 @@ import config
 import re
 from core.libs import profiles
 
-# --- 5 GHz wide-channel (VHT/HE) helpers ------------------------------------
-# 40 MHz secondary-channel direction per 5 GHz primary channel: the lower
-# channel of each 40 MHz pair takes its secondary above ('+'), the upper below
-# ('-'). Used to advertise the single valid [HT40+]/[HT40-] for a wide channel.
+'''
+--- 5 GHz wide-channel (VHT/HE) helpers ------------------------------------
+40 MHz secondary-channel direction per 5 GHz primary channel: the lower
+channel of each 40 MHz pair takes its secondary above ('+'), the upper below
+('-'). Used to advertise the single valid [HT40+]/[HT40-] for a wide channel.
+'''
 _HT40_PLUS_5G = {36, 44, 52, 60, 100, 108, 116, 124, 132, 140, 149, 157, 165, 173}
 _HT40_MINUS_5G = {40, 48, 56, 64, 104, 112, 120, 128, 136, 144, 153, 161, 169, 177}
 
@@ -53,6 +55,39 @@ def center_freq_seg0(channel, chwidth):
             if channel in chans:
                 return center
     return channel
+
+'''
+--- 6 GHz (Wi-Fi 6E) helpers ----------------------------------------------
+6 GHz 20 MHz channels are numbered 1,5,9,...,233. Preferred Scanning Channels
+(PSC) are the recommended discovery channels and align to 80 MHz blocks.
+'''
+_PSC_6GHZ = [5, 21, 37, 53, 69, 85, 101, 117, 133, 149, 165, 181, 197, 213, 229]
+
+
+def is_valid_6ghz_channel(channel):
+    # True for a valid 6 GHz 20 MHz channel index (1,5,9,...,233).
+    return (1 <= channel <= 233) and (((channel - 1) % 4) == 0)
+
+
+def op_class_6ghz(chwidth):
+    # Global operating class for a 6 GHz channel width (0=20,1=80,2=160,3=80+80).
+    return {0: 131, 1: 133, 2: 134, 3: 135}.get(chwidth, 131)
+
+
+def center_freq_seg0_6ghz(channel, chwidth):
+    '''
+    he_oper_centr_freq_seg0_idx for a 6 GHz primary channel and width. 6 GHz
+    blocks are contiguous groups of 20 MHz channels: an 80 MHz block spans 16
+    channel numbers (centre = start+6), a 160 MHz block spans 32 (centre =
+    start+14). 20 MHz uses the primary channel itself.
+    '''
+    if chwidth == 1:      # 80 MHz
+        start = 1 + ((channel - 1) // 16) * 16
+        return start + 6
+    if chwidth == 2:      # 160 MHz
+        start = 1 + ((channel - 1) // 32) * 32
+        return start + 14
+    return channel        # 20 MHz
 
 
 class optionsClass():
@@ -133,6 +168,21 @@ class optionsClass():
 
     @classmethod
     def check_channel(self):
+        if(self.freq == 6):
+            '''
+            6 GHz: channel numbers overlap 2.4/5 GHz, so this band is handled
+            separately (and before the 5 GHz check below, which keys on
+            hw_mode == 'a').
+            '''
+            if((self.channel != 0) and (not is_valid_6ghz_channel(self.channel))):
+                self.parser.error("[!] The provided channel {} is not a valid 6 GHz channel (1,5,9,...,233).".format(self.channel))
+            if((self.channel == 0) and (self.channel_randomiser)):
+                import random
+                print('[-] Randomised channel selection is superseding ACS')
+                # 6 GHz Preferred Scanning Channels (all 80 MHz-block aligned).
+                self.channel = random.choice(_PSC_6GHZ)
+                print('[-]   Channel {} was selected'.format(self.channel))
+            return
         if((self.freq == 2) and (self.channel != 0)):
             if(self.channel > 13):
                 self.parser.error("[!] The provided channel {} can not be used with Radio Band 2.4GHz.".format(self.channel))
@@ -143,10 +193,12 @@ class optionsClass():
             import random
             print('[-] Randomised channel selection is superseding ACS')
             if((self.hw_mode == 'a' or self.freq == 5)):
-                # Non-DFS 5 GHz channels (UNII-1 + UNII-3) usable for AP mode
-                # without radar detection. DFS channels (UNII-2) are only added
-                # when DFS/802.11h is enabled, otherwise hostapd rejects them
-                # ("Primary frequency not allowed ... RADAR").
+                '''
+                Non-DFS 5 GHz channels (UNII-1 + UNII-3) usable for AP mode
+                without radar detection. DFS channels (UNII-2) are only added
+                when DFS/802.11h is enabled, otherwise hostapd rejects them
+                ("Primary frequency not allowed ... RADAR").
+                '''
                 non_dfs = [36, 40, 44, 48, 149, 153, 157, 161]
                 dfs = [52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140]
                 self.channel = random.choice(non_dfs + dfs if self.ieee80211h else non_dfs)
@@ -160,19 +212,23 @@ class optionsClass():
 
     @classmethod
     def set_ht_capability(self):
-        # HT capabilities are advertised whenever HT is enabled (ieee80211n),
-        # not only when non-HT clients are rejected (require_ht). VHT/HE 80/160
-        # MHz operation depends on the HT40 secondary channel being present here.
+        '''
+        HT capabilities are advertised whenever HT is enabled (ieee80211n),
+        not only when non-HT clients are rejected (require_ht). VHT/HE 80/160
+        MHz operation depends on the HT40 secondary channel being present here.
+        '''
         if(self.ieee80211n):
             if(self.ht_smps_dynamic and self.ht_smps_static):
                 self.parser.error("[!] Select one Spatial Multiplexing capability --enable-smps-dynamic or --enable-smps-static")
             if(self.ht_rx_stbc1 and self.ht_rx_stbc12 and self.ht_rx_stbc123):
                 self.parser.error("[!] Select one Rx STBC capability --enable-rx-stbc1, --enable-rx-stbc12 or --enable-rx-stbc123")
             self.ht_capab = "ht_capab="
-            # For a VHT/HE wide channel (80/160 MHz) the 40 MHz secondary must
-            # match the operating channel, so advertise the single valid
-            # direction. For a 20 MHz HE channel advertise no HT40. Otherwise
-            # honour the manual --disable-ht40+/- flags (legacy behaviour).
+            '''
+            For a VHT/HE wide channel (80/160 MHz) the 40 MHz secondary must
+            match the operating channel, so advertise the single valid
+            direction. For a 20 MHz HE channel advertise no HT40. Otherwise
+            honour the manual --disable-ht40+/- flags (legacy behaviour).
+            '''
             _wide = (self.ieee80211ac and self.channel and self.vht_oper_chwidth >= 1)
             _direction = ht40_direction(self.channel) if _wide else None
             if(_direction == '+'):
@@ -208,10 +264,12 @@ class optionsClass():
 
     @classmethod
     def set_vht_operations(self):
-        # VHT operation is emitted whenever VHT is enabled (ieee80211ac), not
-        # only when non-VHT clients are rejected (require_vht). hostapd derives
-        # the HE operation from this on 5 GHz, so getting it right is what makes
-        # both Wi-Fi 5 and Wi-Fi 6 negotiate correctly.
+        '''
+        VHT operation is emitted whenever VHT is enabled (ieee80211ac), not
+        only when non-VHT clients are rejected (require_vht). hostapd derives
+        the HE operation from this on 5 GHz, so getting it right is what makes
+        both Wi-Fi 5 and Wi-Fi 6 negotiate correctly.
+        '''
         if(self.ieee80211ac):
             if(('--vht-index' in sys.argv) or ('--vht-operation' in sys.argv)):
                 # Manual override: keep the explicit segment selection + checks.
@@ -230,8 +288,10 @@ class optionsClass():
 
     @classmethod
     def set_vht_capability(self):
-        # Advertise VHT capabilities whenever VHT is enabled (ieee80211ac),
-        # decoupled from require_vht (which only rejects non-VHT clients).
+        '''
+        Advertise VHT capabilities whenever VHT is enabled (ieee80211ac),
+        decoupled from require_vht (which only rejects non-VHT clients).
+        '''
         if(self.ieee80211ac):
             if(self.vht_mpdu7991 and self.vht_mpdu11454):
                 self.parser.error("[!] Select one VHT MPDU length option --enable-mpdu7991 or --enable-mpdu11454")
@@ -341,6 +401,12 @@ class optionsClass():
             self.check_wpa_passphrase()
         elif(self.auth == 'wpa-enterprise'):
             self.auth_algs=1
+        elif(self.auth == 'owe'):
+            '''
+            OWE (Enhanced Open) is an RSN network with no credentials; use
+            open-system authentication (auth_algs=1), no passphrase, no EAP.
+            '''
+            self.auth_algs=1
         else:
             pass
 
@@ -385,8 +451,138 @@ class optionsClass():
 
     @classmethod
     def check_wpa_passphrase(self):
-        if((self.auth == 'wpa') and (self.wpa_passphrase is None)):
-            self.parser.error("[!] Please configure provide the following wpa-personal configuration options: ['{}']".format("--wpa-passphrase"))
+        '''
+        A passphrase is required for wpa-personal (WPA2-PSK and WPA3-SAE alike;
+        SAE uses it as the password).
+        '''
+        if((self.auth == 'wpa-personal') and (self.wpa_passphrase is None)):
+            self.parser.error("[!] Please provide the following wpa-personal configuration option: ['{}']".format("--wpa-passphrase"))
+
+    #
+    ## WPA / RSN key management, PMF and SAE
+    #
+
+    @classmethod
+    def set_key_mgmt(self):
+        '''
+        wpa_key_mgmt derives from the credential model (--auth) and the WPA
+        generation selector (--wpa): 2 -> WPA2, 3 -> WPA3.
+        '''
+        if(self.auth == 'wpa-personal'):
+            self.wpa_key_mgmt = 'SAE' if self.wpa == 3 else 'WPA-PSK'
+        elif(self.auth == 'wpa-enterprise'):
+            self.wpa_key_mgmt = 'WPA-EAP-SHA256' if self.wpa == 3 else 'WPA-EAP'
+        elif(self.auth == 'owe'):
+            self.wpa_key_mgmt = 'OWE'
+        else:
+            self.wpa_key_mgmt = ''  # not used for open/wep templates
+
+    @classmethod
+    def set_pmf(self):
+        '''
+        ieee80211w (Management Frame Protection): explicit --pmf wins, otherwise
+        auto per mode. WPA3 and OWE mandate PMF=2; WPA2 -> 1; legacy WPA1 and
+        open/wep -> 0.
+        '''
+        pmf_required = (self.auth == 'owe') or ((self.wpa == 3) and (self.auth in ('wpa-personal', 'wpa-enterprise')))
+        if(self.pmf is not None):
+            w = self.pmf
+        elif(self.auth == 'owe'):
+            w = 2
+        elif(self.auth in ('wpa-personal', 'wpa-enterprise')):
+            if(self.wpa == 3):
+                w = 2
+            elif(self.wpa == 2):
+                w = 1
+            else:
+                w = 0
+        else:
+            w = 0
+        if(pmf_required and (w < 2)):
+            self.parser.error("[!] {} requires Management Frame Protection; use --pmf 2 or omit --pmf for auto.".format('OWE (--auth owe)' if self.auth == 'owe' else 'WPA3 (--wpa 3)'))
+        self.ieee80211w = w
+
+    @classmethod
+    def set_sae_pwe(self):
+        '''
+        SAE Password Element derivation, rendered active only for WPA3-Personal.
+        2 = advertise both hunting-and-pecking and hash-to-element (H2E), the
+        most interoperable choice (H2E is also mandatory on 6 GHz).
+        '''
+        if((self.auth == 'wpa-personal') and (self.wpa == 3)):
+            self.sae_pwe = 'sae_pwe=2'
+        else:
+            self.sae_pwe = '#sae_pwe=2'
+
+    @classmethod
+    def set_passphrase(self):
+        '''
+        Render the wpa_passphrase directive as a full line so it can be omitted
+        (commented) for OWE, which is credential-less. wpa-personal (WPA2-PSK
+        and WPA3-SAE) carries the passphrase; every other mode comments it out.
+        '''
+        if(self.auth == 'wpa-personal'):
+            self.wpa_passphrase = 'wpa_passphrase={}'.format(self.wpa_passphrase)
+        else:
+            self.wpa_passphrase = '#wpa_passphrase='
+
+    @classmethod
+    def set_wpa(self):
+        '''
+        Collapse the rogue selector to the hostapd `wpa=` bitfield: 2 = RSN,
+        used by WPA2, WPA3 and OWE (WPA3 is expressed via wpa_key_mgmt + PMF).
+        Must run AFTER set_key_mgmt/set_pmf/set_sae_pwe, which read the selector.
+        '''
+        if((self.auth == 'owe') or (self.wpa == 3)):
+            self.wpa = 2
+
+    #
+    ## 6 GHz (Wi-Fi 6E)
+    #
+
+    @classmethod
+    def check_6ghz(self):
+        '''
+        6 GHz forbids open and WPA2 and mandates WPA3/OWE + PMF. Map the
+        requested auth to a 6 GHz-legal equivalent before key-mgmt/PMF are
+        computed. Runs before check_auth so the mapped auth takes effect.
+        '''
+        if(self.freq != 6):
+            return
+        if(self.auth == 'wep'):
+            self.parser.error("[!] WEP is not permitted on the 6 GHz band; use WPA3 (--wpa 3) or OWE (--auth owe).")
+        if(self.auth == 'open'):
+            print("[-] 6 GHz forbids open networks; using OWE (Enhanced Open).")
+            self.auth = 'owe'
+        elif((self.auth in ('wpa-personal', 'wpa-enterprise')) and (self.wpa < 3)):
+            print("[-] 6 GHz requires WPA3; upgrading --wpa to 3.")
+            self.wpa = 3
+
+    @classmethod
+    def set_op_class(self):
+        '''
+        op_class disambiguates the 6 GHz band (channel numbers overlap 2.4/5
+        GHz) and encodes the channel width. Commented out on 2.4/5 GHz, where
+        hostapd derives it from hw_mode + channel.
+        '''
+        if(self.freq == 6):
+            self.op_class = 'op_class={}'.format(op_class_6ghz(self.vht_oper_chwidth))
+        else:
+            self.op_class = '#op_class=131'
+
+    @classmethod
+    def set_he_operations(self):
+        '''
+        HE operation for 6 GHz, where there is no VHT operation to inherit
+        from. On 2.4/5 GHz hostapd derives HE operation from HT/VHT, so this
+        is left commented.
+        '''
+        if((self.freq == 6) and (self.channel)):
+            width = self.vht_oper_chwidth
+            seg0 = center_freq_seg0_6ghz(self.channel, width)
+            self.he_operations = 'he_oper_chwidth={}\r\nhe_oper_centr_freq_seg0_idx={}'.format(width, seg0)
+        else:
+            self.he_operations = '#he_oper_chwidth=1\r\n#he_oper_centr_freq_seg0_idx=42'
 
     #
     ## IEEE 802.1x Configuration
@@ -477,9 +673,9 @@ def set_options():
     parser.add_argument('--auth',
                     dest='auth',
                     type=str,
-                    choices=['open','wep','wpa-personal','wpa-enterprise'],
+                    choices=['open','owe','wep','wpa-personal','wpa-enterprise'],
                     default=config.rogue_auth,
-                    help='Specify auth type. (Default: {})'.format(config.rogue_auth))
+                    help='Specify auth type. \'owe\' is Enhanced Open (encrypted, no credentials). (Default: {})'.format(config.rogue_auth))
 
     parser.add_argument('--cert-wizard',
                     dest='cert_wizard',
@@ -1035,6 +1231,13 @@ def set_options():
                     default='CCMP',
                     help='(Default: \'CCMP\')')
 
+    wpa_psk_config.add_argument('--pmf',
+                    dest='pmf',
+                    type=int,
+                    choices=[0,1,2],
+                    default=None,
+                    help='Management Frame Protection / ieee80211w: 0=disabled, 1=optional, 2=required. Default is auto (WPA3/OWE->2, WPA2->1, open->0). WPA3 (--wpa 3) always requires 2.')
+
     ieee8021x_config.add_argument('--ieee8021x',
                     dest='ieee8021x',
                     action='store_true',
@@ -1334,7 +1537,20 @@ def set_options():
     o.set_wmm_enabled()
     o.set_ap_isolate()
     o.detect_manual_auth()
+    o.check_6ghz()
     o.check_auth()
+
+    # WPA/RSN key management, PMF and SAE (order matters: set_wpa collapses the
+    # --wpa 3 selector to the hostapd `wpa=2` directive and must run last).
+    o.set_key_mgmt()
+    o.set_pmf()
+    o.set_sae_pwe()
+    o.set_passphrase()
+    o.set_wpa()
+
+    # 6 GHz operating class + HE operation (need the resolved channel/width).
+    o.set_op_class()
+    o.set_he_operations()
 
     # 802.1x Configuration
     o.set_8021x()

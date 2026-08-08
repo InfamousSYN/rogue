@@ -128,14 +128,13 @@ PROFILES = {
     },
     # 802.11ax (High Efficiency / Wi-Fi 6)
     #
-    # Defaults to 5 GHz; --freq overrides the band. hw_mode/freq/ieee80211ac
-    # are derived by the 'band_default_hw_mode' handler in apply_profile()
-    # (so they are intentionally absent here). HE builds on top of HT (+ VHT on
-    # 5 GHz), so ieee80211n stays on and WMM is required. HT/VHT are advertised
-    # but not *required* by default, so non-HE clients can still associate.
+    # Defaults to 5 GHz; --freq overrides the band. hw_mode/freq/ieee80211n/
+    # ieee80211ac/vht_oper_chwidth are derived per band by the
+    # 'band_default_hw_mode' handler in apply_profile() (so they are absent
+    # here). HE is always on (ieee80211ax=1) and WMM is required. HT/VHT are
+    # advertised but not *required* by default, so non-HE clients can associate.
     'wifi6': {
         'band_default_hw_mode': True,
-        'ieee80211n': 1,
         'ieee80211ax': 1,
         'wmm_enabled': True,
         'require_ht': Overridable('--require-ht', False),
@@ -182,24 +181,33 @@ def apply_profile(options, name, argv=None):
         options['freq'] = 5 if options['freq'] == 5 else 2
 
     # 802.11ax (Wi-Fi 6): default to 5 GHz, but honour --freq (2/5/6).
-    #   2 GHz -> hw_mode g, VHT off (VHT is 5 GHz-only), 20 MHz
-    #   5 GHz -> hw_mode a, VHT on, 80 MHz (the Wi-Fi 6 default)
-    #   6 GHz -> guarded until Wi-Fi 6E (WPA3-SAE/OWE + PMF + op_class) is implemented
+    #   2 GHz -> hw_mode g, HT on, VHT off, 20 MHz
+    #   5 GHz -> hw_mode a, HT+VHT on, 80 MHz (the Wi-Fi 6 default)
+    #   6 GHz -> hw_mode a, HE-only (no HT/VHT), 80 MHz (Wi-Fi 6E). Security is
+    #           forced to WPA3/OWE + PMF by optionsClass.check_6ghz().
+    # A user-supplied --vht-width always wins for the channel width.
     if profile.get('band_default_hw_mode'):
         freq = options['freq'] if '--freq' in argv else 5
-        if freq == 6:
-            raise ProfileError(
-                "6 GHz (Wi-Fi 6E) is not yet supported for the wifi6 profile "
-                "(requires WPA3-SAE/OWE, PMF and op_class handling); "
-                "use --freq 2 or --freq 5."
-            )
         options['freq'] = freq
-        options['hw_mode'] = 'g' if freq == 2 else 'a'
-        options['ieee80211ac'] = 0 if freq == 2 else 1
-        # Channel width: 80 MHz on 5 GHz (standard Wi-Fi 6), 20 MHz on 2.4 GHz.
-        # A user-supplied --vht-width always wins.
-        if '--vht-width' not in argv:
-            options['vht_oper_chwidth'] = 0 if freq == 2 else 1
+        user_width = '--vht-width' in argv
+        if freq == 6:
+            options['hw_mode'] = 'a'
+            options['ieee80211n'] = 0
+            options['ieee80211ac'] = 0
+            if not user_width:
+                options['vht_oper_chwidth'] = 1   # 80 MHz
+        elif freq == 2:
+            options['hw_mode'] = 'g'
+            options['ieee80211n'] = 1
+            options['ieee80211ac'] = 0
+            if not user_width:
+                options['vht_oper_chwidth'] = 0   # 20 MHz
+        else:  # 5 GHz
+            options['hw_mode'] = 'a'
+            options['ieee80211n'] = 1
+            options['ieee80211ac'] = 1
+            if not user_width:
+                options['vht_oper_chwidth'] = 1   # 80 MHz
 
     for key, value in profile.items():
         if key in ('freq_dependent_hw_mode', 'band_default_hw_mode'):

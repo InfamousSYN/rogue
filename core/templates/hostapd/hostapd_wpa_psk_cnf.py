@@ -663,6 +663,15 @@ ieee80211ac=%d
 # directives are documented in the IEEE 802.11ax section below.
 ieee80211ax=%d
 
+# op_class: 6 GHz operating class (disambiguates the 6 GHz band and encodes the
+# channel width). Managed by rogue; commented out on 2.4/5 GHz.
+%s
+
+# he_oper_chwidth / he_oper_centr_freq_seg0_idx: HE operation for the 6 GHz band
+# (which has no VHT operation to inherit from). Managed by rogue; commented on
+# 2.4/5 GHz where hostapd derives HE operation from HT/VHT.
+%s
+
 # disable_11ac: Boolean (0/1) to disable VHT for a specific BSS
 #disable_11ac=0
 
@@ -1664,7 +1673,7 @@ wpa=%d
 # wpa_passphrase (dot11RSNAConfigPSKPassPhrase)
 #wpa_psk=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
 #wpa_passphrase=secret passphrase
-wpa_passphrase=%s
+%s
 
 # Optionally, WPA PSKs can be read from a separate text file (containing list
 # of (PSK,MAC address) pairs. This allows more than one PSK to be configured.
@@ -1703,7 +1712,15 @@ wpa_passphrase=%s
 # OSEN = Hotspot 2.0 online signup with encryption
 # (dot11RSNAConfigAuthenticationSuitesTable)
 #wpa_key_mgmt=WPA-PSK WPA-EAP
-wpa_key_mgmt=WPA-PSK
+wpa_key_mgmt=%s
+
+# ieee80211w: Management Frame Protection (MFP). 0=disabled, 1=optional, 2=required.
+# Required for WPA3 (SAE) and OWE.
+ieee80211w=%d
+
+# sae_pwe: SAE Password Element derivation for WPA3-Personal (0=hunting-and-pecking,
+# 1=hash-to-element, 2=both). Rendered active only when SAE is in use.
+%s
 
 # Set of accepted cipher suites (encryption algorithms) for pairwise keys
 # (unicast packets). This is a space separated list of algorithms:
