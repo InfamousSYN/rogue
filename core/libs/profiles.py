@@ -182,8 +182,8 @@ def apply_profile(options, name, argv=None):
         options['freq'] = 5 if options['freq'] == 5 else 2
 
     # 802.11ax (Wi-Fi 6): default to 5 GHz, but honour --freq (2/5/6).
-    #   2 GHz -> hw_mode g, VHT off (VHT is 5 GHz-only)
-    #   5 GHz -> hw_mode a, VHT on
+    #   2 GHz -> hw_mode g, VHT off (VHT is 5 GHz-only), 20 MHz
+    #   5 GHz -> hw_mode a, VHT on, 80 MHz (the Wi-Fi 6 default)
     #   6 GHz -> guarded until Wi-Fi 6E (WPA3-SAE/OWE + PMF + op_class) is implemented
     if profile.get('band_default_hw_mode'):
         freq = options['freq'] if '--freq' in argv else 5
@@ -196,6 +196,10 @@ def apply_profile(options, name, argv=None):
         options['freq'] = freq
         options['hw_mode'] = 'g' if freq == 2 else 'a'
         options['ieee80211ac'] = 0 if freq == 2 else 1
+        # Channel width: 80 MHz on 5 GHz (standard Wi-Fi 6), 20 MHz on 2.4 GHz.
+        # A user-supplied --vht-width always wins.
+        if '--vht-width' not in argv:
+            options['vht_oper_chwidth'] = 0 if freq == 2 else 1
 
     for key, value in profile.items():
         if key in ('freq_dependent_hw_mode', 'band_default_hw_mode'):

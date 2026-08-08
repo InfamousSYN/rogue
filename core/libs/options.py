@@ -5,6 +5,56 @@ import config
 import re
 from core.libs import profiles
 
+# --- 5 GHz wide-channel (VHT/HE) helpers ------------------------------------
+# 40 MHz secondary-channel direction per 5 GHz primary channel: the lower
+# channel of each 40 MHz pair takes its secondary above ('+'), the upper below
+# ('-'). Used to advertise the single valid [HT40+]/[HT40-] for a wide channel.
+_HT40_PLUS_5G = {36, 44, 52, 60, 100, 108, 116, 124, 132, 140, 149, 157, 165, 173}
+_HT40_MINUS_5G = {40, 48, 56, 64, 104, 112, 120, 128, 136, 144, 153, 161, 169, 177}
+
+# Center channel index per wide-channel block (vht/he_oper_centr_freq_seg0_idx).
+_VHT80_CENTER = {
+    frozenset({36, 40, 44, 48}): 42,
+    frozenset({52, 56, 60, 64}): 58,
+    frozenset({100, 104, 108, 112}): 106,
+    frozenset({116, 120, 124, 128}): 122,
+    frozenset({132, 136, 140, 144}): 138,
+    frozenset({149, 153, 157, 161}): 155,
+    frozenset({165, 169, 173, 177}): 171,
+}
+_VHT160_CENTER = {
+    frozenset({36, 40, 44, 48, 52, 56, 60, 64}): 50,
+    frozenset({100, 104, 108, 112, 116, 120, 124, 128}): 114,
+    frozenset({149, 153, 157, 161, 165, 169, 173, 177}): 163,
+}
+
+
+def ht40_direction(channel):
+    '''Return '+', '-' or None for the 40 MHz secondary channel of a 5 GHz channel.'''
+    if channel in _HT40_PLUS_5G:
+        return '+'
+    if channel in _HT40_MINUS_5G:
+        return '-'
+    return None
+
+
+def center_freq_seg0(channel, chwidth):
+    '''
+    Compute vht_oper_centr_freq_seg0_idx for a 5 GHz primary channel and width
+    (0 = 20/40 MHz, 1 = 80 MHz, 2 = 160 MHz). Falls back to the primary channel
+    (correct for 20 MHz) when the channel is not in a known wide block.
+    '''
+    if chwidth == 1:
+        for chans, center in _VHT80_CENTER.items():
+            if channel in chans:
+                return center
+    elif chwidth == 2:
+        for chans, center in _VHT160_CENTER.items():
+            if channel in chans:
+                return center
+    return channel
+
+
 class optionsClass():
 
     @classmethod
@@ -72,9 +122,11 @@ class optionsClass():
 
     @classmethod
     def check_80211h(self):
-        if((self.ieee80211d is False) and (self.ieee80211h is True)):
+        # check_80211d() runs first and converts self.ieee80211d to an int (0/1),
+        # so compare truthily rather than with 'is True'/'is False' (1 is not True).
+        if((not self.ieee80211d) and (self.ieee80211h is True)):
             self.parser.error('[!] --ieee80211h has been provided without --ieee80211d.')
-        elif((self.ieee80211d is True) and (self.ieee80211h is True)):
+        elif((self.ieee80211d) and (self.ieee80211h is True)):
             self.ieee80211h = 1
         else:
             self.ieee80211h = 0
@@ -91,7 +143,13 @@ class optionsClass():
             import random
             print('[-] Randomised channel selection is superseding ACS')
             if((self.hw_mode == 'a' or self.freq == 5)):
-                self.channel = random.choice([40,48,56,64,36,44,52,60])
+                # Non-DFS 5 GHz channels (UNII-1 + UNII-3) usable for AP mode
+                # without radar detection. DFS channels (UNII-2) are only added
+                # when DFS/802.11h is enabled, otherwise hostapd rejects them
+                # ("Primary frequency not allowed ... RADAR").
+                non_dfs = [36, 40, 44, 48, 149, 153, 157, 161]
+                dfs = [52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140]
+                self.channel = random.choice(non_dfs + dfs if self.ieee80211h else non_dfs)
             else:
                 self.channel = random.randrange(1,11)
             print('[-]   Channel {} was selected'.format(self.channel))
@@ -102,14 +160,30 @@ class optionsClass():
 
     @classmethod
     def set_ht_capability(self):
-        if(self.require_ht == 1):
+        # HT capabilities are advertised whenever HT is enabled (ieee80211n),
+        # not only when non-HT clients are rejected (require_ht). VHT/HE 80/160
+        # MHz operation depends on the HT40 secondary channel being present here.
+        if(self.ieee80211n):
             if(self.ht_smps_dynamic and self.ht_smps_static):
                 self.parser.error("[!] Select one Spatial Multiplexing capability --enable-smps-dynamic or --enable-smps-static")
             if(self.ht_rx_stbc1 and self.ht_rx_stbc12 and self.ht_rx_stbc123):
                 self.parser.error("[!] Select one Rx STBC capability --enable-rx-stbc1, --enable-rx-stbc12 or --enable-rx-stbc123")
             self.ht_capab = "ht_capab="
-            self.ht_capab = self.ht_capab+"{}".format("[HT40-]" if not self.ht40_neg else "")
-            self.ht_capab = self.ht_capab+"{}".format("[HT40+]" if not self.ht40_pos else "")
+            # For a VHT/HE wide channel (80/160 MHz) the 40 MHz secondary must
+            # match the operating channel, so advertise the single valid
+            # direction. For a 20 MHz HE channel advertise no HT40. Otherwise
+            # honour the manual --disable-ht40+/- flags (legacy behaviour).
+            _wide = (self.ieee80211ac and self.channel and self.vht_oper_chwidth >= 1)
+            _direction = ht40_direction(self.channel) if _wide else None
+            if(_direction == '+'):
+                self.ht_capab = self.ht_capab+"[HT40+]"
+            elif(_direction == '-'):
+                self.ht_capab = self.ht_capab+"[HT40-]"
+            elif(self.ieee80211ax and self.channel and self.vht_oper_chwidth == 0):
+                pass  # 20 MHz HE: no HT40 secondary channel
+            else:
+                self.ht_capab = self.ht_capab+"{}".format("[HT40-]" if not self.ht40_neg else "")
+                self.ht_capab = self.ht_capab+"{}".format("[HT40+]" if not self.ht40_pos else "")
             self.ht_capab = self.ht_capab+"{}".format("[SHORT-GI-20]" if not self.short20 else "")
             self.ht_capab = self.ht_capab+"{}".format("[SHORT-GI-40]" if not self.short40 else "")
             self.ht_capab = self.ht_capab+"{}".format("[GF]" if self.ht_greenfield else "")
@@ -134,18 +208,31 @@ class optionsClass():
 
     @classmethod
     def set_vht_operations(self):
-        if(self.require_vht):
-            if(self.vht_operations == 0 and self.vht_index == 159):
-                self.parser.error("[!] Invalid VHT operational mode and index combination!\r\n\t(For --vht-operation 0 use --vht-index 42)")
-            if(self.vht_operations == 1 and self.vht_index == 42):
-                self.parser.error("[!] Invalid VHT operational mode and index combination!\r\n\t(For --vht-operation 1 use --vht-index 159)")
-            self.vht_operations = "vht_oper_centr_freq_seg{}_idx={}".format(self.vht_operations, self.vht_index)
+        # VHT operation is emitted whenever VHT is enabled (ieee80211ac), not
+        # only when non-VHT clients are rejected (require_vht). hostapd derives
+        # the HE operation from this on 5 GHz, so getting it right is what makes
+        # both Wi-Fi 5 and Wi-Fi 6 negotiate correctly.
+        if(self.ieee80211ac):
+            if(('--vht-index' in sys.argv) or ('--vht-operation' in sys.argv)):
+                # Manual override: keep the explicit segment selection + checks.
+                if(self.vht_operations == 0 and self.vht_index == 159):
+                    self.parser.error("[!] Invalid VHT operational mode and index combination!\r\n\t(For --vht-operation 0 use --vht-index 42)")
+                if(self.vht_operations == 1 and self.vht_index == 42):
+                    self.parser.error("[!] Invalid VHT operational mode and index combination!\r\n\t(For --vht-operation 1 use --vht-index 159)")
+                self.vht_operations = "vht_oper_centr_freq_seg{}_idx={}".format(self.vht_operations, self.vht_index)
+            elif(self.channel == 0):
+                # ACS selects the channel and center frequency automatically.
+                self.vht_operations = "#vht_oper_centr_freq_seg0_idx=42"
+            else:
+                self.vht_operations = "vht_oper_centr_freq_seg0_idx={}".format(center_freq_seg0(self.channel, self.vht_oper_chwidth))
         else:
             self.vht_operations = "#vht_oper_centr_freq_seg0_idx=42"
 
     @classmethod
     def set_vht_capability(self):
-        if(self.require_vht):
+        # Advertise VHT capabilities whenever VHT is enabled (ieee80211ac),
+        # decoupled from require_vht (which only rejects non-VHT clients).
+        if(self.ieee80211ac):
             if(self.vht_mpdu7991 and self.vht_mpdu11454):
                 self.parser.error("[!] Select one VHT MPDU length option --enable-mpdu7991 or --enable-mpdu11454")
             if(self.vht_rx_stbc1 and self.vht_rx_stbc12 and self.vht_rx_stbc123 and self.vht_rx_stbc1234):
@@ -1241,6 +1328,11 @@ def set_options():
     o.check_80211d()
     o.check_80211h()
     o.check_channel()
+    # Determine the PHY toggles (ieee80211n/ac/ax) before building HT/VHT/HE
+    # capabilities. Preset profiles set these in apply_profile(); the non-preset
+    # path derives them here from --hw-mode.
+    if(options['80211_preset_profile'] is None):
+        o.check_hardware_mode()
     o.set_require_ht()
     o.set_ht_capability()
     o.set_require_vht()
@@ -1250,8 +1342,6 @@ def set_options():
     o.set_ap_isolate()
     o.detect_manual_auth()
     o.check_auth()
-    if(options['80211_preset_profile'] is None):
-        o.check_hardware_mode()
 
     # 802.1x Configuration
     o.set_8021x()
