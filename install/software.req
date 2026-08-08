@@ -1,4 +1,3 @@
-hostapd-wpe
 freeradius-wpe
 freeradius-utils
 isc-dhcp-server
@@ -7,3 +6,9 @@ responder
 python3-pip
 iw
 wireless-tools
+git
+build-essential
+pkg-config
+libssl-dev
+libnl-3-dev
+libnl-genl-3-dev
