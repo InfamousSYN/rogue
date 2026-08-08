@@ -164,6 +164,7 @@ class optionsClass():
 
     @classmethod
     def check_hardware_mode(self):
+        self.ieee80211ax = 1 if self.hw_mode == 'ax' else 0
         self.ieee80211n = 1 if self.hw_mode == 'n' else 0
         self.ieee80211n = 1 if self.hw_mode == 'ac' else 0
         self.ieee80211ac = 1 if self.hw_mode == 'ac' else 0
@@ -437,9 +438,9 @@ def set_options():
     ieee80211_config.add_argument('--freq',
                     dest='freq',
                     type=int,
-                    choices=[2,5],
+                    choices=[2,5,6],
                     default=config.rogue_default_frequency,
-                    help='Specify the radio band to use (Default: {}GHz).'.format(config.rogue_default_frequency))
+                    help='Specify the radio band to use: 2 (2.4GHz), 5 (5GHz) or 6 (6GHz). Note: 6GHz currently requires Wi-Fi 6E support which is not yet implemented. (Default: {}GHz).'.format(config.rogue_default_frequency))
 
     ieee80211_config.add_argument('--beacon-interval',
                     dest='beacon_interval',
@@ -1196,8 +1197,13 @@ def set_options():
     if(options['80211_preset_profile'] is not None):
         if(options['80211_preset_profile'] in profiles.NOT_IMPLEMENTED):
             parser.error("[!] Functionality not implemented yet!")
-        elif(not profiles.apply_profile(options, options['80211_preset_profile'])):
-            parser.error("[!] Unknown 802.11 preset profile specified")
+        else:
+            try:
+                applied = profiles.apply_profile(options, options['80211_preset_profile'])
+            except profiles.ProfileError as e:
+                parser.error("[!] {}".format(e))
+            if(not applied):
+                parser.error("[!] Unknown 802.11 preset profile specified")
 
     # Attack Configurations
     options['responder'] = True if('responder' in options['attack_modules']) else False

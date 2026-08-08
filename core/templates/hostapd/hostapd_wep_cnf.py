@@ -658,6 +658,13 @@ require_ht=%d
 # Note: hw_mode=a is used to specify that 5 GHz band is used with VHT.
 ieee80211ac=%d
 
+# ieee80211ax: Whether IEEE 802.11ax (HE / Wi-Fi 6) is enabled
+# 0 = disabled
+# 1 = enabled
+# Managed by rogue (e.g. --preset-profile wifi6). Optional he_* tuning
+# directives are documented in the IEEE 802.11ax section below.
+ieee80211ax=%d
+
 # disable_11ac: Boolean (0/1) to disable VHT for a specific BSS
 #disable_11ac=0
 

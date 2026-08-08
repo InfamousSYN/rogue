@@ -46,9 +46,17 @@ sudo python3 /opt/rogue/rogue.py -i wlan0 --auth open --preset-profile wifi5 --c
 802.11ax (wifi 6)
 ^^^^^^^^^^^^^^^^
 
+The ``wifi6`` profile defaults to the 5GHz band. Use ``--freq 2`` to run on 2.4GHz instead.
+
 ```bash
-coming soon...
+sudo python3 /opt/rogue/rogue.py -i wlan0 --auth open --preset-profile wifi6 --channel-randomiser
 ```
+
+```bash
+sudo python3 /opt/rogue/rogue.py -i wlan0 --auth open --preset-profile wifi6 --freq 2 --channel-randomiser
+```
+
+Note: 6GHz (Wi-Fi 6E, ``--freq 6``) is not yet supported for this profile; it requires WPA3-SAE/OWE, PMF and op_class handling.
 
 802.11be (wifi 7)
 ^^^^^^^^^^^^^^^^

@@ -19,8 +19,7 @@ requested radio band (used by 802.11n, which is valid on both 2.4 and 5 GHz).
 '''
 import sys
 
-# WMM (WME) EDCA parameters shared by every preset profile. Previously these
-# twenty values were copy-pasted verbatim into wifi1-wifi5.
+# WMM (WME) EDCA parameters shared by every preset profile.
 WMM_AC_DEFAULTS = {
     'wmm_ac_bk_cwmin': 5,
     'wmm_ac_bk_cwmax': 10,
@@ -56,10 +55,20 @@ class Overridable(object):
         self.default = default
 
 
-# Preset profiles whose accepted as choices but not yet implemented. Selecting
-# one produces the historical "not implemented yet" error rather than being
-# treated as an unknown profile.
-NOT_IMPLEMENTED = {'wifi6'}
+class ProfileError(Exception):
+    '''
+    Raised by apply_profile() when a profile is selected with an unsupported
+    option combination (e.g. wifi6 on the 6 GHz band before Wi-Fi 6E support
+    lands). The caller is expected to translate this into a parser error.
+    '''
+    pass
+
+'''
+Preset profiles that are accepted as choices but not yet implemented.
+Selecting one produces the historical "not implemented yet" error rather than
+being treated as an unknown profile. (Kept for future generations, e.g. wifi8.)
+'''
+NOT_IMPLEMENTED = set()
 
 PROFILES = {
     # 802.11b
@@ -117,6 +126,24 @@ PROFILES = {
         'ht_msdu7935': Overridable('--enable-msdu7935', False),
         'ht_dsss_cck': Overridable('--enable-cck', False),
     },
+    # 802.11ax (High Efficiency / Wi-Fi 6)
+    #
+    # Defaults to 5 GHz; --freq overrides the band. hw_mode/freq/ieee80211ac
+    # are derived by the 'band_default_hw_mode' handler in apply_profile()
+    # (so they are intentionally absent here). HE builds on top of HT (+ VHT on
+    # 5 GHz), so ieee80211n stays on and WMM is required. HT/VHT are advertised
+    # but not *required* by default, so non-HE clients can still associate.
+    'wifi6': {
+        'band_default_hw_mode': True,
+        'ieee80211n': 1,
+        'ieee80211ax': 1,
+        'wmm_enabled': True,
+        'require_ht': Overridable('--require-ht', False),
+        'require_vht': Overridable('--require-vht', False),
+        'ht_rx_stbc1': Overridable('--enable-rx-stbc1', False),
+        'ht_msdu7935': Overridable('--enable-msdu7935', False),
+        'ht_dsss_cck': Overridable('--enable-cck', False),
+    },
 }
 
 
@@ -140,6 +167,12 @@ def apply_profile(options, name, argv=None):
     if profile is None:
         return False
 
+    '''
+    Ensure the HE toggle always exists in the options dict so downstream
+    rendering never hits a KeyError; profiles that enable it override below.
+    '''
+    options.setdefault('ieee80211ax', 0)
+
     # Shared WMM/EDCA parameter block (identical across every profile).
     options.update(WMM_AC_DEFAULTS)
 
@@ -148,8 +181,24 @@ def apply_profile(options, name, argv=None):
         options['hw_mode'] = 'a' if options['freq'] == 5 else 'g'
         options['freq'] = 5 if options['freq'] == 5 else 2
 
+    # 802.11ax (Wi-Fi 6): default to 5 GHz, but honour --freq (2/5/6).
+    #   2 GHz -> hw_mode g, VHT off (VHT is 5 GHz-only)
+    #   5 GHz -> hw_mode a, VHT on
+    #   6 GHz -> guarded until Wi-Fi 6E (WPA3-SAE/OWE + PMF + op_class) is implemented
+    if profile.get('band_default_hw_mode'):
+        freq = options['freq'] if '--freq' in argv else 5
+        if freq == 6:
+            raise ProfileError(
+                "6 GHz (Wi-Fi 6E) is not yet supported for the wifi6 profile "
+                "(requires WPA3-SAE/OWE, PMF and op_class handling); "
+                "use --freq 2 or --freq 5."
+            )
+        options['freq'] = freq
+        options['hw_mode'] = 'g' if freq == 2 else 'a'
+        options['ieee80211ac'] = 0 if freq == 2 else 1
+
     for key, value in profile.items():
-        if key == 'freq_dependent_hw_mode':
+        if key in ('freq_dependent_hw_mode', 'band_default_hw_mode'):
             continue
         options[key] = _resolve(value, key, options, argv)
 
