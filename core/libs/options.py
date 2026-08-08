@@ -3,6 +3,7 @@ from argparse import *
 import sys
 import config
 import re
+from core.libs import profiles
 
 class optionsClass():
 
@@ -1193,155 +1194,9 @@ def set_options():
     options = args.__dict__
 
     if(options['80211_preset_profile'] is not None):
-        if(options['80211_preset_profile'] == 'wifi1'):
-            options['hw_mode'] = 'b'
-            options['freq'] = 2
-            options['ieee80211n'] = 0
-            options['ieee80211ac'] = 0
-            options['wmm_enabled'] = False if('--wmm-enabled' not in sys.argv) else options['wmm_enabled']
-            options['wmm_ac_bk_cwmin'] = 5
-            options['wmm_ac_bk_cwmax'] = 10
-            options['wmm_ac_bk_aifs'] = 7
-            options['wmm_ac_bk_txop_limit'] = 0
-            options['wmm_ac_bk_acm'] = 0
-            options['wmm_ac_be_aifs'] = 3
-            options['wmm_ac_be_cwmin'] = 5
-            options['wmm_ac_be_cwmax'] = 7
-            options['wmm_ac_be_txop_limit'] = 0
-            options['wmm_ac_be_acm'] = 0
-            options['wmm_ac_vi_aifs'] = 2
-            options['wmm_ac_vi_cwmin'] = 4
-            options['wmm_ac_vi_cwmax'] = 5
-            options['wmm_ac_vi_txop_limit'] = 188
-            options['wmm_ac_vi_acm'] = 0
-            options['wmm_ac_vo_aifs'] = 2
-            options['wmm_ac_vo_cwmin'] = 3
-            options['wmm_ac_vo_cwmax'] = 4
-            options['wmm_ac_vo_txop_limit'] = 47
-            options['wmm_ac_vo_acm'] = 0
-            options['require_ht'] = False if('--require-ht' not in sys.argv) else options['require_ht']
-            options['require_vht'] = False if('--require-vht' not in sys.argv) else options['require_vht']
-        elif(options['80211_preset_profile'] == 'wifi2'):
-            options['hw_mode'] = 'a'
-            options['freq'] = 5
-            options['ieee80211n'] = 0
-            options['ieee80211ac'] = 0
-            options['wmm_enabled'] = False if('--wmm-enabled' not in sys.argv) else options['wmm_enabled']
-            options['wmm_ac_bk_cwmin'] = 5
-            options['wmm_ac_bk_cwmax'] = 10
-            options['wmm_ac_bk_aifs'] = 7
-            options['wmm_ac_bk_txop_limit'] = 0
-            options['wmm_ac_bk_acm'] = 0
-            options['wmm_ac_be_aifs'] = 3
-            options['wmm_ac_be_cwmin'] = 5
-            options['wmm_ac_be_cwmax'] = 7
-            options['wmm_ac_be_txop_limit'] = 0
-            options['wmm_ac_be_acm'] = 0
-            options['wmm_ac_vi_aifs'] = 2
-            options['wmm_ac_vi_cwmin'] = 4
-            options['wmm_ac_vi_cwmax'] = 5
-            options['wmm_ac_vi_txop_limit'] = 188
-            options['wmm_ac_vi_acm'] = 0
-            options['wmm_ac_vo_aifs'] = 2
-            options['wmm_ac_vo_cwmin'] = 3
-            options['wmm_ac_vo_cwmax'] = 4
-            options['wmm_ac_vo_txop_limit'] = 47
-            options['wmm_ac_vo_acm'] = 0
-            options['require_ht'] = False if('--require-ht' not in sys.argv) else options['require_ht']
-            options['require_vht'] = False if('--require-vht' not in sys.argv) else options['require_vht']
-        elif(options['80211_preset_profile'] == 'wifi3'):
-            options['hw_mode'] = 'g'
-            options['freq'] = 2
-            options['ieee80211n'] = 0
-            options['ieee80211ac'] = 0
-            options['wmm_enabled'] = False if('--wmm-enabled' not in sys.argv) else options['wmm_enabled']
-            options['wmm_ac_bk_cwmin'] = 5
-            options['wmm_ac_bk_cwmax'] = 10
-            options['wmm_ac_bk_aifs'] = 7
-            options['wmm_ac_bk_txop_limit'] = 0
-            options['wmm_ac_bk_acm'] = 0
-            options['wmm_ac_be_aifs'] = 3
-            options['wmm_ac_be_cwmin'] = 5
-            options['wmm_ac_be_cwmax'] = 7
-            options['wmm_ac_be_txop_limit'] = 0
-            options['wmm_ac_be_acm'] = 0
-            options['wmm_ac_vi_aifs'] = 2
-            options['wmm_ac_vi_cwmin'] = 4
-            options['wmm_ac_vi_cwmax'] = 5
-            options['wmm_ac_vi_txop_limit'] = 188
-            options['wmm_ac_vi_acm'] = 0
-            options['wmm_ac_vo_aifs'] = 2
-            options['wmm_ac_vo_cwmin'] = 3
-            options['wmm_ac_vo_cwmax'] = 4
-            options['wmm_ac_vo_txop_limit'] = 47
-            options['wmm_ac_vo_acm'] = 0
-            options['require_ht'] = False if('--require-ht' not in sys.argv) else options['require_ht']
-            options['require_vht'] = False if('--require-vht' not in sys.argv) else options['require_vht']
-        elif(options['80211_preset_profile'] == 'wifi4'):
-            options['hw_mode'] = 'a' if options['freq'] == 5 else 'g'
-            options['freq'] = 5 if options['freq'] == 5 else 2
-            options['ieee80211n'] = 1
-            options['ieee80211ac'] = 0
-            options['wmm_enabled'] = False if('--wmm-enabled' not in sys.argv) else options['wmm_enabled']
-            options['wmm_ac_bk_cwmin'] = 5
-            options['wmm_ac_bk_cwmax'] = 10
-            options['wmm_ac_bk_aifs'] = 7
-            options['wmm_ac_bk_txop_limit'] = 0
-            options['wmm_ac_bk_acm'] = 0
-            options['wmm_ac_be_aifs'] = 3
-            options['wmm_ac_be_cwmin'] = 5
-            options['wmm_ac_be_cwmax'] = 7
-            options['wmm_ac_be_txop_limit'] = 0
-            options['wmm_ac_be_acm'] = 0
-            options['wmm_ac_vi_aifs'] = 2
-            options['wmm_ac_vi_cwmin'] = 4
-            options['wmm_ac_vi_cwmax'] = 5
-            options['wmm_ac_vi_txop_limit'] = 188
-            options['wmm_ac_vi_acm'] = 0
-            options['wmm_ac_vo_aifs'] = 2
-            options['wmm_ac_vo_cwmin'] = 3
-            options['wmm_ac_vo_cwmax'] = 4
-            options['wmm_ac_vo_txop_limit'] = 47
-            options['wmm_ac_vo_acm'] = 0
-            options['require_ht'] = True
-            options['require_vht'] = False if('--require-vht' not in sys.argv) else options['require_vht']
-            options['ht_rx_stbc1'] = False if('--enable-rx-stbc1' not in sys.argv) else options['ht_rx_stbc1']
-            options['ht_msdu7935'] = False if('--enable-msdu7935' not in sys.argv) else options['ht_msdu7935']
-            options['ht_dsss_cck'] = False if('--enable-cck' not in sys.argv) else options['ht_dsss_cck']
-        elif(options['80211_preset_profile'] == 'wifi5'):
-            options['hw_mode'] = 'a'
-            options['freq'] = 5
-            options['ieee80211n'] = 1
-            options['ieee80211ac'] = 1
-            options['wmm_enabled'] = True
-            options['wmm_ac_bk_cwmin'] = 5
-            options['wmm_ac_bk_cwmax'] = 10
-            options['wmm_ac_bk_aifs'] = 7
-            options['wmm_ac_bk_txop_limit'] = 0
-            options['wmm_ac_bk_acm'] = 0
-            options['wmm_ac_be_aifs'] = 3
-            options['wmm_ac_be_cwmin'] = 5
-            options['wmm_ac_be_cwmax'] = 7
-            options['wmm_ac_be_txop_limit'] = 0
-            options['wmm_ac_be_acm'] = 0
-            options['wmm_ac_vi_aifs'] = 2
-            options['wmm_ac_vi_cwmin'] = 4
-            options['wmm_ac_vi_cwmax'] = 5
-            options['wmm_ac_vi_txop_limit'] = 188
-            options['wmm_ac_vi_acm'] = 0
-            options['wmm_ac_vo_aifs'] = 2
-            options['wmm_ac_vo_cwmin'] = 3
-            options['wmm_ac_vo_cwmax'] = 4
-            options['wmm_ac_vo_txop_limit'] = 47
-            options['wmm_ac_vo_acm'] = 0
-            options['require_ht'] = True
-            options['require_vht'] = True
-            options['ht_rx_stbc1'] = False if('--enable-rx-stbc1' not in sys.argv) else options['ht_rx_stbc1']
-            options['ht_msdu7935'] = False if('--enable-msdu7935' not in sys.argv) else options['ht_msdu7935']
-            options['ht_dsss_cck'] = False if('--enable-cck' not in sys.argv) else options['ht_dsss_cck']
-        elif(options['80211_preset_profile'] == 'wifi6'):
+        if(options['80211_preset_profile'] in profiles.NOT_IMPLEMENTED):
             parser.error("[!] Functionality not implemented yet!")
-        else:
+        elif(not profiles.apply_profile(options, options['80211_preset_profile'])):
             parser.error("[!] Unknown 802.11 preset profile specified")
 
     # Attack Configurations
