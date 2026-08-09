@@ -104,6 +104,18 @@ def block_channels_6ghz(channel, chwidth):
     return [channel]      # 20 MHz
 
 
+def _iw_phy_info(interface):
+    '''Return the `iw phy <phy> info` text for the interface's wiphy, or None.'''
+    try:
+        info = subprocess.check_output(['iw', 'dev', interface, 'info'], stderr=subprocess.DEVNULL).decode()
+        m = re.search(r'wiphy\s+(\d+)', info)
+        if not m:
+            return None
+        return subprocess.check_output(['iw', 'phy', 'phy' + m.group(1), 'info'], stderr=subprocess.DEVNULL).decode()
+    except Exception:
+        return None
+
+
 def enabled_6ghz_channels(interface):
     '''
     Return the list of 6 GHz 20 MHz channels the driver currently permits for AP
@@ -111,13 +123,8 @@ def enabled_6ghz_channels(interface):
     `iw phy` for the interface's wiphy. Returns None if it cannot be determined,
     so callers fall back to a best-effort static list.
     '''
-    try:
-        info = subprocess.check_output(['iw', 'dev', interface, 'info'], stderr=subprocess.DEVNULL).decode()
-        m = re.search(r'wiphy\s+(\d+)', info)
-        if not m:
-            return None
-        out = subprocess.check_output(['iw', 'phy', 'phy' + m.group(1), 'info'], stderr=subprocess.DEVNULL).decode()
-    except Exception:
+    out = _iw_phy_info(interface)
+    if out is None:
         return None
     enabled = []
     for line in out.splitlines():
@@ -129,6 +136,55 @@ def enabled_6ghz_channels(interface):
         if (5925.0 <= freq <= 7125.0) and ('disabled' not in line):
             enabled.append(chan)
     return enabled or None
+
+
+def enabled_5ghz_channels(interface):
+    '''
+    Return (non_dfs, dfs) lists of 5 GHz channels the driver permits for AP use
+    in the active regulatory domain, parsed from `iw phy`. Non-DFS channels are
+    usable directly; DFS channels ('radar detection') require ieee80211h. Channels
+    that are 'disabled', or 'no IR' without radar (cannot start a BSS), are
+    excluded. Returns (None, None) if it cannot be determined, so callers fall
+    back to a best-effort static list.
+    '''
+    out = _iw_phy_info(interface)
+    if out is None:
+        return (None, None)
+    non_dfs, dfs = [], []
+    for line in out.splitlines():
+        mm = re.search(r'\*\s+([0-9.]+)\s+MHz\s+\[(\d+)\]', line)
+        if not mm:
+            continue
+        freq = float(mm.group(1))
+        chan = int(mm.group(2))
+        if not (5150.0 <= freq <= 5895.0):
+            continue
+        if 'disabled' in line:
+            continue
+        if 'radar detection' in line:
+            dfs.append(chan)
+        elif 'no IR' in line:
+            continue
+        else:
+            non_dfs.append(chan)
+    if (not non_dfs) and (not dfs):
+        return (None, None)
+    return (non_dfs, dfs)
+
+
+def block_channels_5ghz(channel, chwidth):
+    '''The 20 MHz channels making up the 5 GHz wide block containing `channel`
+    (so the whole block can be checked as regulatory-enabled). 20/40 MHz treat
+    the channel individually.'''
+    if chwidth == 1:      # 80 MHz
+        for chans in _VHT80_CENTER:
+            if channel in chans:
+                return list(chans)
+    elif chwidth == 2:    # 160 MHz
+        for chans in _VHT160_CENTER:
+            if channel in chans:
+                return list(chans)
+    return [channel]
 
 
 class optionsClass():
@@ -250,27 +306,52 @@ class optionsClass():
                 self.channel = random.choice(candidates)
                 print('[-]   Channel {} was selected'.format(self.channel))
             return
+        if((self.hw_mode == 'a') or (self.freq == 5)):
+            '''
+            5 GHz: like 6 GHz, usable channels are regulatory-domain dependent
+            and DFS (UNII-2) channels need radar detection (--ieee80211h). Set
+            the regdomain to --country first, then filter against the channels
+            the driver actually permits (falling back to a static list if that
+            can't be determined). Non-DFS default; DFS added only with 802.11h.
+            '''
+            cc = self.country_code.split('country_code=')[-1].strip()
+            if(cc and cc != '00'):
+                try:
+                    subprocess.call(['iw', 'reg', 'set', cc], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+                    time.sleep(0.5)
+                except Exception:
+                    pass
+            non_dfs, dfs = enabled_5ghz_channels(self.interface)
+            driver_known = non_dfs is not None
+            if(not driver_known):
+                non_dfs = [36, 40, 44, 48, 149, 153, 157, 161]
+                dfs = [52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140]
+            pool = (non_dfs + dfs) if self.ieee80211h else non_dfs
+            pool_set = set(pool)
+            # Only apply wide-block validation for VHT/HE widths (VHT/HE off -> 20 MHz).
+            width = self.vht_oper_chwidth if self.ieee80211ac else 0
+            if(self.channel != 0):
+                if(self.channel < 13):
+                    self.parser.error("[!] The provided channel {} can not be used with Radio Band 5.0GHz.".format(self.channel))
+                if(driver_known and any(x not in pool_set for x in block_channels_5ghz(self.channel, width))):
+                    usable = [c for c in pool if all(x in pool_set for x in block_channels_5ghz(c, width))]
+                    self.parser.error("[!] 5 GHz channel {} is not permitted for AP use in the current regulatory domain{} at this width. Permitted channels: {}".format(self.channel, '' if self.ieee80211h else ' without DFS (enable --ieee80211d --ieee80211h)', usable))
+            if((self.channel == 0) and (self.channel_randomiser)):
+                import random
+                print('[-] Randomised channel selection is superseding ACS')
+                candidates = [c for c in pool if all(x in pool_set for x in block_channels_5ghz(c, width))]
+                if(not candidates):
+                    candidates = pool if pool else [36]
+                self.channel = random.choice(candidates)
+                print('[-]   Channel {} was selected'.format(self.channel))
+            return
         if((self.freq == 2) and (self.channel != 0)):
             if(self.channel > 13):
                 self.parser.error("[!] The provided channel {} can not be used with Radio Band 2.4GHz.".format(self.channel))
-        if((self.hw_mode == 'a' or self.freq == 5) and (self.channel != 0)):
-            if(self.channel < 13):
-                self.parser.error("[!] The provided channel {} can not be used with Radio Band 5.0GHz.".format(self.channel))
-        if(self.channel == 0 and self.channel_randomiser):
+        if((self.channel == 0) and (self.channel_randomiser)):
             import random
             print('[-] Randomised channel selection is superseding ACS')
-            if((self.hw_mode == 'a' or self.freq == 5)):
-                '''
-                Non-DFS 5 GHz channels (UNII-1 + UNII-3) usable for AP mode
-                without radar detection. DFS channels (UNII-2) are only added
-                when DFS/802.11h is enabled, otherwise hostapd rejects them
-                ("Primary frequency not allowed ... RADAR").
-                '''
-                non_dfs = [36, 40, 44, 48, 149, 153, 157, 161]
-                dfs = [52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140]
-                self.channel = random.choice(non_dfs + dfs if self.ieee80211h else non_dfs)
-            else:
-                self.channel = random.randrange(1,11)
+            self.channel = random.randrange(1,11)
             print('[-]   Channel {} was selected'.format(self.channel))
 
     @classmethod
