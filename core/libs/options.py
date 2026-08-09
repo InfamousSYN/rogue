@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 from argparse import *
 import sys
+import subprocess
+import time
 import config
 import re
 from core.libs import profiles
@@ -90,6 +92,45 @@ def center_freq_seg0_6ghz(channel, chwidth):
     return channel        # 20 MHz
 
 
+def block_channels_6ghz(channel, chwidth):
+    '''All 20 MHz channel indices that make up the wide block containing
+    `channel` (used to check the whole block is regulatory-enabled).'''
+    if chwidth == 1:      # 80 MHz -> 4 channels
+        start = 1 + ((channel - 1) // 16) * 16
+        return [start + 4 * i for i in range(4)]
+    if chwidth == 2:      # 160 MHz -> 8 channels
+        start = 1 + ((channel - 1) // 32) * 32
+        return [start + 4 * i for i in range(8)]
+    return [channel]      # 20 MHz
+
+
+def enabled_6ghz_channels(interface):
+    '''
+    Return the list of 6 GHz 20 MHz channels the driver currently permits for AP
+    use (i.e. not flagged 'disabled' in the active regulatory domain), by parsing
+    `iw phy` for the interface's wiphy. Returns None if it cannot be determined,
+    so callers fall back to a best-effort static list.
+    '''
+    try:
+        info = subprocess.check_output(['iw', 'dev', interface, 'info'], stderr=subprocess.DEVNULL).decode()
+        m = re.search(r'wiphy\s+(\d+)', info)
+        if not m:
+            return None
+        out = subprocess.check_output(['iw', 'phy', 'phy' + m.group(1), 'info'], stderr=subprocess.DEVNULL).decode()
+    except Exception:
+        return None
+    enabled = []
+    for line in out.splitlines():
+        mm = re.search(r'\*\s+([0-9.]+)\s+MHz\s+\[(\d+)\]', line)
+        if not mm:
+            continue
+        freq = float(mm.group(1))
+        chan = int(mm.group(2))
+        if (5925.0 <= freq <= 7125.0) and ('disabled' not in line):
+            enabled.append(chan)
+    return enabled or None
+
+
 class optionsClass():
 
     @classmethod
@@ -172,15 +213,41 @@ class optionsClass():
             '''
             6 GHz: channel numbers overlap 2.4/5 GHz, so this band is handled
             separately (and before the 5 GHz check below, which keys on
-            hw_mode == 'a').
+            hw_mode == 'a'). Usable channels are regulatory-domain dependent, so
+            filter against what the driver actually permits for AP use.
+
+            Bug:
+            hostapd applies --country only at launch, but we must choose a
+            channel that is legal in that domain NOW.
             '''
-            if((self.channel != 0) and (not is_valid_6ghz_channel(self.channel))):
-                self.parser.error("[!] The provided channel {} is not a valid 6 GHz channel (1,5,9,...,233).".format(self.channel))
+            cc = self.country_code.split('country_code=')[-1].strip()
+            if(cc and cc != '00'):
+                try:
+                    subprocess.call(['iw', 'reg', 'set', cc], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+                    time.sleep(0.5)
+                except Exception:
+                    pass
+            enabled = enabled_6ghz_channels(self.interface)
+            width = self.vht_oper_chwidth
+            if(enabled is not None):
+                usable_psc = [c for c in _PSC_6GHZ if all(x in enabled for x in block_channels_6ghz(c, width))]
+            else:
+                '''
+                Could not determine the domain's channels: fall back to the
+                low PSC channels legal in essentially all 6E regions rather
+                than the full list (which includes regionally-banned channels).
+                '''
+                usable_psc = [5, 21, 37, 53, 69, 85]
+            if(self.channel != 0):
+                if(not is_valid_6ghz_channel(self.channel)):
+                    self.parser.error("[!] The provided channel {} is not a valid 6 GHz channel (1,5,9,...,233).".format(self.channel))
+                if((enabled is not None) and any(x not in enabled for x in block_channels_6ghz(self.channel, width))):
+                    self.parser.error("[!] 6 GHz channel {} is not permitted for AP use in the current regulatory domain at this width. Permitted PSC channels: {}".format(self.channel, usable_psc or '(none - try --vht-width 0 or a different --country)'))
             if((self.channel == 0) and (self.channel_randomiser)):
                 import random
                 print('[-] Randomised channel selection is superseding ACS')
-                # 6 GHz Preferred Scanning Channels (all 80 MHz-block aligned).
-                self.channel = random.choice(_PSC_6GHZ)
+                candidates = usable_psc if usable_psc else list(_PSC_6GHZ)
+                self.channel = random.choice(candidates)
                 print('[-]   Channel {} was selected'.format(self.channel))
             return
         if((self.freq == 2) and (self.channel != 0)):
@@ -331,6 +398,7 @@ class optionsClass():
 
     @classmethod
     def check_hardware_mode(self):
+        self.ieee80211be = 1 if self.hw_mode == 'be' else 0
         self.ieee80211ax = 1 if self.hw_mode == 'ax' else 0
         self.ieee80211n = 1 if self.hw_mode == 'n' else 0
         self.ieee80211n = 1 if self.hw_mode == 'ac' else 0
@@ -541,21 +609,23 @@ class optionsClass():
     #
 
     @classmethod
-    def check_6ghz(self):
+    def check_wpa3_required(self):
         '''
-        6 GHz forbids open and WPA2 and mandates WPA3/OWE + PMF. Map the
-        requested auth to a 6 GHz-legal equivalent before key-mgmt/PMF are
-        computed. Runs before check_auth so the mapped auth takes effect.
+        Both the 6 GHz band AND Wi-Fi 7 (EHT) forbid open/WPA2 and mandate
+        WPA3/OWE + PMF (EHT on every band, not just 6 GHz). Map the requested
+        auth to a legal equivalent before key-mgmt/PMF are computed. Runs before
+        check_auth so the mapped auth takes effect.
         '''
-        if(self.freq != 6):
+        if((self.freq != 6) and (self.ieee80211be != 1)):
             return
+        reason = '6 GHz' if self.freq == 6 else 'Wi-Fi 7 (EHT)'
         if(self.auth == 'wep'):
-            self.parser.error("[!] WEP is not permitted on the 6 GHz band; use WPA3 (--wpa 3) or OWE (--auth owe).")
+            self.parser.error("[!] WEP is not permitted with {}; use WPA3 (--wpa 3) or OWE (--auth owe).".format(reason))
         if(self.auth == 'open'):
-            print("[-] 6 GHz forbids open networks; using OWE (Enhanced Open).")
+            print("[-] {} forbids open networks; using OWE (Enhanced Open).".format(reason))
             self.auth = 'owe'
         elif((self.auth in ('wpa-personal', 'wpa-enterprise')) and (self.wpa < 3)):
-            print("[-] 6 GHz requires WPA3; upgrading --wpa to 3.")
+            print("[-] {} requires WPA3; upgrading --wpa to 3.".format(reason))
             self.wpa = 3
 
     @classmethod
@@ -578,11 +648,19 @@ class optionsClass():
         is left commented.
         '''
         if((self.freq == 6) and (self.channel)):
-            width = self.vht_oper_chwidth
-            seg0 = center_freq_seg0_6ghz(self.channel, width)
-            self.he_operations = 'he_oper_chwidth={}\r\nhe_oper_centr_freq_seg0_idx={}'.format(width, seg0)
+            '''
+            On 6 GHz the width is conveyed by op_class; he_oper_chwidth is
+            ignored, so only the centre index is needed. EHT (ieee80211be)
+            additionally needs its OWN operation centre or the kernel rejects
+            the channel definition ("invalid channel definition").
+            '''
+            seg0 = center_freq_seg0_6ghz(self.channel, self.vht_oper_chwidth)
+            lines = ['he_oper_centr_freq_seg0_idx={}'.format(seg0)]
+            if(self.ieee80211be == 1):
+                lines.append('eht_oper_centr_freq_seg0_idx={}'.format(seg0))
+            self.he_operations = '\r\n'.join(lines)
         else:
-            self.he_operations = '#he_oper_chwidth=1\r\n#he_oper_centr_freq_seg0_idx=42'
+            self.he_operations = '#he_oper_centr_freq_seg0_idx=42'
 
     #
     ## IEEE 802.1x Configuration
@@ -726,7 +804,7 @@ def set_options():
     ieee80211_config.add_argument('-p', '--preset-profile',
                     dest='80211_preset_profile',
                     type=str,
-                    choices=['wifi1','wifi2','wifi3','wifi4','wifi5','wifi6'],
+                    choices=['wifi1','wifi2','wifi3','wifi4','wifi5','wifi6','wifi7'],
                     default=None,
                     help='Use a preset 802.11 profile')
 
@@ -1537,7 +1615,7 @@ def set_options():
     o.set_wmm_enabled()
     o.set_ap_isolate()
     o.detect_manual_auth()
-    o.check_6ghz()
+    o.check_wpa3_required()
     o.check_auth()
 
     # WPA/RSN key management, PMF and SAE (order matters: set_wpa collapses the

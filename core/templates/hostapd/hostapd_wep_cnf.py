@@ -665,6 +665,11 @@ ieee80211ac=%d
 # directives are documented in the IEEE 802.11ax section below.
 ieee80211ax=%d
 
+# ieee80211be: Whether IEEE 802.11be (EHT / Wi-Fi 7) is enabled (0/1).
+# Managed by rogue (--preset-profile wifi7). Builds on HE (ieee80211ax=1) and,
+# on every band, requires WPA3/OWE + PMF.
+ieee80211be=%d
+
 # op_class: 6 GHz operating class (disambiguates the 6 GHz band and encodes the
 # channel width). Managed by rogue; commented out on 2.4/5 GHz.
 %s

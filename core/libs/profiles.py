@@ -143,6 +143,23 @@ PROFILES = {
         'ht_msdu7935': Overridable('--enable-msdu7935', False),
         'ht_dsss_cck': Overridable('--enable-cck', False),
     },
+    # 802.11be (Extremely High Throughput / Wi-Fi 7)
+    #
+    # Same band-derived PHY as wifi6 plus EHT (ieee80211be=1). EHT builds on HE,
+    # so ieee80211ax is on too. EHT mandates WPA3/OWE + PMF on *every* band, which
+    # optionsClass.check_wpa3_required() enforces. (320 MHz / MLO are future work;
+    # this ships EHT up to the per-band HE width, e.g. 80/160 MHz.)
+    'wifi7': {
+        'band_default_hw_mode': True,
+        'ieee80211ax': 1,
+        'ieee80211be': 1,
+        'wmm_enabled': True,
+        'require_ht': Overridable('--require-ht', False),
+        'require_vht': Overridable('--require-vht', False),
+        'ht_rx_stbc1': Overridable('--enable-rx-stbc1', False),
+        'ht_msdu7935': Overridable('--enable-msdu7935', False),
+        'ht_dsss_cck': Overridable('--enable-cck', False),
+    },
 }
 
 
@@ -171,6 +188,7 @@ def apply_profile(options, name, argv=None):
     rendering never hits a KeyError; profiles that enable it override below.
     '''
     options.setdefault('ieee80211ax', 0)
+    options.setdefault('ieee80211be', 0)
 
     # Shared WMM/EDCA parameter block (identical across every profile).
     options.update(WMM_AC_DEFAULTS)

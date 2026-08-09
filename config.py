@@ -3,7 +3,7 @@ import os
 import argparse
 
 # application version
-__version__ = "3.4.0"
+__version__ = "3.5.0"
 
 # application site
 __location__ = "https://rogue.infamoussyn.com/"

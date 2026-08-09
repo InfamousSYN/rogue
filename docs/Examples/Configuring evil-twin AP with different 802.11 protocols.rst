@@ -72,9 +72,24 @@ The ``wifi6`` profile defaults to the 5GHz band. Use ``--freq 2`` to run on 2.4G
 802.11be (wifi 7)
 ^^^^^^^^^^^^^^^^
 
-.. code-block:: text
+The ``wifi7`` profile enables EHT (802.11be) on top of HE. It defaults to the
+5 GHz band; use ``--freq 2`` or ``--freq 6`` to change band.
 
-   coming soon...
+.. code-block:: bash
+
+   sudo python3 /opt/rogue/rogue.py -i wlan0 --auth open --preset-profile wifi7 --channel-randomiser --country AU
+
+.. code-block:: bash
+
+   sudo python3 /opt/rogue/rogue.py -i wlan0 --auth open --preset-profile wifi7 --freq 6 --channel-randomiser --country AU
+
+.. note::
+
+   Wi-Fi 7 (EHT) mandates WPA3/OWE + PMF on **every** band (not just 6 GHz), so
+   rogue auto-maps the requested auth exactly as it does on 6 GHz: ``open`` ->
+   OWE, ``wpa-personal`` / ``wpa-enterprise`` -> WPA3, and ``wep`` is rejected.
+   320 MHz and multi-link operation (MLO) are not yet supported; EHT runs at the
+   per-band HE width (e.g. 80/160 MHz).
 
 Manual 802.11 configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
