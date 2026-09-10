@@ -52,11 +52,11 @@ def set_options():
         return 1, 0
 
 def getHash(fline):
-    regex = re.compile('.*(?:\$NETNTLM\$).*')
+    regex = re.compile('.*(?:\\$NETNTLM\\$).*')
     return re.search(regex, fline)
 
 def getUser(fline, user_list):
-    regex = re.compile('.*(?:\:\$)')
+    regex = re.compile('.*(?:\\:\\$)')
     username = re.search(regex, fline).group()
     if username in user_list:
         return False, user_list
@@ -66,7 +66,7 @@ def getUser(fline, user_list):
 
 def convert2NetNTLMv1(hash_list):
     new_hash_list = []
-    regex = re.compile('(.*?):(\$.*?)\$(.*?)\$(.*)')
+    regex = re.compile('(.*?):(\\$.*?)\\$(.*?)\\$(.*)')
     for hash in hash_list:
         new_hash_list.append(regex.sub(r'\1::::\4:\3', hash).rstrip('\n\n'))
     return new_hash_list
@@ -91,7 +91,7 @@ if __name__ == '__main__':
         hash_list = []
         user_list = []
         file = open(opts['filename'], 'r')
-        flist = re.split('\s+', file.read())
+        flist = re.split('\\s+', file.read())
         file.close()
         if(opts['mode'] == 'single'):
             for fline in flist:

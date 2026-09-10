@@ -75,7 +75,7 @@ CaptureMultipleCredentials = On
 
 ; If set to On, we will write to file all hashes captured from the same host.
 ; In this case, Responder will log from 172.16.0.12 all user hashes: domain\toto,
-; domain\popo, domain\zozo. Recommended value: On, capture everything.
+; domain\\popo, domain\\zozo. Recommended value: On, capture everything.
 CaptureMultipleHashFromSameHost = On
 
 [HTTP Server]
@@ -190,7 +190,7 @@ CaptureMultipleCredentials = On
 
 ; If set to On, we will write to file all hashes captured from the same host.
 ; In this case, Responder will log from 172.16.0.12 all user hashes: domain\toto,
-; domain\popo, domain\zozo. Recommended value: On, capture everything.
+; domain\\popo, domain\\zozo. Recommended value: On, capture everything.
 CaptureMultipleHashFromSameHost = On
 
 [HTTP Server]
